@@ -43,12 +43,17 @@ export const useVoiceCorrection = (targetVerses = [], onComplete) => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Normalize Arabic text to ensure consistent STT vs Script comparisons
+  // Normalize Arabic text strictly for comparison (STT usually returns simplified text)
   const normalize = useCallback((str) => {
     if (!str) return "";
     return str
+      // 1. Remove all Quranic symbols, diacritics, and small characters
       .replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E8\u06EA-\u06ED]/g, "")
-      // Standardize Alef, Yaa, Hamza, and Teh Marbuta variations
+      // 2. Standardize Alef variations (أ, إ, آ -> ا)
+      .replace(/[أإآ]/g, "ا")
+      // 3. Standardize Alef Maqsura and Ya (ى -> ي)
+      .replace(/ى/g, "ي")
+      // 4. Standardize Teh Marbuta (ة -> ه)
       .replace(/ة/g, "ه")
       .replace(/\s+/g, " ")
       .trim();
@@ -73,14 +78,15 @@ export const useVoiceCorrection = (targetVerses = [], onComplete) => {
     
     setMatches(prev => {
       const updated = [...prev];
-      const threshold = 0.8; // 80% Similarity Threshold
+      const threshold = 0.75; // Balanced Similarity Threshold (was 0.8)
       let localIndex = currentIndex;
       
       speechWords.forEach(sWord => {
         if (localIndex >= updated.length || errorDetected) return;
 
-        // 1. Try to match the CURRENT word
-        const currentSim = getSimilarity(updated[localIndex].normalized, sWord);
+        // Visual match for debugging
+        const targetWordNormalized = updated[localIndex].normalized;
+        const currentSim = getSimilarity(targetWordNormalized, sWord);
         
         if (currentSim >= threshold) {
             updated[localIndex].status = 'correct';
