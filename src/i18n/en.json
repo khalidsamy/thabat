@@ -65,7 +65,8 @@
     "golden_rule_msg": "Don't recite what you learned today to your teacher yet! Test yourself every 8 hours, and recite tomorrow for long-term mastery."
   },
   "chart": {
-    "title": "Memorization History"
+    "title": "Memorization History",
+    "no_data": "No history records yet. Start memorizing to track your progress!"
   },
   "achievements": {
     "title": "Achievements & Badges",

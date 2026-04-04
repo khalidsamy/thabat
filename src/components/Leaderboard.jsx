@@ -70,7 +70,7 @@ const Leaderboard = () => {
 
       <div className="flow-root overflow-y-auto pe-2 custom-scrollbar">
         <ul className="-my-5 divide-y divide-gray-100">
-          {leaderboard.map((entry, index) => {
+          {(leaderboard || []).map((entry, index) => {
             // Evaluates securely against the context
             const isTargetUser = user && user.name === entry.name; 
             

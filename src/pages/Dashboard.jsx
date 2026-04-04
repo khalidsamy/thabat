@@ -267,10 +267,10 @@ const Dashboard = () => {
                 {t('auth.welcome_back', { name: user?.name || '' })}
                 </h1>
                 <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-sm border border-white/10 flex items-center gap-2 ${
-                    getUserRank(progress?.totalMemorized).bgColor
-                } ${getUserRank(progress?.totalMemorized).color}`}>
-                    <span className="text-sm">{getUserRank(progress?.totalMemorized).icon}</span>
-                    {t(`ranks.${getUserRank(progress?.totalMemorized).id}`)}
+                    getUserRank(progress?.totalMemorized || 0).bgColor
+                } ${getUserRank(progress?.totalMemorized || 0).color}`}>
+                    <span className="text-sm">{getUserRank(progress?.totalMemorized || 0).icon}</span>
+                    {t(`ranks.${getUserRank(progress?.totalMemorized || 0).id}`)}
                 </div>
             </div>
             <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400 mt-1 opacity-90">
@@ -390,7 +390,7 @@ const Dashboard = () => {
             <div className="h-px flex-1 bg-gradient-to-r from-amber-500/20 to-transparent ms-4"></div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {getDailyTasks(progress?.totalMemorized, progress?.currentPage).map((task) => (
+            {(getDailyTasks(progress?.totalMemorized || 0, progress?.currentPage || 1) || []).map((task) => (
               <div key={task.id} className="bg-card dark:bg-card/50 border border-gray-100 dark:border-white/5 rounded-2xl p-5 hover:border-amber-500/30 transition-colors group">
                 <div className="flex items-center gap-4 mb-3">
                   <div className="p-2.5 bg-amber-500/10 rounded-xl text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">

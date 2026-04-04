@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 
 const ProgressChart = ({ refreshTrigger }) => {
+  const { t } = useTranslation();
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,7 +20,8 @@ const ProgressChart = ({ refreshTrigger }) => {
         
         if (response.data.success) {
           // Format date for better visual display on X-Axis and tooltips
-          const formattedData = response.data.chart.map(item => {
+          const chartData = response.data.chart || [];
+          const formattedData = chartData.map(item => {
             const dateObj = new Date(item.date);
             return {
               ...item,
@@ -60,51 +63,62 @@ const ProgressChart = ({ refreshTrigger }) => {
 
   // The AreaChart visually matches modern dashboards (Apple Health, Premium trackers)
   return (
-    <div className="bg-card rounded-xl border border-gray-100 p-6 shadow-sm h-full flex flex-col">
-      <h3 className="text-lg font-medium tracking-tight text-foreground mb-6">Memorization History</h3>
+    <div className="bg-card rounded-xl border border-gray-100 p-6 shadow-sm h-full flex flex-col min-h-[300px]">
+      <h3 className="text-lg font-medium tracking-tight text-foreground mb-6">{t('chart.title')}</h3>
       
-      <div className="flex-1 w-full min-h-[300px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart
-            data={data}
-            margin={{ top: 5, right: 0, left: -20, bottom: 0 }}
-          >
-            <defs>
-              <linearGradient id="colorPages" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/> {/* Emerald 500 equivalent */}
-                <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-            <XAxis 
-              dataKey="displayDate" 
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 12, fill: '#64748b' }}
-              dy={10}
-            />
-            <YAxis 
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 12, fill: '#64748b' }}
-              allowDecimals={false}
-            />
-            <Tooltip 
-              contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}
-              cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '3 3' }}
-            />
-            <Area 
-              type="monotone" 
-              dataKey="pages" 
-              name="Pages"
-              stroke="#10b981" 
-              strokeWidth={3}
-              fillOpacity={1} 
-              fill="url(#colorPages)" 
-              activeDot={{ r: 6, strokeWidth: 0, fill: '#10b981' }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+      <div className="flex-1 w-full relative">
+        {data.length > 0 ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              data={data}
+              margin={{ top: 5, right: 0, left: -20, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id="colorPages" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/> {/* Emerald 500 equivalent */}
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+              <XAxis 
+                dataKey="displayDate" 
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 12, fill: '#64748b' }}
+                dy={10}
+              />
+              <YAxis 
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 12, fill: '#64748b' }}
+                allowDecimals={false}
+              />
+              <Tooltip 
+                contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}
+                cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '3 3' }}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="pages" 
+                name={t('dashboard.pages')}
+                stroke="#10b981" 
+                strokeWidth={3}
+                fillOpacity={1} 
+                fill="url(#colorPages)" 
+                activeDot={{ r: 6, strokeWidth: 0, fill: '#10b981' }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
+            <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mb-4">
+              <AreaChart className="h-8 w-8 text-emerald-500 opacity-20" />
+            </div>
+            <p className="text-sm font-medium text-slate-400 max-w-[200px]">
+              {t('chart.no_data')}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

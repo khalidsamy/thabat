@@ -65,7 +65,7 @@ const Achievements = ({ refreshTrigger }) => {
       </div>
       
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        {achievements.map((ach) => (
+        {(achievements || []).map((ach) => (
           <div 
             key={ach.title}
             className={`relative flex flex-col items-center justify-center p-4 rounded-xl border transition-all duration-300
