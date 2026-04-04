@@ -12,12 +12,12 @@ import confetti from 'canvas-confetti';
 import HeartMessage from '../components/HeartMessage';
 import BottomNav from '../components/BottomNav';
 
-// Tabs
-import HomeTab from '../components/tabs/HomeTab';
-import ProgressTab from '../components/tabs/ProgressTab';
-import ReciteTab from '../components/tabs/ReciteTab';
-import ReviewTab from '../components/tabs/ReviewTab';
-import CommunityTab from '../components/tabs/CommunityTab';
+// Sub-pages (Adaptive)
+import Home from './dashboard/Home';
+import Progress from './dashboard/Progress';
+import Recite from './dashboard/Recite';
+import Community from './dashboard/Community';
+import Review from './dashboard/Review';
 
 const Dashboard = () => {
   const { t, i18n } = useTranslation();
@@ -184,15 +184,15 @@ const Dashboard = () => {
         {/* Adaptive View: Grid on Desktop, Tabbed on Mobile */}
         <div className="hidden lg:grid grid-cols-3 gap-8 mb-12">
             <div className="col-span-2 space-y-8">
-                <Home /> {/* Assuming unified view components use shared context inside */}
+                <Home {...sharedProps} />
                 <div className="grid grid-cols-2 gap-8">
-                    <Recite />
-                    <Progress />
+                    <Recite {...sharedProps} />
+                    <Progress {...sharedProps} />
                 </div>
             </div>
             <div className="col-span-1 space-y-8">
-                <Review />
-                <Community />
+                <Review {...sharedProps} />
+                <Community {...sharedProps} />
             </div>
         </div>
 

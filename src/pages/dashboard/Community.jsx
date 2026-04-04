@@ -7,9 +7,10 @@ import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
 import Button from '../../components/Button';
 
-const Community = () => {
+const Community = (props) => {
   const { t } = useTranslation();
-  const { progress, itemVariants } = useOutletContext();
+  const context = useOutletContext() || {};
+  const { progress, itemVariants } = { ...context, ...props };
   const { showSuccess, showError } = useToast();
   const [reflections, setReflections] = useState([]);
   const [newReflection, setNewReflection] = useState('');

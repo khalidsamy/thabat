@@ -11,9 +11,10 @@ import { AuthContext } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import api from '../../services/api';
 
-const Recite = () => {
+const Recite = (props) => {
   const { t } = useTranslation();
-  const { progress, user, pagesInput, setPagesInput, handleUpdateSubmit, isUpdating, handleSunnahToggle, isTogglingSunnah, handleVoiceComplete, itemVariants } = useOutletContext();
+  const context = useOutletContext() || {};
+  const { progress, user, pagesInput, setPagesInput, handleUpdateSubmit, isUpdating, handleSunnahToggle, isTogglingSunnah, handleVoiceComplete, itemVariants } = { ...context, ...props };
   const { updateUser } = useContext(AuthContext);
   const { showSuccess, showError } = useToast();
   const [isMindMapOpen, setIsMindMapOpen] = useState(false);

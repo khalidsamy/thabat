@@ -8,9 +8,10 @@ import SpiritualCarousel from '../../components/SpiritualCarousel';
 import Leaderboard from '../../components/Leaderboard';
 import RecoveryCard from '../../components/RecoveryCard';
 
-const Home = () => {
+const Home = (props) => {
   const { t } = useTranslation();
-  const { progress, dailyVerse, itemVariants } = useOutletContext();
+  const context = useOutletContext() || {};
+  const { progress, dailyVerse, itemVariants } = { ...context, ...props };
 
   return (
     <div className="space-y-8 pb-32">

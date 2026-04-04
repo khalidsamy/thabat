@@ -8,9 +8,10 @@ import ProgressChart from '../../components/ProgressChart';
 import AchievementBadges from '../../components/AchievementBadges';
 import HifzProgress from '../../components/HifzProgress';
 
-const Progress = () => {
+const Progress = (props) => {
   const { t } = useTranslation();
-  const { progress, refreshKey, itemVariants, oldDailyTarget, newDailyTarget, reviewPace, planLabels } = useOutletContext();
+  const context = useOutletContext() || {};
+  const { progress, refreshKey, itemVariants, oldDailyTarget, newDailyTarget, reviewPace, planLabels } = { ...context, ...props };
 
   return (
     <div className="space-y-8 pb-32">

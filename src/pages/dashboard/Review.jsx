@@ -7,9 +7,10 @@ import { Link } from 'react-router-dom';
 import { getDailyTasks } from '../../utils/PlanManager';
 import MindMapModal from '../../components/MindMapModal';
 
-const Review = () => {
+const Review = (props) => {
   const { t } = useTranslation();
-  const { progress, itemVariants } = useOutletContext();
+  const context = useOutletContext() || {};
+  const { progress, itemVariants } = { ...context, ...props };
   const [isMindMapOpen, setIsMindMapOpen] = useState(false);
 
   const reviewTools = [
