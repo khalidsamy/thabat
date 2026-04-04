@@ -21,7 +21,10 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="hidden md:flex flex-col h-screen sticky top-0 left-0 z-40 bg-card dark:bg-card/50 border-e border-gray-100 dark:border-white/5 transition-all duration-300 w-20 lg:w-64 overflow-y-auto overflow-x-hidden group">
+    <aside 
+      className="hidden md:flex flex-col h-screen sticky top-0 left-0 z-40 bg-card dark:bg-card/50 border-e border-gray-100 dark:border-white/5 transition-all duration-300 w-20 lg:w-64 overflow-y-auto overflow-x-hidden group shrink-0"
+      dir={t('dir') || (i18n.language === 'ar' ? 'rtl' : 'ltr')}
+    >
       <div className="p-6 flex items-center gap-3">
         <div className="w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
           <span className="text-white font-black">ث</span>
@@ -37,6 +40,8 @@ const Sidebar = () => {
             end={item.exact}
             className={({ isActive }) =>
               `relative flex items-center gap-4 p-3 rounded-2xl transition-all duration-300 group/item ${
+                i18n.language === 'ar' ? 'flex-row-reverse' : 'flex-row'
+              } ${
                 isActive 
                   ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
                   : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-600 dark:hover:text-slate-200'
@@ -67,7 +72,9 @@ const Sidebar = () => {
           <NavLink
             key={item.path}
             to={item.path}
-            className="flex items-center gap-4 p-3 rounded-2xl text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-600 dark:hover:text-slate-200 transition-all duration-300"
+            className={`flex items-center gap-4 p-3 rounded-2xl text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-600 dark:hover:text-slate-200 transition-all duration-300 ${
+              i18n.language === 'ar' ? 'flex-row-reverse text-right' : 'flex-row text-left'
+            }`}
           >
             <item.icon className="h-6 w-6 shrink-0" />
             <span className="hidden lg:block text-sm font-bold truncate">
@@ -76,9 +83,16 @@ const Sidebar = () => {
           </NavLink>
         ))}
         
-        <button className="w-full flex items-center gap-4 p-3 rounded-2xl text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 transition-all duration-300">
+        <button 
+          onClick={() => {/* Logout logic */}}
+          className={`w-full flex items-center gap-4 p-3 rounded-2xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 transition-all duration-300 ${
+            i18n.language === 'ar' ? 'flex-row-reverse text-right' : 'flex-row text-left'
+          }`}
+        >
           <LogOut className="h-6 w-6 shrink-0" />
-          <span className="hidden lg:block text-sm font-bold truncate">Log Out</span>
+          <span className="hidden lg:block text-sm font-bold truncate">
+            {t('navbar.logout')}
+          </span>
         </button>
       </div>
     </aside>

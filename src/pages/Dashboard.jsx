@@ -179,38 +179,58 @@ const Dashboard = () => {
     planLabels: { 7: 'المثالي (7 أيام)', 10: 'المتوسط (10 أيام)', 14: 'الحد الأدنى (14 يوماً)' }
   };
 
+  const isDashboardRoot = location.pathname === '/dashboard' || location.pathname === '/dashboard/';
+
   return (
     <div className="dashboard-main relative w-full h-full">
-        {/* Adaptive View: Grid on Desktop, Tabbed on Mobile */}
-        <div className="hidden lg:grid grid-cols-3 gap-8 mb-12">
-            <div className="col-span-2 space-y-8">
-                <Home {...sharedProps} />
-                <div className="grid grid-cols-2 gap-8">
-                    <Recite {...sharedProps} />
-                    <Progress {...sharedProps} />
+        {/* Unified Grid: ONLY for Desktop AND the main overview route */}
+        {isDashboardRoot ? (
+          <>
+            <div className="hidden lg:grid grid-cols-3 gap-8 mb-12">
+                <div className="col-span-2 space-y-8">
+                    <Home {...sharedProps} />
+                    <div className="grid grid-cols-2 gap-8">
+                        <Recite {...sharedProps} />
+                        <Progress {...sharedProps} />
+                    </div>
+                </div>
+                <div className="col-span-1 space-y-8">
+                    <Review {...sharedProps} />
+                    <Community {...sharedProps} />
                 </div>
             </div>
-            <div className="col-span-1 space-y-8">
-                <Review {...sharedProps} />
-                <Community {...sharedProps} />
-            </div>
-        </div>
 
-        {/* Tabbed View for Mobile/Tablet */}
-        <div className="lg:hidden">
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={location.pathname}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    variants={sharedProps.itemVariants}
-                    transition={{ duration: 0.3 }}
-                >
-                    <Outlet context={sharedProps} />
-                </motion.div>
-            </AnimatePresence>
-        </div>
+            {/* Mobile/Tablet Tabbed View for Root */}
+            <div className="lg:hidden">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={location.pathname}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        variants={sharedProps.itemVariants}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <Home {...sharedProps} />
+                    </motion.div>
+                </AnimatePresence>
+            </div>
+          </>
+        ) : (
+          /* Sub-routes (Progress, Recite, etc.) render their specific content via Outlet on ALL devices */
+          <AnimatePresence mode="wait">
+              <motion.div
+                  key={location.pathname}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={sharedProps.itemVariants}
+                  transition={{ duration: 0.3 }}
+              >
+                  <Outlet context={sharedProps} />
+              </motion.div>
+          </AnimatePresence>
+        )}
 
         {/* Floating Heart FAB - Repositioned for Sidebar accessibility */}
         <motion.button

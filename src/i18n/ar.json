@@ -117,7 +117,9 @@
     "community": "المجتمع",
     "errors": "سجل الأخطاء",
     "mutashabihat": "المتشابهات",
-    "review_sessions": "جلسات المراجعة"
+    "review_sessions": "جلسات المراجعة",
+    "profile": "ملفي الشخصي",
+    "settings": "الإعدادات"
   },
   "community": {
     "title": "مجتمع ثبات",

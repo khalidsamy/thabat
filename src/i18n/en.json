@@ -117,7 +117,9 @@
     "community": "Community",
     "errors": "Error Log",
     "mutashabihat": "Mutashabihat",
-    "review_sessions": "Review Sessions"
+    "review_sessions": "Review Sessions",
+    "profile": "My Profile",
+    "settings": "Settings"
   },
   "community": {
     "title": "Thabat Community",
