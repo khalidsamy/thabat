@@ -14,6 +14,11 @@ import Footer from './components/Footer';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Home from './pages/dashboard/Home';
+import Progress from './pages/dashboard/Progress';
+import Recite from './pages/dashboard/Recite';
+import Community from './pages/dashboard/Community';
+import Review from './pages/dashboard/Review';
 import Profile from './pages/Profile';
 import ErrorLog from './pages/ErrorLog';
 import ReviewSession from './pages/ReviewSession';
@@ -62,15 +67,21 @@ function App() {
                   />
                   
                   <Route 
-                    path="/dashboard/*" 
+                    path="/dashboard" 
                     element={
                       <ProtectedRoute>
                         <AnimatedPage>
                           <Dashboard />
                         </AnimatedPage>
                       </ProtectedRoute>
-                    } 
-                  />
+                    }
+                  >
+                    <Route index element={<Home />} />
+                    <Route path="progress" element={<Progress />} />
+                    <Route path="recite" element={<Recite />} />
+                    <Route path="community" element={<Community />} />
+                    <Route path="review" element={<Review />} />
+                  </Route>
                   
                   <Route 
                     path="/profile" 

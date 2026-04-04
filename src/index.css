@@ -60,3 +60,12 @@
 .dark .glow-border {
   @apply border-primary/20 shadow-[0_0_20px_rgba(52,211,153,0.1)];
 }
+
+/* App-like container */
+.dashboard-container {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 sm:pb-8;
+}
+
+@utility glass-nav {
+  @apply backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border-t border-white/20 dark:border-white/5;
+}
