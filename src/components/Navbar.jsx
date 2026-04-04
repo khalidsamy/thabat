@@ -57,8 +57,12 @@ const Navbar = () => {
                     : 'text-zinc-400 dark:text-slate-500 hover:text-zinc-950'
                 }`}
               >
-                <item.icon className={`h-4 w-4 ${isActive ? item.color : 'text-zinc-300'}`} />
-                {item.label}
+                {({ isActive }) => (
+                  <>
+                    <item.icon className={`h-4 w-4 ${isActive ? item.color : 'text-zinc-300'}`} />
+                    {item.label}
+                  </>
+                )}
               </NavLink>
             ))}
           </div>
@@ -161,10 +165,14 @@ const Navbar = () => {
                         : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5'
                     }`}
                   >
-                    <div className={`p-2.5 rounded-xl ${isActive ? 'bg-white shadow-sm' : 'bg-transparent'}`}>
-                      <item.icon className="h-5 w-5" />
-                    </div>
-                    {item.label}
+                    {({ isActive }) => (
+                      <>
+                        <div className={`p-2.5 rounded-xl ${isActive ? 'bg-white shadow-sm' : 'bg-transparent'}`}>
+                          <item.icon className="h-5 w-5" />
+                        </div>
+                        {item.label}
+                      </>
+                    )}
                   </NavLink>
                 ))}
               </div>
