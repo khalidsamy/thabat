@@ -37,12 +37,38 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     -webkit-font-smoothing: antialiased;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    /* Fluid Typography - Scales between 14px and 16px */
     font-size: clamp(0.875rem, 0.8rem + 0.375vw, 1rem); 
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  /* Prevent double scrollbars and layout shifts */
+  #root {
+    overflow-x: hidden;
+    width: 100vw;
+    min-height: 100vh;
   }
 }
+
+/* Premium Slim Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.2);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.4);
+}
+
 
 @utility glass-card {
   @apply backdrop-blur-md border border-white/10 shadow-xl;

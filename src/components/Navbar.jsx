@@ -1,7 +1,8 @@
 import React, { useContext } from 'react';
-import { Moon, Sun, LogOut, Globe, UserCircle2, BookMarked, Brain, GitMerge } from 'lucide-react';
+import { Moon, Sun, LogOut, Globe, UserCircle2, BookMarked, Brain, GitMerge, Menu, X, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, NavLink } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
 
@@ -10,6 +11,15 @@ const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const location = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+
+  const menuItems = [
+    { path: '/dashboard/errors', icon: BookMarked, label: t('nav.errors'), color: 'text-red-500' },
+    { path: '/dashboard/review-session', icon: Brain, label: t('nav.review_sessions'), color: 'text-emerald-500' },
+    { path: '/dashboard/mutashabihat', icon: GitMerge, label: t('nav.mutashabihat'), color: 'text-teal-500' },
+    { path: '/dashboard/profile', icon: UserCircle2, label: t('nav.profile'), color: 'text-blue-500' },
+    { path: '/dashboard/settings', icon: Settings, label: t('nav.settings'), color: 'text-slate-500' },
+  ];
 
   // If there's no user, we don't render the connected Navbar (can keep a public one later if desired)
   const toggleLanguage = () => {
@@ -24,70 +34,31 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           
-          {/* Logo — Official ThabatLogo */}
-          <div className="flex items-center">
+          <div className="flex items-center gap-4">
             <Link to="/dashboard" className="flex items-center gap-2.5 group">
-              <img
-                src="/ThabatLogo.png"
-                alt="Thabat"
-                className="h-9 w-9 object-contain group-hover:opacity-90 transition-opacity"
-              />
-              <span className="font-extrabold text-xl tracking-tight text-foreground group-hover:text-primary transition-colors">
+               <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+                  <span className="text-white font-black text-xl">ث</span>
+               </div>
+              <span className="font-extrabold text-xl tracking-tight text-foreground group-hover:text-primary transition-colors hidden sm:block">
                 {t('navbar.app_name')}
               </span>
             </Link>
-          </div>
-
-          {/* Center Nav Links (desktop only) */}
-          <div className="hidden md:flex items-center gap-1">
-            <Link
-              to="/errors"
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                location.pathname === '/errors'
-                  ? 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400'
-                  : 'text-secondary-foreground hover:bg-gray-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              <BookMarked className="h-4 w-4" />
-              كراسة الأخطاء
-            </Link>
-            <Link
-              to="/review"
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                location.pathname === '/review'
-                  ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'
-                  : 'text-secondary-foreground hover:bg-gray-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              <Brain className="h-4 w-4" />
-              Review
-            </Link>
-
-            {/* Divider */}
-            <div className="h-5 w-px bg-gray-200 dark:bg-gray-700 mx-1" />
-
-            <Link
-              to="/mutashabihat"
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                location.pathname === '/mutashabihat'
-                  ? 'bg-teal-50 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400'
-                  : 'text-secondary-foreground hover:bg-gray-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              <GitMerge className="h-4 w-4" />
-              المتشابهات
-            </Link>
-            <Link
-              to="/mutashabihat-review"
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                location.pathname === '/mutashabihat-review'
-                  ? 'bg-teal-50 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400'
-                  : 'text-secondary-foreground hover:bg-gray-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              <Brain className="h-4 w-4" />
-              مراجعة
-            </Link>
+          </div>          {/* Center Nav Links (desktop only) */}
+          <div className="hidden lg:flex items-center gap-1 mx-8">
+            {menuItems.slice(0, 3).map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) => `flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${
+                  isActive 
+                    ? `bg-emerald-500/10 ${item.color} shadow-sm border border-emerald-500/10 scale-105` 
+                    : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-600'
+                }`}
+              >
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </NavLink>
+            ))}
           </div>
 
           <div className="flex items-center gap-3 sm:gap-6">
@@ -143,14 +114,91 @@ const Navbar = () => {
             {/* Logout Mechanism */}
             <button 
               onClick={logout}
-              className="group flex items-center gap-1.5 text-sm font-medium text-secondary-foreground hover:text-destructive dark:hover:text-red-400 transition-colors px-3 py-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/10"
+              className="hidden sm:flex group items-center gap-1.5 text-sm font-bold text-slate-400 hover:text-rose-500 transition-colors px-4 py-2 rounded-xl hover:bg-rose-500/10"
             >
-              <LogOut className="h-4 w-4 rtl:rotate-180 transition-transform" />
-              <span className="hidden sm:inline">{t('navbar.logout')}</span>
+              <LogOut className="h-4 w-4 rtl:rotate-180" />
+              <span>{t('navbar.logout')}</span>
+            </button>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="lg:hidden p-2 rounded-xl text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
+            >
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu Drawer */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMenuOpen(false)}
+              className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm lg:hidden"
+            />
+            <motion.div
+              initial={{ x: i18n.language === 'ar' ? '100%' : '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: i18n.language === 'ar' ? '100%' : '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className={`fixed inset-y-0 ${i18n.language === 'ar' ? 'right-0' : 'left-0'} w-72 z-50 bg-card/90 backdrop-blur-xl border-x border-white/10 p-6 lg:hidden shadow-2xl flex flex-col`}
+            >
+              <div className="flex items-center justify-between mb-8">
+                 <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
+                       <span className="text-white font-black text-lg">ث</span>
+                    </div>
+                    <span className="font-bold text-foreground">Menu</span>
+                 </div>
+                 <button onClick={() => setIsMenuOpen(false)} className="p-2 text-slate-400 hover:text-foreground transition-colors">
+                    <X className="h-5 w-5" />
+                 </button>
+              </div>
+
+              <nav className="flex-1 space-y-2">
+                {menuItems.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={({ isActive }) => `flex items-center gap-4 p-4 rounded-2xl text-sm font-bold transition-all ${
+                      isActive 
+                        ? `bg-emerald-500/10 ${item.color} shadow-sm border border-emerald-500/10` 
+                        : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    {item.label}
+                  </NavLink>
+                ))}
+              </nav>
+
+              <div className="pt-6 border-t border-white/5 space-y-4">
+                 <button 
+                   onClick={() => { toggleTheme(); setIsMenuOpen(false); }}
+                   className="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
+                 >
+                   {isDarkMode ? <Sun className="h-5 w-5 text-yellow-400" /> : <Moon className="h-5 w-5" />}
+                   {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+                 </button>
+                 <button 
+                   onClick={logout}
+                   className="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-rose-500 hover:bg-rose-500/10 transition-all"
+                 >
+                   <LogOut className="h-5 w-5 rtl:rotate-180" />
+                   {t('navbar.logout')}
+                 </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };

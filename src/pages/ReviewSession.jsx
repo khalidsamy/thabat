@@ -30,7 +30,7 @@ const AllDoneScreen = ({ reviewed, onReturnHome }) => (
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
         <Link
-          to="/errors"
+          to="/dashboard/errors"
           className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-foreground rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-sm"
         >
           <RotateCcw className="h-4 w-4" />
@@ -61,7 +61,7 @@ const NothingDueScreen = () => (
       </p>
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Link
-          to="/errors"
+          to="/dashboard/errors"
           className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-primary text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all"
         >
           Go to Error Log

@@ -20,12 +20,13 @@ const Sidebar = () => {
     { path: '/dashboard/progress', icon: TrendingUp, label: t('nav.progress') },
     { path: '/dashboard/recite', icon: Mic, label: t('nav.recite') },
     { path: '/dashboard/community', icon: MessageCircle, label: t('nav.community') },
-    { path: '/dashboard/review', icon: BookOpen, label: t('nav.review') },
+    { path: '/dashboard/review-session', icon: BookOpen, label: t('nav.review_sessions') },
   ];
 
   const secondaryItems = [
-    { path: '/profile', icon: User, label: t('nav.profile') },
-    { path: '/settings', icon: Settings, label: t('nav.settings') || 'Settings' },
+    { path: '/dashboard/errors', icon: TrendingUp, label: t('nav.errors') },
+    { path: '/dashboard/profile', icon: User, label: t('nav.profile') },
+    { path: '/dashboard/settings', icon: Settings, label: t('nav.settings') || 'Settings' },
   ];
 
   return (

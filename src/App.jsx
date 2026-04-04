@@ -62,7 +62,7 @@ function App() {
                   } 
                 />
 
-                {/* Dashboard & Protected Routes with ResponsiveLayout */}
+                {/* Unified Dashboard Hub */}
                 <Route element={<ProtectedRoute><ResponsiveLayout /></ProtectedRoute>}>
                   <Route path="/" element={<Navigate to="/dashboard" replace />} />
                   
@@ -72,13 +72,14 @@ function App() {
                     <Route path="recite" element={<Recite />} />
                     <Route path="community" element={<Community />} />
                     <Route path="review" element={<Review />} />
+                    
+                    {/* Specialized Tools Consolidated Under Dashboard Layout */}
+                    <Route path="errors" element={<ErrorLog />} />
+                    <Route path="review-session" element={<ReviewSession />} />
+                    <Route path="mutashabihat" element={<MutashabihatLog />} />
+                    <Route path="mutashabihat-review" element={<MutashabihatReview />} />
+                    <Route path="profile" element={<Profile />} />
                   </Route>
-                  
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/errors" element={<ErrorLog />} />
-                  <Route path="/review" element={<ReviewSession />} />
-                  <Route path="/mutashabihat" element={<MutashabihatLog />} />
-                  <Route path="/mutashabihat-review" element={<MutashabihatReview />} />
                 </Route>
 
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />

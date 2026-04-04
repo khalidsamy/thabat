@@ -1,9 +1,6 @@
-import React from 'react';
-import Sidebar from '../Sidebar';
-import BottomNav from '../BottomNav';
-import Navbar from '../Navbar';
+import { Outlet } from 'react-router-dom';
 
-const ResponsiveLayout = ({ children }) => {
+const ResponsiveLayout = () => {
   return (
     <div className="flex min-h-screen bg-background transition-colors duration-300">
       {/* Sidebar for Desktop/Tablet (md+) */}
@@ -15,8 +12,8 @@ const ResponsiveLayout = ({ children }) => {
 
         {/* Main Content Area */}
         <main className="flex-1 relative">
-          <div className="max-w-7xl mx-auto w-full h-full">
-            {children}
+          <div className="max-w-7xl mx-auto w-full h-full p-4 md:p-6 lg:p-8">
+            <Outlet />
           </div>
         </main>
 

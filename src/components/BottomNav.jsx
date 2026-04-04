@@ -12,7 +12,7 @@ const BottomNav = () => {
     { path: '/dashboard/progress', icon: TrendingUp, label: t('nav.progress') },
     { path: '/dashboard/recite', icon: Mic, label: t('nav.recite') },
     { path: '/dashboard/community', icon: MessageCircle, label: t('nav.community') },
-    { path: '/dashboard/review', icon: BookOpen, label: t('nav.review') },
+    { path: '/dashboard/review-session', icon: BookOpen, label: t('nav.review_sessions') },
   ];
 
   return (

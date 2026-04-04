@@ -14,9 +14,9 @@ const Review = (props) => {
   const [isMindMapOpen, setIsMindMapOpen] = useState(false);
 
   const reviewTools = [
-    { title: t('nav.errors'), icon: ShieldAlert, path: '/errors', color: 'bg-rose-500/10 text-rose-600' },
-    { title: t('nav.mutashabihat'), icon: GitCompare, path: '/mutashabihat', color: 'bg-emerald-500/10 text-emerald-600' },
-    { title: t('nav.review_sessions'), icon: History, path: '/review', color: 'bg-blue-500/10 text-blue-600' },
+    { title: t('nav.errors'), icon: ShieldAlert, path: '/dashboard/errors', color: 'bg-rose-500/10 text-rose-600' },
+    { title: t('nav.mutashabihat'), icon: GitCompare, path: '/dashboard/mutashabihat', color: 'bg-emerald-500/10 text-emerald-600' },
+    { title: t('nav.review_sessions'), icon: History, path: '/dashboard/review-session', color: 'bg-blue-500/10 text-blue-600' },
   ];
 
   return (
