@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import VoiceRecitation from '../../components/VoiceRecitation';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
-import Button from '../../components/Button';
 import { AuthContext } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import api from '../../services/api';
