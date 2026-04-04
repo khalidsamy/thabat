@@ -5,12 +5,12 @@
   --color-primary-foreground: #ffffff;
   --color-secondary: #f1f5f9;
   --color-secondary-foreground: #475569;
-  --color-background: #f8fafc;
-  --color-foreground: #0f172a;
+  --color-background: #ffffff; /* Crystal White for maximum clarity */
+  --color-foreground: #09090b; /* Zinc-950 for elite readability */
   --color-card: #ffffff;
-  --color-card-foreground: #0f172a;
+  --color-card-foreground: #09090b;
   --color-destructive: #ef4444;
-  --color-border: #e2e8f0;
+  --color-border: #f1f5f9; /* Soft Slate border */
 }
 
 @layer base {

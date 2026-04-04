@@ -31,10 +31,10 @@ const Sidebar = () => {
 
   return (
     <aside 
-      className={`hidden md:flex flex-col h-screen sticky top-0 z-40 bg-card dark:bg-card/50 border-gray-100 dark:border-white/5 transition-all duration-300 w-20 lg:w-64 overflow-y-auto overflow-x-hidden group shrink-0 ${
+      className={`hidden md:flex flex-col h-screen sticky top-0 z-40 bg-white/60 dark:bg-card/50 backdrop-blur-md border-gray-100 dark:border-white/5 transition-all duration-300 w-20 lg:w-64 overflow-y-auto overflow-x-hidden group shrink-0 ${
         i18n.language === 'ar' ? 'border-s' : 'border-e'
       }`}
-      dir={t('dir') || (i18n.language === 'ar' ? 'rtl' : 'ltr')}
+      dir={t('direction') || (i18n.language === 'ar' ? 'rtl' : 'ltr')}
     >
       <div className="p-6 flex items-center gap-4 overflow-hidden min-h-[80px]">
         <div className="w-10 h-10 bg-emerald-600 rounded-[1rem] flex items-center justify-center shrink-0 shadow-xl shadow-emerald-500/20 border border-white/10 group-hover:rotate-6 transition-transform">
@@ -55,8 +55,8 @@ const Sidebar = () => {
             className={({ isActive }) =>
               `relative flex items-center gap-4 p-3 rounded-2xl transition-all duration-300 group/item ${
                 isActive 
-                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
-                  : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-600 dark:hover:text-slate-200'
+                  ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' 
+                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200'
               }`
             }
           >
@@ -84,7 +84,7 @@ const Sidebar = () => {
           <NavLink
             key={item.path}
             to={item.path}
-            className="flex items-center gap-4 p-3 rounded-2xl text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-600 dark:hover:text-slate-200 transition-all duration-300"
+            className="flex items-center gap-4 p-3 rounded-2xl text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200 transition-all duration-300"
           >
             <item.icon className="h-6 w-6 shrink-0" />
             <span className="hidden lg:block text-sm font-bold truncate">

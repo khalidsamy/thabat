@@ -11,18 +11,18 @@ const DailyMotivationCard = ({ dailyVerse, itemVariants }) => {
       variants={itemVariants}
       className="lg:col-span-8 group h-full"
     >
-      <div className="relative h-full min-h-[400px] max-h-[480px] overflow-hidden bg-gradient-to-br from-emerald-600 to-teal-700 rounded-[3rem] p-8 sm:p-10 shadow-2xl shadow-emerald-500/10 border border-white/10 flex flex-col justify-between transition-all duration-500 hover:shadow-emerald-500/20">
+      <div className="relative h-full min-h-[400px] max-h-[480px] overflow-hidden bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-600 dark:to-teal-700 rounded-[3rem] p-8 sm:p-10 shadow-2xl shadow-emerald-500/5 dark:shadow-emerald-500/10 border border-emerald-100/50 dark:border-white/10 flex flex-col justify-between transition-all duration-500 hover:shadow-emerald-500/10">
         {/* Glassmorphism Accents */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full -mr-40 -mt-40 blur-3xl transition-transform duration-1000 group-hover:scale-110"></div>
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full -ml-32 -mb-32 blur-3xl"></div>
+        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-200/20 dark:bg-white/5 rounded-full -mr-40 -mt-40 blur-3xl transition-transform duration-1000 group-hover:scale-110"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-100/10 dark:bg-black/10 rounded-full -ml-32 -mb-32 blur-3xl"></div>
 
         {/* Header: Title */}
         <div className="relative flex items-center justify-between">
           <div className="flex flex-col">
-            <span className="text-[10px] font-black text-emerald-100/40 uppercase tracking-[0.4em] mb-1">
+            <span className="text-[10px] font-black text-emerald-600/40 dark:text-emerald-100/40 uppercase tracking-[0.4em] mb-1">
               {t('dashboard.daily_motivation') || 'DAILY MOTIVATION'}
             </span>
-            <h2 className="text-xl font-bold text-white tracking-tight">
+            <h2 className="text-xl font-bold text-emerald-900 dark:text-white tracking-tight">
               {t('dashboard.daily_verse') || 'Daily Verse'}
             </h2>
           </div>
