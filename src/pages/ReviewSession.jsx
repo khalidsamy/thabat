@@ -207,9 +207,8 @@ const ReviewSession = () => {
           <div className="px-6 py-6 border-b border-gray-100 dark:border-slate-700 bg-amber-50/30 dark:bg-amber-900/5">
             {current.ayahText ? (
               <p
-                className="text-2xl font-bold text-foreground leading-loose text-center"
+                className="text-2xl font-quran font-bold text-foreground leading-loose text-center"
                 dir="rtl"
-                style={{ fontFamily: "'Scheherazade New', serif" }}
               >
                 {current.ayahText}
               </p>

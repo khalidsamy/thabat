@@ -33,6 +33,7 @@
   }
   
   body {
+    font-family: 'Tajawal', sans-serif;
     background-color: var(--color-background);
     color: var(--color-foreground);
     -webkit-font-smoothing: antialiased;

@@ -6,7 +6,12 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['Tajawal', 'sans-serif'],
+        quran: ['Amiri', 'serif'],
+      },
+    },
   },
   plugins: [],
 }

@@ -1,8 +1,16 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 const StatCard = ({ title, value, icon, subtitle, className = "" }) => {
   return (
-    <div className={`glass-card dark:glass-card rounded-2xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:glow-border flex flex-col justify-between group ${className}`}>
+    <motion.div 
+      whileHover={{ 
+        scale: 1.02, 
+        y: -5,
+        transition: { duration: 0.2, ease: "easeOut" }
+      }}
+      className={`glass-card dark:glass-card rounded-2xl p-6 transition-all duration-300 hover:shadow-2xl hover:glow-border flex flex-col justify-between group ${className}`}
+    >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <h3 className="text-sm font-bold text-slate-500 dark:text-emerald-500/80 uppercase tracking-widest mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
@@ -25,7 +33,7 @@ const StatCard = ({ title, value, icon, subtitle, className = "" }) => {
           {subtitle}
         </p>
       )}
-    </div>
+    </motion.div>
   );
 };
 

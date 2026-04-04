@@ -22,6 +22,7 @@ import MutashabihatReview from './pages/MutashabihatReview';
 // Auth Guards
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicOnlyRoute from './components/PublicOnlyRoute';
+import AnimatedPage from './components/AnimatedPage';
 
 function App() {
   return (
@@ -41,7 +42,9 @@ function App() {
                     path="/register" 
                     element={
                       <PublicOnlyRoute>
-                        <Register />
+                        <AnimatedPage>
+                          <Register />
+                        </AnimatedPage>
                       </PublicOnlyRoute>
                     } 
                   />
@@ -50,7 +53,9 @@ function App() {
                     path="/login" 
                     element={
                       <PublicOnlyRoute>
-                        <Login />
+                        <AnimatedPage>
+                          <Login />
+                        </AnimatedPage>
                       </PublicOnlyRoute>
                     } 
                   />
@@ -59,7 +64,9 @@ function App() {
                     path="/dashboard" 
                     element={
                       <ProtectedRoute>
-                        <Dashboard />
+                        <AnimatedPage>
+                          <Dashboard />
+                        </AnimatedPage>
                       </ProtectedRoute>
                     } 
                   />
@@ -68,7 +75,9 @@ function App() {
                     path="/profile" 
                     element={
                       <ProtectedRoute>
-                        <Profile />
+                        <AnimatedPage>
+                          <Profile />
+                        </AnimatedPage>
                       </ProtectedRoute>
                     } 
                   />
@@ -77,7 +86,9 @@ function App() {
                     path="/errors" 
                     element={
                       <ProtectedRoute>
-                        <ErrorLog />
+                        <AnimatedPage>
+                          <ErrorLog />
+                        </AnimatedPage>
                       </ProtectedRoute>
                     } 
                   />
@@ -86,7 +97,9 @@ function App() {
                     path="/review" 
                     element={
                       <ProtectedRoute>
-                        <ReviewSession />
+                        <AnimatedPage>
+                          <ReviewSession />
+                        </AnimatedPage>
                       </ProtectedRoute>
                     } 
                   />
@@ -95,7 +108,9 @@ function App() {
                     path="/mutashabihat" 
                     element={
                       <ProtectedRoute>
-                        <MutashabihatLog />
+                        <AnimatedPage>
+                          <MutashabihatLog />
+                        </AnimatedPage>
                       </ProtectedRoute>
                     } 
                   />
@@ -104,7 +119,9 @@ function App() {
                     path="/mutashabihat-review" 
                     element={
                       <ProtectedRoute>
-                        <MutashabihatReview />
+                        <AnimatedPage>
+                          <MutashabihatReview />
+                        </AnimatedPage>
                       </ProtectedRoute>
                     } 
                   />

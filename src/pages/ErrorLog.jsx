@@ -228,7 +228,7 @@ const ErrorLog = () => {
                     <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mb-1">
                       {resolvedLocation.surahName} — Ayah {form.ayahNumber}
                     </p>
-                    <p className="text-lg font-bold text-emerald-900 dark:text-emerald-200 leading-loose text-right" dir="rtl">
+                    <p className="text-lg font-quran font-bold text-emerald-900 dark:text-emerald-200 leading-loose text-right" dir="rtl">
                       {resolvedLocation.text}
                     </p>
                   </div>
@@ -325,7 +325,7 @@ const ErrorLog = () => {
                     {/* Middle: Content */}
                     <div className="flex-1 min-w-0">
                       {err.ayahText && (
-                        <p className="text-base font-bold text-foreground leading-loose mb-2 text-right line-clamp-2" dir="rtl">
+                        <p className="text-base font-quran font-bold text-foreground leading-loose mb-2 text-right line-clamp-2" dir="rtl">
                           {err.ayahText}
                         </p>
                       )}

@@ -208,9 +208,8 @@ const MutashabihatReview = () => {
                   </div>
                   {v.ayahText ? (
                     <p
-                      className="text-lg font-bold text-foreground leading-loose text-right"
+                      className="text-lg font-quran font-bold text-foreground leading-loose text-right"
                       dir="rtl"
-                      style={{ fontFamily: "'Scheherazade New', serif" }}
                     >
                       {v.ayahText}
                     </p>
