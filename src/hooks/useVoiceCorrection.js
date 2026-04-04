@@ -14,16 +14,48 @@ export const useVoiceCorrection = (targetVerses = [], onComplete) => {
   
   const recognitionRef = useRef(null);
 
-  // Normalize: Strip Tashkeel, small signs, and standardize letters
+  const getLevenshteinDistance = (a, b) => {
+    const matrix = [];
+    for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+    for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+    for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+            if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                matrix[i][j] = matrix[i - 1][j - 1];
+            } else {
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j - 1] + 1,
+                    matrix[i][j - 1] + 1,
+                    matrix[i - 1][j] + 1
+                );
+            }
+        }
+    }
+    return matrix[b.length][a.length];
+  };
+
+  const getSimilarity = (a, b) => {
+      if (!a || !b) return 0;
+      if (a === b) return 1;
+      const distance = getLevenshteinDistance(a, b);
+      return 1 - distance / Math.max(a.length, b.length);
+  };
+
+  // Normalize: Strip ALL Tashkeel, harakat, tajweed signs and standardize letters
   const normalize = useCallback((str) => {
     if (!str) return "";
     return str
-      .replace(/[\u064B-\u0652\u06D6-\u06ED]/g, "") // Strip Tashkeel & small tajweed signs
-      .replace(/[إأآٱ]/g, "ا")
+      // Strip all Tashkeel (harakat), tajweed marks, and small signs
+      .replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E8\u06EA-\u06ED]/g, "")
+      // Standardize Alef variations
+      .replace(/[أإآٱ]/g, "ا")
+      // Standardize Yaa/Hamza variations
+      .replace(/[ىئ]/g, "ي")
+      // Standardize Waw-Hamza
       .replace(/ؤ/g, "و")
-      .replace(/ئ/g, "ي")
+      // Standardize Teh Marbuta (often heard as Heh in speech or confused by STT)
       .replace(/ة/g, "ه")
-      .replace(/[ىي]/g, "ي")
+      // Clean whitespace and trim
       .replace(/\s+/g, " ")
       .trim();
   }, []);
@@ -37,6 +69,8 @@ export const useVoiceCorrection = (targetVerses = [], onComplete) => {
       setInterimTranscript('');
       setMasteryScore(0);
     }
+    // Safety cleanup on target change
+    return () => stopListening();
   }, [targetVerses, normalize]);
 
   const updateMatches = useCallback((finalSpeech) => {
@@ -44,20 +78,35 @@ export const useVoiceCorrection = (targetVerses = [], onComplete) => {
     
     setMatches(prev => {
       const updated = [...prev];
-      let matchCount = 0;
+      const threshold = 0.8; // 80% Similarity Threshold
       
-      // Simple greedy matching for demonstration
       speechWords.forEach(sWord => {
-        const index = updated.findIndex(m => m.status === 'pending' && m.normalized === sWord);
-        if (index !== -1) {
-          updated[index].status = 'correct';
+        // Find best fuzzy match among pending words
+        let bestMatchIdx = -1;
+        let highestSim = 0;
+
+        for (let i = 0; i < updated.length; i++) {
+          if (updated[i].status === 'pending') {
+            const sim = getSimilarity(updated[i].normalized, sWord);
+            if (sim > highestSim) {
+              highestSim = sim;
+              bestMatchIdx = i;
+            }
+            // Stop if we hit a 100% match
+            if (sim > 0.99) break;
+          }
+        }
+
+        if (bestMatchIdx !== -1 && highestSim >= threshold) {
+          updated[bestMatchIdx].status = 'correct';
         }
       });
 
       // Calculate score based on correct matches
-      const correct = updated.filter(m => m.status === 'correct').length;
-      matchCount = Math.round((correct / updated.length) * 100);
-      setMasteryScore(matchCount);
+      const totalWords = updated.length;
+      const correctCount = updated.filter(m => m.status === 'correct').length;
+      const score = totalWords > 0 ? Math.round((correctCount / totalWords) * 100) : 0;
+      setMasteryScore(score);
 
       return updated;
     });
