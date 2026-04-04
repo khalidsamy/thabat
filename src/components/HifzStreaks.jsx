@@ -42,7 +42,7 @@ const HifzStreaks = ({ streak = 0, isCompletedToday = false, wasActiveYesterday 
 
   return (
     <div className="lg:col-span-4 group h-full">
-      <div className="bg-white/80 dark:bg-card/40 border border-zinc-200 dark:border-white/5 rounded-[2.5rem] p-8 shadow-xl shadow-zinc-200/50 dark:shadow-black/5 h-full min-h-[320px] flex flex-col justify-between transition-all duration-300 hover:shadow-emerald-500/10 backdrop-blur-md relative overflow-hidden group">
+      <div className="bg-white dark:bg-card/40 border border-slate-200 dark:border-white/5 rounded-3xl p-8 shadow-xl shadow-slate-200/50 dark:shadow-black/5 h-full min-h-[320px] flex flex-col justify-between transition-all duration-300 hover:shadow-emerald-500/10 backdrop-blur-md relative overflow-hidden group">
         {/* Dynamic Background Glow Based on Mood */}
         <div className={`absolute top-0 right-0 w-64 h-64 -mr-32 -mt-32 blur-3xl opacity-20 transition-colors duration-1000 ${
           mood.bgColor.replace('/10', '/30')
@@ -54,8 +54,8 @@ const HifzStreaks = ({ streak = 0, isCompletedToday = false, wasActiveYesterday 
               {t('dashboard.active_streak_label') || 'ACTIVE STREAK'}
             </span>
             <div className="flex items-center gap-3">
-               <span className="text-5xl font-black text-zinc-900 dark:text-foreground drop-shadow-sm">{streak}</span>
-               <span className="text-xl font-bold text-zinc-400 mt-2">{t('dashboard.days') || 'days'}</span>
+               <span className="text-5xl font-black text-zinc-950 dark:text-foreground drop-shadow-sm">{streak}</span>
+               <span className="text-xl font-bold text-zinc-500 mt-2">{t('dashboard.days') || 'days'}</span>
                <div className="ms-2">
                   <Sparkles className="h-5 w-5 text-amber-500 animate-pulse" />
                </div>

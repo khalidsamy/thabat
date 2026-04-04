@@ -16,7 +16,7 @@ const ReviewPacerCard = ({ data = [], itemVariants }) => {
       variants={itemVariants}
       className="lg:col-span-4 group h-full"
     >
-      <div className="bg-white/80 dark:bg-card/40 border border-zinc-200 dark:border-white/5 rounded-[2.5rem] p-8 shadow-xl shadow-zinc-200/50 dark:shadow-black/5 h-full min-h-[320px] flex flex-col justify-between transition-all duration-300 hover:shadow-indigo-500/10 backdrop-blur-md">
+      <div className="bg-white dark:bg-card/40 border border-slate-200 dark:border-white/5 rounded-3xl p-8 shadow-xl shadow-slate-200/50 dark:shadow-black/5 h-full min-h-[320px] flex flex-col justify-between transition-all duration-300 hover:shadow-indigo-500/10 backdrop-blur-md">
         <div className="flex flex-col">
           <span className="text-[10px] font-black text-indigo-800/40 dark:text-indigo-500/40 uppercase tracking-[0.4em] mb-2 px-1">
             {t('dashboard.review_pacer_label') || 'REVIEW PACER'}

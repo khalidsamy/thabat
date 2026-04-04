@@ -104,35 +104,35 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background py-10 px-4 sm:px-6 lg:px-8 animate-fade-in">
       <div className="max-w-2xl mx-auto">
 
         {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-extrabold text-foreground tracking-tight">
+        <div className="mb-12">
+          <h1 className="text-3xl font-black text-zinc-950 dark:text-foreground tracking-tight mb-2">
             Account Settings
           </h1>
-          <p className="text-sm text-secondary-foreground mt-1">
+          <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest leading-relaxed">
             Manage your personal information and security settings.
           </p>
         </div>
 
         {/* Personal Information */}
-        <div className="bg-white/90 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-slate-700 shadow-lg shadow-black/5 dark:shadow-black/30 mb-6 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800/80 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/40 mb-10 overflow-hidden transition-all duration-300">
           
           {/* Card Header */}
-          <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 dark:border-slate-700 bg-emerald-50/50 dark:bg-emerald-900/10">
-            <div className="p-2 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg">
-              <User className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+          <div className="flex items-center gap-3 px-8 py-6 border-b border-slate-100 dark:border-slate-700 bg-emerald-50/30 dark:bg-emerald-900/10">
+            <div className="p-3 bg-emerald-500/10 dark:bg-emerald-900/40 rounded-2xl">
+              <User className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-foreground">Personal Information</h2>
-              <p className="text-xs text-secondary-foreground">Update your display name</p>
+              <h2 className="text-lg font-black text-zinc-950 dark:text-foreground uppercase tracking-tight">Personal Information</h2>
+              <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mt-1">Update your display name</p>
             </div>
           </div>
 
           {/* Card Body */}
-          <form onSubmit={handleProfileSave} className="px-6 py-6 space-y-1">
+          <form onSubmit={handleProfileSave} className="px-8 py-10 space-y-6">
             <Input
               label="Full Name"
               id="name"
@@ -142,7 +142,8 @@ const Profile = () => {
               placeholder="Your full name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              icon={<User className="h-4 w-4" />}
+              icon={<User className="h-5 w-5" />}
+              className="h-14 font-bold"
             />
 
             {/* Email is read-only — shown for reference */}
@@ -176,22 +177,22 @@ const Profile = () => {
         </div>
 
         {/* Review Plan Selection */}
-        <div className="bg-white/90 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-slate-700 shadow-lg shadow-black/5 dark:shadow-black/30 mb-6 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800/80 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/40 mb-10 overflow-hidden transition-all duration-300">
           
           {/* Card Header */}
-          <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 dark:border-slate-700 bg-blue-50/50 dark:bg-blue-900/10">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
-              <CalendarCheck className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          <div className="flex items-center gap-3 px-8 py-6 border-b border-slate-100 dark:border-slate-700 bg-emerald-50/30 dark:bg-emerald-900/10">
+            <div className="p-3 bg-emerald-500/10 dark:bg-emerald-900/40 rounded-2xl">
+              <CalendarCheck className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-foreground">Review Plan (خطة المراجعة)</h2>
-              <p className="text-xs text-secondary-foreground">Select your daily target preference</p>
+              <h2 className="text-lg font-black text-zinc-950 dark:text-foreground uppercase tracking-tight">Review Plan</h2>
+              <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mt-1">Select your daily target preference</p>
             </div>
           </div>
 
           {/* Card Body */}
-          <div className="px-6 py-6 transition-all duration-300">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div className="px-8 py-10 transition-all duration-300">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
               {[
                 { val: 7, label: 'Ideal (المثالي)', sub: 'Complete in 7 Days', color: 'emerald' },
                 { val: 10, label: 'Medium (المتوسط)', sub: 'Complete in 10 Days', color: 'blue' },
@@ -201,28 +202,28 @@ const Profile = () => {
                   key={plan.val}
                   type="button"
                   onClick={() => setReviewPace(plan.val)}
-                  className={`relative p-4 rounded-xl border-2 text-start transition-all duration-300 group ${
+                  className={`relative p-6 rounded-2xl border-4 text-start transition-all duration-300 group ${
                     reviewPace === plan.val 
-                      ? 'border-primary bg-primary/5 shadow-md' 
-                      : 'border-gray-100 dark:border-slate-700 hover:border-gray-200 dark:hover:border-slate-600'
+                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 shadow-lg' 
+                      : 'border-slate-50 dark:border-slate-900 bg-slate-50 dark:bg-slate-900/50 hover:border-slate-200 dark:hover:border-slate-700'
                   }`}
                 >
                   {reviewPace === plan.val && (
-                    <div className="absolute top-2 end-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
+                    <div className="absolute top-3 end-3">
+                      <CheckCircle className="h-5 w-5 text-emerald-600" />
                     </div>
                   )}
-                  <h4 className={`text-sm font-bold ${reviewPace === plan.val ? 'text-primary' : 'text-foreground'}`}>
+                  <h4 className={`text-base font-black ${reviewPace === plan.val ? 'text-emerald-700 dark:text-emerald-400' : 'text-zinc-950 dark:text-foreground'}`}>
                     {plan.label}
                   </h4>
-                  <p className="text-xs text-secondary-foreground mt-1">{plan.sub}</p>
+                  <p className="text-[10px] font-bold text-zinc-500 mt-2 uppercase tracking-widest">{plan.sub}</p>
                 </button>
               ))}
             </div>
 
-            <div className="pt-1">
-              <Button onClick={handleProfileSave} isLoading={isSavingProfile} disabled={isSavingProfile} className="sm:w-auto px-8">
-                <Save className="h-4 w-4 me-2" />
+            <div className="pt-2">
+              <Button onClick={handleProfileSave} isLoading={isSavingProfile} disabled={isSavingProfile} className="h-16 px-10 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 text-white rounded-3xl font-black shadow-xl shadow-zinc-950/20 transition-all active:scale-95">
+                <Save className="h-5 w-5 me-3" />
                 {isSavingProfile ? 'Saving Plan...' : 'Update Review Plan'}
               </Button>
             </div>
@@ -230,21 +231,21 @@ const Profile = () => {
         </div>
 
         {/* Security Settings */}
-        <div className="bg-white/90 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-slate-700 shadow-lg shadow-black/5 dark:shadow-black/30 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800/80 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/40 overflow-hidden transition-all duration-300">
 
           {/* Card Header */}
-          <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 dark:border-slate-700 bg-amber-50/50 dark:bg-amber-900/10">
-            <div className="p-2 bg-amber-100 dark:bg-amber-900/40 rounded-lg">
-              <KeyRound className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+          <div className="flex items-center gap-3 px-8 py-6 border-b border-slate-100 dark:border-slate-700 bg-amber-50/30 dark:bg-amber-900/10">
+            <div className="p-3 bg-amber-100 dark:bg-amber-900/40 rounded-2xl">
+              <KeyRound className="h-6 w-6 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-foreground">Security</h2>
-              <p className="text-xs text-secondary-foreground">Change your account password</p>
+              <h2 className="text-lg font-black text-zinc-950 dark:text-foreground uppercase tracking-tight">Security</h2>
+              <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mt-1">Change your account password</p>
             </div>
           </div>
 
           {/* Card Body */}
-          <form onSubmit={handlePasswordChange} className="px-6 py-6 space-y-1">
+          <form onSubmit={handlePasswordChange} className="px-8 py-10 space-y-6">
             <Input
               label="Current Password"
               id="currentPassword"
@@ -254,7 +255,8 @@ const Profile = () => {
               placeholder="Enter your current password"
               value={passwords.currentPassword}
               onChange={handlePasswordInput}
-              icon={<Lock className="h-4 w-4" />}
+              icon={<Lock className="h-5 w-5" />}
+              className="h-14 font-bold"
             />
             <Input
               label="New Password"
@@ -265,7 +267,8 @@ const Profile = () => {
               placeholder="Min. 6 characters"
               value={passwords.newPassword}
               onChange={handlePasswordInput}
-              icon={<Lock className="h-4 w-4" />}
+              icon={<Lock className="h-5 w-5" />}
+              className="h-14 font-bold"
             />
             <Input
               label="Confirm New Password"
@@ -276,12 +279,13 @@ const Profile = () => {
               placeholder="Repeat new password"
               value={passwords.confirmPassword}
               onChange={handlePasswordInput}
-              icon={<CheckCircle className="h-4 w-4" />}
+              icon={<CheckCircle className="h-5 w-5" />}
+              className="h-14 font-bold"
             />
 
-            <div className="pt-1">
-              <Button type="submit" isLoading={isChangingPassword} disabled={isChangingPassword} className="sm:w-auto px-8">
-                <KeyRound className="h-4 w-4 me-2" />
+            <div className="pt-2">
+              <Button type="submit" isLoading={isChangingPassword} disabled={isChangingPassword} className="h-16 px-10 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 text-white rounded-3xl font-black shadow-xl shadow-zinc-950/20 transition-all active:scale-95">
+                <KeyRound className="h-5 w-5 me-3" />
                 {isChangingPassword ? 'Changing...' : 'Change Password'}
               </Button>
             </div>

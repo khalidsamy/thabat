@@ -11,7 +11,7 @@ const DailyMotivationCard = ({ dailyVerse, itemVariants }) => {
       variants={itemVariants}
       className="lg:col-span-8 group h-full"
     >
-      <div className="relative h-full min-h-[400px] overflow-hidden bg-white/80 dark:bg-gradient-to-br dark:from-emerald-600 dark:to-teal-700 rounded-[3rem] p-8 sm:p-10 shadow-2xl shadow-zinc-200/50 dark:shadow-emerald-500/10 border border-zinc-200 dark:border-white/10 flex flex-col justify-between transition-all duration-500 hover:shadow-emerald-500/10 backdrop-blur-md">
+      <div className="relative h-full min-h-[400px] overflow-hidden bg-white dark:bg-card/40 rounded-3xl p-8 sm:p-10 shadow-xl shadow-slate-200/50 dark:shadow-black/5 border border-slate-200 dark:border-white/10 flex flex-col justify-between transition-all duration-500 hover:shadow-emerald-500/10 backdrop-blur-md relative overflow-hidden group">
         {/* Glassmorphism Accents */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-200/20 dark:bg-white/5 rounded-full -mr-40 -mt-40 blur-3xl transition-transform duration-1000 group-hover:scale-110"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-100/10 dark:bg-black/10 rounded-full -ml-32 -mb-32 blur-3xl"></div>
@@ -33,7 +33,7 @@ const DailyMotivationCard = ({ dailyVerse, itemVariants }) => {
 
         {/* Content: Verse */}
         <div className="relative py-6">
-          <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-zinc-900 dark:text-white leading-[1.4] drop-shadow-sm mb-4 text-center sm:text-right" dir="rtl">
+          <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-zinc-950 dark:text-white leading-[1.4] drop-shadow-sm mb-4 text-center sm:text-right" dir="rtl">
             {dailyVerse?.arabic}
           </p>
           <div className="flex flex-col items-center sm:items-end gap-2">

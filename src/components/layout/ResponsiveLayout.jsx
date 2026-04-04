@@ -1,12 +1,17 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from '../Sidebar';
 import BottomNav from '../BottomNav';
 import Navbar from '../Navbar';
+import FloatingFAB from '../FloatingFAB';
 
 const ResponsiveLayout = () => {
+  const location = useLocation();
+  const isDashboardHome = location.pathname === '/dashboard';
+  const isRecite = location.pathname === '/dashboard/recite';
+
   return (
-    <div className="flex h-screen bg-background transition-colors duration-300 overflow-hidden">
+    <div className="flex h-screen bg-background transition-colors duration-500 overflow-hidden font-tajawal">
       {/* Sidebar for Desktop/Tablet (md+) */}
       <Sidebar />
 
@@ -15,10 +20,18 @@ const ResponsiveLayout = () => {
         <Navbar />
 
         {/* Scrollable Main Area */}
-        <main className="flex-1 h-full overflow-y-auto overflow-x-hidden">
-          <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-12 w-full">
+        <main className="flex-1 h-full overflow-y-auto overflow-x-hidden relative">
+          <div className="max-w-[1600px] mx-auto px-4 py-8 sm:px-6 lg:px-12 w-full">
             <Outlet />
           </div>
+
+          {/* Global Floating Actions synchronized with image_6.png */}
+          {(isDashboardHome || isRecite) && (
+            <FloatingFAB 
+                label="Spiritual Insight" 
+                onClick={() => console.log('Spiritual Stats Triggered')} 
+            />
+          )}
         </main>
 
         <BottomNav />

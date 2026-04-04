@@ -9,14 +9,14 @@ const StatCard = ({ title, value, icon, subtitle, className = "" }) => {
         y: -5,
         transition: { duration: 0.2, ease: "easeOut" }
       }}
-      className={`glass-card dark:glass-card rounded-[1.5rem] p-6 transition-all duration-300 hover:shadow-2xl hover:glow-border flex flex-col justify-between group overflow-hidden border border-gray-100 dark:border-white/5 ${className}`}
+      className={`bg-white dark:bg-card/40 rounded-3xl p-6 transition-all duration-300 hover:shadow-2xl flex flex-col justify-between group overflow-hidden border border-slate-200 dark:border-white/5 shadow-xl shadow-slate-200/40 ${className}`}
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <h3 className="text-sm font-bold text-slate-500 dark:text-emerald-500/80 uppercase tracking-widest mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+          <h3 className="text-[10px] font-black text-zinc-400 dark:text-emerald-500/80 uppercase tracking-[0.3em] mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
             {title}
           </h3>
-          <p className="text-3xl font-extrabold text-slate-900 dark:text-white drop-shadow-sm">
+          <p className="text-3xl font-black text-zinc-950 dark:text-white drop-shadow-sm">
             {value !== undefined ? value : '--'}
           </p>
         </div>

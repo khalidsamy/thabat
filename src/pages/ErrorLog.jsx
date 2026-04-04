@@ -168,34 +168,34 @@ const ErrorLog = () => {
 
   // ── Render ────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-amber-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
 
         {/* Page Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2.5 bg-red-100 dark:bg-red-900/30 rounded-xl">
-              <BookMarked className="h-6 w-6 text-red-600 dark:text-red-400" />
+        <div className="mb-10">
+          <div className="flex items-center gap-4 mb-2">
+            <div className="p-3.5 bg-rose-500/10 dark:bg-rose-900/30 rounded-2xl shadow-sm">
+              <BookMarked className="h-7 w-7 text-rose-600 dark:text-rose-400" />
             </div>
             <div>
-              <h1 className="text-2xl font-extrabold text-foreground tracking-tight">
+              <h1 className="text-3xl font-black text-zinc-950 dark:text-foreground tracking-tight leading-none mb-1">
                 كراسة الأخطاء
               </h1>
-              <p className="text-sm text-secondary-foreground">Hifz Error Log — track and cure your memorization mistakes</p>
+              <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Hifz Error Log — cure your mistakes</p>
             </div>
           </div>
         </div>
 
         {/* ── LOG NEW ERROR FORM ──────────────────────────────── */}
-        <div className="bg-white/90 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-slate-700 shadow-lg mb-8 overflow-hidden">
-          <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 dark:border-slate-700 bg-red-50/50 dark:bg-red-900/10">
-            <PlusCircle className="h-5 w-5 text-red-500" />
-            <h2 className="text-base font-bold text-foreground">Log a New Error</h2>
+        <div className="bg-white dark:bg-slate-800/80 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/50 mb-10 overflow-hidden">
+          <div className="flex items-center gap-3 px-8 py-5 border-b border-slate-100 dark:border-slate-700 bg-rose-50/30 dark:bg-rose-900/10">
+            <PlusCircle className="h-5 w-5 text-rose-500" />
+            <h2 className="text-base font-black text-zinc-950 dark:text-foreground uppercase tracking-wider">Log a New Error</h2>
           </div>
 
-          <form onSubmit={handleSubmit} className="px-6 py-6">
+          <form onSubmit={handleSubmit} className="px-8 py-8">
             {/* Location Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-6">
               {[
                 { name: 'surahNumber', label: 'Surah #', placeholder: '1–114', required: true },
                 { name: 'ayahNumber', label: 'Ayah #', placeholder: 'e.g., 5', required: true },
@@ -203,8 +203,8 @@ const ErrorLog = () => {
                 { name: 'juzNumber', label: 'Juz #', placeholder: '1–30' },
               ].map(({ name, label, placeholder, required }) => (
                 <div key={name}>
-                  <label className="block text-xs font-semibold text-secondary-foreground mb-1.5 uppercase tracking-wider">
-                    {label}{required && <span className="text-red-500 ms-0.5">*</span>}
+                  <label className="block text-[10px] font-black text-zinc-400 mb-2 uppercase tracking-widest px-1">
+                    {label}{required && <span className="text-rose-500 ms-1">*</span>}
                   </label>
                   <input
                     type="number"
@@ -212,7 +212,7 @@ const ErrorLog = () => {
                     value={form[name]}
                     onChange={handleFormChange}
                     placeholder={placeholder}
-                    className="w-full py-2.5 px-3 border border-gray-200 dark:border-slate-600 rounded-xl bg-card text-sm focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
+                    className="w-full h-14 px-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-600 rounded-2xl font-bold text-zinc-950 dark:text-foreground focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all outline-none"
                   />
                 </div>
               ))}
@@ -220,15 +220,15 @@ const ErrorLog = () => {
 
             {/* Ayah Preview */}
             {(isFetchingAyah || resolvedLocation) && (
-              <div className="mb-4 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-200 dark:border-emerald-800 min-h-[60px] flex items-center">
+              <div className="mb-6 p-6 bg-emerald-50/50 dark:bg-emerald-900/20 rounded-2xl border border-emerald-100 dark:border-emerald-800 min-h-[80px] flex items-center shadow-inner">
                 {isFetchingAyah ? (
-                  <Loader2 className="h-5 w-5 text-primary animate-spin mx-auto" />
+                  <Loader2 className="h-6 w-6 text-primary animate-spin mx-auto" />
                 ) : (
                   <div className="w-full">
-                    <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mb-1">
+                    <p className="text-[10px] text-emerald-600/60 dark:text-emerald-400 font-black uppercase tracking-widest mb-2">
                       {resolvedLocation.surahName} — Ayah {form.ayahNumber}
                     </p>
-                    <p className="text-lg font-quran font-bold text-emerald-900 dark:text-emerald-200 leading-loose text-right" dir="rtl">
+                    <p className="text-2xl font-quran font-black text-emerald-900 dark:text-emerald-200 leading-relaxed text-right" dir="rtl">
                       {resolvedLocation.text}
                     </p>
                   </div>
@@ -237,27 +237,27 @@ const ErrorLog = () => {
             )}
 
             {/* Error Type + Note */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
               <div>
-                <label className="block text-xs font-semibold text-secondary-foreground mb-1.5 uppercase tracking-wider">
-                  Error Type <span className="text-red-500">*</span>
+                <label className="block text-[10px] font-black text-zinc-400 mb-2 uppercase tracking-widest px-1">
+                  Error Type <span className="text-rose-500 ms-1">*</span>
                 </label>
                 <select
                   name="errorType"
                   value={form.errorType}
                   onChange={handleFormChange}
-                  className="w-full py-2.5 px-3 border border-gray-200 dark:border-slate-600 rounded-xl bg-card text-sm focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
+                  className="w-full h-14 px-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-600 rounded-2xl font-bold text-zinc-950 dark:text-foreground focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all outline-none appearance-none"
                 >
                   {ERROR_TYPES.map((t) => (
                     <option key={t.value} value={t.value}>
-                      {t.label} — {t.labelAr}
+                      {isAr ? t.labelAr : t.label}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-secondary-foreground mb-1.5 uppercase tracking-wider">
+                <label className="block text-[10px] font-black text-zinc-400 mb-2 uppercase tracking-widest px-1">
                   Your Note
                 </label>
                 <input
@@ -266,83 +266,84 @@ const ErrorLog = () => {
                   value={form.note}
                   onChange={handleFormChange}
                   placeholder="e.g., said فَـ instead of وَ"
-                  maxLength={500}
-                  className="w-full py-2.5 px-3 border border-gray-200 dark:border-slate-600 rounded-xl bg-card text-sm focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
+                  className="w-full h-14 px-4 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-600 rounded-2xl font-bold text-zinc-950 dark:text-foreground focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all outline-none"
                 />
               </div>
             </div>
 
-            <Button type="submit" isLoading={isSubmitting} className="sm:w-auto px-8">
-              <PlusCircle className="h-4 w-4 me-2" />
-              {isSubmitting ? 'Logging...' : 'Log This Error'}
-            </Button>
+            <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="h-16 px-10 bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 text-white rounded-3xl font-black shadow-xl shadow-zinc-950/20 flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50"
+            >
+              <PlusCircle className="h-5 w-5" />
+              <span>{isSubmitting ? 'Logging...' : 'Log This Error'}</span>
+            </button>
           </form>
         </div>
 
         {/* ── ACTIVE ERRORS LIST ──────────────────────────────── */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-foreground">
-              Active Errors
-              {errors.length > 0 && (
-                <span className="ms-2 bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 text-sm font-bold px-2 py-0.5 rounded-full">
-                  {errors.length}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-black text-zinc-950 dark:text-foreground uppercase tracking-tight">Active Errors</h2>
+            {errors.length > 0 && (
+                <span className="bg-rose-500 text-white text-xs font-black px-3 py-1 rounded-full shadow-lg shadow-rose-500/20">
+                    {errors.length} Sessions
                 </span>
-              )}
-            </h2>
+            )}
           </div>
 
           {isLoadingList ? (
-            <div className="flex justify-center py-16">
-              <Loader2 className="h-8 w-8 text-primary animate-spin" />
+            <div className="flex justify-center py-20">
+              <Loader2 className="h-10 w-10 text-primary animate-spin" />
             </div>
           ) : errors.length === 0 ? (
-            <div className="text-center py-16 bg-white/60 dark:bg-slate-800/40 rounded-2xl border border-dashed border-gray-200 dark:border-slate-700">
-              <BookOpen className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-              <p className="text-secondary-foreground font-medium">No active errors logged yet.</p>
-              <p className="text-sm text-secondary-foreground opacity-70 mt-1">Use the form above to log your first mistake — it's the first step to curing it!</p>
+            <div className="text-center py-24 bg-white dark:bg-slate-800/40 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700 shadow-sm">
+              <BookOpen className="h-16 w-16 text-slate-200 dark:text-slate-700 mx-auto mb-4" />
+              <p className="text-zinc-950 dark:text-foreground font-black text-lg">No active errors logged yet.</p>
+              <p className="text-sm text-zinc-400 mt-2 max-w-sm mx-auto">Use the system above to log your first mistake — it's the first step to curing it!</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 gap-6">
               {errors.map((err) => {
                 const due = formatDueDate(err.srs.nextReviewDate);
                 return (
                   <div
                     key={err._id}
-                    className="bg-white/90 dark:bg-slate-800/80 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm p-4 flex flex-col sm:flex-row sm:items-start gap-4 hover:shadow-md transition-shadow"
+                    className="bg-white dark:bg-slate-800/80 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/40 p-6 flex flex-col sm:flex-row sm:items-start gap-6 hover:shadow-2xl transition-all group"
                   >
                     {/* Left: Location Badge */}
-                    <div className="flex-shrink-0 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-3 text-center min-w-[65px]">
-                      <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
+                    <div className="flex-shrink-0 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-white/5 rounded-2xl p-4 text-center min-w-[80px] shadow-sm">
+                      <p className="text-[10px] text-zinc-400 font-black uppercase tracking-widest mb-1">
                         {err.location.surahName}
                       </p>
-                      <p className="text-xl font-extrabold text-emerald-700 dark:text-emerald-300">
+                      <p className="text-3xl font-black text-zinc-950 dark:text-white">
                         {err.location.ayahNumber}
                       </p>
-                      <p className="text-[10px] text-secondary-foreground">Ayah</p>
+                      <p className="text-[10px] text-emerald-500 font-black uppercase tracking-widest">Ayah</p>
                     </div>
 
                     {/* Middle: Content */}
                     <div className="flex-1 min-w-0">
                       {err.ayahText && (
-                        <p className="text-base font-quran font-bold text-foreground leading-loose mb-2 text-right line-clamp-2" dir="rtl">
+                        <p className="text-2xl font-quran font-black text-zinc-950 dark:text-foreground leading-relaxed mb-4 text-right" dir="rtl">
                           {err.ayahText}
                         </p>
                       )}
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-3">
                         <ErrorTypeBadge value={err.errorType} lang={i18n.language} />
                         {err.note && (
-                          <span className="text-sm text-secondary-foreground italic">"{err.note}"</span>
+                          <span className="text-sm font-bold text-zinc-500 italic px-2 border-s-2 border-slate-100">"{err.note}"</span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 mt-2">
-                        <div className={`flex items-center gap-1 text-xs font-semibold ${due.urgent ? 'text-red-500' : 'text-secondary-foreground'}`}>
-                          <Clock className="h-3.5 w-3.5" />
+                      <div className="flex items-center gap-4 mt-6">
+                        <div className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest ${due.urgent ? 'text-rose-500' : 'text-zinc-400'}`}>
+                          <Clock className="h-4 w-4" />
                           {due.label}
                         </div>
-                        <span className="text-xs text-secondary-foreground opacity-50">·</span>
-                        <span className="text-xs text-secondary-foreground opacity-60">
-                          {err.srs.consecutiveCorrect}/{5} correct reviews
+                        <div className="h-1 w-1 rounded-full bg-slate-200" />
+                        <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">
+                          {err.srs.consecutiveCorrect}/{5} Mastery Level
                         </span>
                       </div>
                     </div>
@@ -350,10 +351,10 @@ const ErrorLog = () => {
                     {/* Right: Delete */}
                     <button
                       onClick={() => handleDelete(err._id)}
-                      className="flex-shrink-0 p-2 text-gray-400 hover:text-destructive hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                      className="flex-shrink-0 p-3 text-slate-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-2xl transition-all"
                       title="Delete error"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-5 w-5" />
                     </button>
                   </div>
                 );

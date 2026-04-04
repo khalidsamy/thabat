@@ -30,100 +30,88 @@ const Navbar = () => {
   if (!user) return null;
 
   return (
-    <nav className="bg-white/80 dark:bg-card backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 transition-all duration-300 sticky top-0 z-50 shadow-sm shadow-zinc-200/50 dark:shadow-none">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <nav className="bg-white/60 dark:bg-card/60 backdrop-blur-md border-b border-slate-200 dark:border-white/5 transition-all duration-500 sticky top-0 z-50 shadow-sm shadow-slate-200/20">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12">
+        <div className="flex justify-between items-center h-20">
           
-          <div className="flex items-center gap-4">
-            <Link to="/dashboard" className="flex items-center gap-2.5 group">
-               <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
-                  <span className="text-white font-black text-xl">ث</span>
+          <div className="flex items-center gap-6">
+            <Link to="/dashboard" className="flex items-center gap-3 group">
+               <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-xl shadow-emerald-500/30 group-hover:scale-105 transition-transform duration-500">
+                  <span className="text-white font-black text-2xl">ث</span>
                </div>
-              <span className="font-extrabold text-xl tracking-tight text-foreground group-hover:text-primary transition-colors hidden sm:block">
+              <span className="font-black text-2xl tracking-tighter text-zinc-950 dark:text-foreground group-hover:text-emerald-600 transition-colors hidden sm:block uppercase">
                 {t('navbar.app_name')}
               </span>
             </Link>
-          </div>          {/* Center Nav Links (desktop only) */}
-          <div className="hidden lg:flex items-center gap-1 mx-8">
+          </div>
+
+          {/* Center Nav Links (desktop only) */}
+          <div className="hidden lg:flex items-center gap-2 mx-8 bg-slate-50 dark:bg-white/5 p-1.5 rounded-3xl border border-slate-200 dark:border-white/5">
             {menuItems.slice(0, 3).map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}
-                className={({ isActive }) => `flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${
+                className={({ isActive }) => `flex items-center gap-3 px-6 py-3 rounded-2xl text-sm font-black transition-all duration-500 uppercase tracking-widest ${
                   isActive 
-                    ? `bg-emerald-500/10 ${item.color} shadow-sm border border-emerald-500/10 scale-105` 
-                    : 'text-zinc-400 dark:text-slate-400 hover:bg-zinc-50 dark:hover:bg-white/5 hover:text-zinc-900'
+                    ? `bg-white dark:bg-zinc-950 shadow-lg shadow-slate-200/50 dark:shadow-black/20 ${item.color} scale-100` 
+                    : 'text-zinc-400 dark:text-slate-500 hover:text-zinc-950'
                 }`}
               >
-                <item.icon className="h-4 w-4" />
+                <item.icon className={`h-4 w-4 ${isActive ? item.color : 'text-zinc-300'}`} />
                 {item.label}
               </NavLink>
             ))}
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-6">
+          <div className="flex items-center gap-2 sm:gap-4">
             
             {/* Language Switcher */}
             <button 
               onClick={toggleLanguage} 
-              className="flex items-center gap-2 p-2 rounded-lg text-sm font-bold text-secondary-foreground hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-xs font-black text-zinc-500 hover:bg-slate-50 dark:hover:bg-white/5 transition-all uppercase tracking-widest"
               aria-label="Toggle Language"
             >
-              <Globe className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-              <span className="hidden sm:inline uppercase tracking-widest">{i18n.language === 'en' ? 'عربي' : 'EN'}</span>
+              <Globe className="h-4 w-4 text-emerald-600" />
+              <span className="hidden sm:inline">{i18n.language === 'en' ? 'Arabic' : 'English'}</span>
             </button>
 
-            {/* Dark Mode Toggle — always visible, ring on hover */}
+            {/* Dark Mode Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg text-secondary-foreground hover:bg-gray-100 dark:hover:bg-gray-800 hover:ring-2 ring-gray-200 dark:ring-gray-700 transition-all"
+              className="p-3 rounded-2xl text-zinc-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-all shadow-inner"
               aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-              title={isDarkMode ? 'Light mode' : 'Dark mode'}
             >
               {isDarkMode
-                ? <Sun className="h-5 w-5 text-yellow-400" />
-                : <Moon className="h-5 w-5 text-slate-600 dark:text-slate-300" />}
+                ? <Sun className="h-5 w-5 text-yellow-500" />
+                : <Moon className="h-5 w-5 text-zinc-950" />}
             </button>
             
-            {/* User Profile Badge → clickable link to /profile */}
+            {/* User Profile Badge */}
             <Link 
-              to="/profile"
-              className="hidden sm:flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
-              title="My Profile"
+              to="/dashboard/profile"
+              className="hidden md:flex items-center gap-3 pl-2 pr-4 py-1.5 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/5 hover:border-emerald-500/30 transition-all group"
             >
-              <div className="w-8 h-8 shadow-inner bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center border border-primary/20 group-hover:border-primary/50 transition-colors">
-                <span className="text-primary font-bold text-sm">
-                  {user?.name?.charAt(0).toUpperCase() || 'U'}
+              <div className="w-9 h-9 bg-zinc-950 dark:bg-white rounded-xl flex items-center justify-center shadow-lg shadow-black/10">
+                <span className="text-white dark:text-zinc-950 font-black text-sm uppercase">
+                  {user?.name?.charAt(0) || 'U'}
                 </span>
               </div>
-              <span className="text-sm font-medium text-foreground truncate max-w-[120px] group-hover:text-primary transition-colors">{user?.name}</span>
+              <span className="text-sm font-black text-zinc-950 dark:text-foreground group-hover:text-emerald-600 transition-colors uppercase tracking-tight">{user?.name}</span>
             </Link>
-
-            {/* Mobile: icon-only profile link */}
-            <Link
-              to="/profile"
-              className="sm:hidden p-2 rounded-full text-secondary-foreground hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label="Profile"
-            >
-              <UserCircle2 className="h-5 w-5" />
-            </Link>
-
-            {/* Logical Separator */}
-            <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 hidden sm:block"></div>
 
             {/* Logout Mechanism */}
             <button 
               onClick={logout}
-              className="hidden sm:flex group items-center gap-1.5 text-sm font-bold text-zinc-400 dark:text-slate-400 hover:text-rose-500 transition-colors px-4 py-2 rounded-xl hover:bg-rose-500/10"
+              className="hidden lg:flex items-center justify-center p-3 text-zinc-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-2xl transition-all"
+              title={t('navbar.logout')}
             >
-              <LogOut className="h-4 w-4 rtl:rotate-180" />
-              <span>{t('navbar.logout')}</span>
+              <LogOut className="h-5 w-5 rtl:rotate-180" />
             </button>
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2 rounded-xl text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
+              className="lg:hidden p-3 rounded-2xl bg-zinc-950 text-white shadow-xl shadow-zinc-950/20 active:scale-95 transition-all"
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>

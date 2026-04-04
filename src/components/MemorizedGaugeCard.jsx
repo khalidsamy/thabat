@@ -13,7 +13,7 @@ const MemorizedGaugeCard = ({ percentage, itemVariants }) => {
       variants={itemVariants}
       className="lg:col-span-4 group h-full"
     >
-      <div className="bg-white/80 dark:bg-card/40 border border-zinc-200 dark:border-white/5 rounded-[2.5rem] p-8 shadow-xl shadow-zinc-200/50 dark:shadow-black/5 h-full min-h-[320px] flex flex-col justify-between transition-all duration-300 hover:shadow-emerald-500/10 backdrop-blur-md">
+      <div className="bg-white dark:bg-card/40 border border-slate-200 dark:border-white/5 rounded-3xl p-8 shadow-xl shadow-slate-200/50 dark:shadow-black/5 h-full min-h-[320px] flex flex-col justify-between transition-all duration-300 hover:shadow-emerald-500/10 backdrop-blur-md">
         <div className="flex flex-col">
           <span className="text-[10px] font-black text-emerald-800/40 dark:text-emerald-500/40 uppercase tracking-[0.4em] mb-2 px-1">
             {t('dashboard.total_memorized_label') || 'TOTAL MEMORIZED'}

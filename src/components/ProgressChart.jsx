@@ -44,8 +44,8 @@ const ProgressChart = ({ refreshTrigger }) => {
 
   if (isLoading) {
     return (
-      <div className="bg-card rounded-xl border border-gray-100 p-6 shadow-sm h-full flex flex-col items-center justify-center min-h-[300px]">
-        <svg className="animate-spin h-8 w-8 text-primary opacity-50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <div className="bg-white dark:bg-card/40 rounded-3xl border border-slate-200 p-8 shadow-xl shadow-slate-200/40 h-full flex flex-col items-center justify-center min-h-[400px]">
+        <svg className="animate-spin h-10 w-10 text-emerald-500 opacity-50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
@@ -55,16 +55,16 @@ const ProgressChart = ({ refreshTrigger }) => {
 
   if (error) {
     return (
-      <div className="bg-card rounded-xl border border-gray-100 p-6 shadow-sm h-full flex flex-col items-center justify-center min-h-[300px]">
-        <p className="text-sm text-destructive">{error}</p>
+      <div className="bg-white dark:bg-card/40 rounded-3xl border border-slate-200 p-8 shadow-xl shadow-slate-200/40 h-full flex flex-col items-center justify-center min-h-[400px]">
+        <p className="text-sm font-bold text-rose-500">{error}</p>
       </div>
     );
   }
 
   // The AreaChart visually matches modern dashboards (Apple Health, Premium trackers)
   return (
-    <div className="bg-card rounded-xl border border-gray-100 p-6 shadow-sm h-full flex flex-col min-h-[300px]">
-      <h3 className="text-lg font-medium tracking-tight text-foreground mb-6">{t('chart.title')}</h3>
+    <div className="bg-white dark:bg-card/40 rounded-3xl border border-slate-200 p-8 lg:p-10 shadow-xl shadow-slate-200/40 h-full flex flex-col min-h-[450px] transition-all duration-300">
+      <h3 className="text-xl font-black tracking-tight text-zinc-950 dark:text-foreground mb-8 uppercase tracking-widest">{t('chart.title')}</h3>
       
       <div className="flex-1 w-full relative">
         {data.length > 0 ? (

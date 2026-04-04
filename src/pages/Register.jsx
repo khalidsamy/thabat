@@ -55,97 +55,102 @@ const Register = () => {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center px-4 py-10 overflow-hidden
-      bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900">
+    <div className="relative min-h-screen flex items-center justify-center px-4 py-10 overflow-hidden bg-background">
 
-      {/* Islamic geometric pattern overlay */}
+      {/* Islamic geometric pattern overlay - subtle for light mode */}
       <IslamicPattern />
 
-      {/* Radial glow — slightly higher to account for taller page */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full
-        bg-emerald-500/10 blur-3xl pointer-events-none" />
+      {/* Soft gradient Orbs for that premium feel */}
+      <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-amber-500/5 blur-[120px] pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-md">
 
-        {/* Logo */}
-        <div className="flex justify-center mb-5">
-          <img
-            src="/ThabatLogo.png"
-            alt="Thabat Logo"
-            className="h-20 w-20 object-contain drop-shadow-[0_0_20px_rgba(52,211,153,0.4)]"
-          />
+        {/* Logo Section */}
+        <div className="flex flex-col items-center mb-10">
+          <div className="w-20 h-20 bg-emerald-500 rounded-[2.5rem] flex items-center justify-center shadow-[0_20px_50px_rgba(16,185,129,0.3)] mb-6 animate-bounce-slow">
+            <span className="text-white font-black text-4xl">ث</span>
+          </div>
+          <h1 className="text-4xl font-black text-zinc-950 tracking-tighter uppercase mb-2">Thabat</h1>
+          <div className="h-1 w-12 bg-emerald-500 rounded-full"></div>
         </div>
 
         {/* Quranic Verse */}
-        <div className="text-center mb-6">
-          <p className="text-lg font-bold text-emerald-100 leading-loose" dir="rtl">
+        <div className="text-center mb-8 p-6 bg-emerald-50/50 rounded-3xl border border-emerald-100/50">
+          <p className="text-xl font-black text-zinc-950 leading-loose" dir="rtl">
             {QURAN_VERSE.arabic}
           </p>
-          <p className="text-xs text-amber-300 font-semibold mt-1" dir="rtl">
+          <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mt-2" dir="rtl">
             {QURAN_VERSE.reference}
           </p>
-          <p className="text-xs text-white/50 italic mt-1">{QURAN_VERSE.english}</p>
         </div>
 
-        {/* Title */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-extrabold text-white tracking-tight">
-            {t('auth.register_title')}
-          </h1>
-          <p className="mt-1 text-sm text-white/60">{t('auth.register_subtitle')}</p>
-        </div>
-
-        {/* Glassmorphism Card */}
-        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl shadow-2xl shadow-black/40 px-7 py-8">
+        {/* Register Card */}
+        <div className="bg-white dark:bg-card/80 border border-slate-200 dark:border-white/5 rounded-[3rem] shadow-[0_30px_60px_rgba(0,0,0,0.08)] px-10 py-12 transition-all duration-500 hover:shadow-[0_40px_80px_rgba(0,0,0,0.12)]">
           <style>{`
-            .glass-input input {
-              background: rgba(255,255,255,0.08) !important;
-              border-color: rgba(255,255,255,0.15) !important;
-              color: white !important;
+            .elite-input input {
+              height: 64px !important;
+              border-radius: 20px !important;
+              background: #F8FAFC !important;
+              border: 2px solid transparent !important;
+              font-weight: 700 !important;
+              font-size: 1rem !important;
+              transition: all 0.3s ease !important;
             }
-            .glass-input input::placeholder { color: rgba(255,255,255,0.35) !important; }
-            .glass-input input:focus {
-              border-color: rgba(52,211,153,0.6) !important;
-              box-shadow: 0 0 0 4px rgba(52,211,153,0.12) !important;
+            .elite-input input:focus {
+              background: white !important;
+              border-color: #10b981 !important;
+              box-shadow: 0 10px 30px rgba(16,185,129,0.1) !important;
             }
-            .glass-input label { color: rgba(255,255,255,0.75) !important; }
-            .glass-input .text-gray-400 { color: rgba(255,255,255,0.35) !important; }
-            .glass-input .text-emerald-600 { color: #34d399 !important; }
+            .elite-input label {
+              font-weight: 800 !important;
+              font-size: 11px !important;
+              text-transform: uppercase !important;
+              letter-spacing: 0.1em !important;
+              color: #64748b !important;
+            }
           `}</style>
 
-          <form onSubmit={handleSubmit} className="space-y-1">
-            <div className="glass-input">
+          <div className="text-center mb-10">
+            <h2 className="text-xl font-black text-zinc-950 dark:text-foreground uppercase tracking-tight">
+              {t('auth.register_title')}
+            </h2>
+            <p className="mt-2 text-xs font-bold text-zinc-400 uppercase tracking-widest">{t('auth.register_subtitle')}</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="elite-input">
               <Input label={t('auth.full_name')} id="name" name="name" type="text"
                 required autoComplete="name" placeholder={t('auth.name_placeholder')}
-                value={formData.name} onChange={handleChange} icon={<User className="h-4 w-4" />}
+                value={formData.name} onChange={handleChange} icon={<User className="h-5 w-5" />}
               />
             </div>
-            <div className="glass-input">
+            <div className="elite-input">
               <Input label={t('auth.email')} id="email" name="email" type="email"
                 required autoComplete="email" placeholder={t('auth.email_placeholder')}
-                value={formData.email} onChange={handleChange} icon={<Mail className="h-4 w-4" />}
+                value={formData.email} onChange={handleChange} icon={<Mail className="h-5 w-5" />}
               />
             </div>
-            <div className="glass-input">
+            <div className="elite-input">
               <Input label={t('auth.password')} id="password" name="password" type="password"
                 required placeholder={t('auth.password_placeholder')}
-                value={formData.password} onChange={handleChange} icon={<Lock className="h-4 w-4" />}
+                value={formData.password} onChange={handleChange} icon={<Lock className="h-5 w-5" />}
               />
             </div>
 
-            <div className="pt-2">
-              <Button type="submit" isLoading={isLoading} disabled={isLoading}>
+            <div className="pt-4">
+              <Button type="submit" isLoading={isLoading} disabled={isLoading} className="h-16 w-full bg-zinc-950 hover:bg-zinc-800 text-white font-black text-lg rounded-2xl shadow-xl shadow-zinc-950/20 active:scale-95 transition-all uppercase tracking-widest">
                 {isLoading ? t('auth.saving') : t('auth.create_account')}
               </Button>
             </div>
           </form>
 
           {/* Footer */}
-          <div className="mt-5 text-center">
-            <p className="text-sm text-white font-medium">
+          <div className="mt-10 text-center">
+            <p className="text-sm font-bold text-zinc-400 uppercase tracking-tight">
               {t('auth.already_have_account')}{' '}
               <Link to="/login"
-                className="font-bold text-emerald-400 hover:text-emerald-300 transition-colors underline underline-offset-4 decoration-2">
+                className="font-black text-emerald-600 hover:text-emerald-500 transition-colors underline underline-offset-[6px] decoration-4 decoration-emerald-500/20">
                 {t('auth.sign_in')}
               </Link>
             </p>
@@ -153,7 +158,7 @@ const Register = () => {
         </div>
 
         {/* Bottom ornament */}
-        <p className="text-center text-white/25 text-xs mt-6 tracking-widest uppercase">
+        <p className="text-center text-zinc-300 font-bold text-[10px] mt-10 tracking-[0.4em] uppercase">
           ثَبِّتْنَا عَلَى حِفْظِ كِتَابِكَ
         </p>
       </div>

@@ -31,32 +31,32 @@ const Sidebar = () => {
 
   return (
     <aside 
-      className={`hidden md:flex flex-col h-screen sticky top-0 z-40 bg-white/60 dark:bg-card/50 backdrop-blur-xl border-zinc-200 dark:border-white/5 transition-all duration-300 w-20 lg:w-64 overflow-y-auto overflow-x-hidden group shrink-0 ${
-        i18n.language === 'ar' ? 'border-s shadow-[-10px_0_30px_rgba(0,0,0,0.02)]' : 'border-e shadow-[10px_0_30px_rgba(0,0,0,0.02)]'
+      className={`hidden md:flex flex-col h-screen sticky top-0 z-40 bg-white/60 dark:bg-card/50 backdrop-blur-md border-slate-200 dark:border-white/5 transition-all duration-300 w-20 lg:w-64 overflow-y-auto overflow-x-hidden group shrink-0 ${
+        i18n.language === 'ar' ? 'border-s shadow-[-10px_0_30px_rgba(0,0,0,0.01)]' : 'border-e shadow-[10px_0_30px_rgba(0,0,0,0.01)]'
       }`}
       dir={t('direction') || (i18n.language === 'ar' ? 'rtl' : 'ltr')}
     >
       <div className="p-6 flex items-center gap-4 overflow-hidden min-h-[80px]">
-        <div className="w-10 h-10 bg-emerald-600 rounded-[1rem] flex items-center justify-center shrink-0 shadow-xl shadow-emerald-500/20 border border-white/10 group-hover:rotate-6 transition-transform">
+        <div className="w-10 h-10 bg-emerald-600 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20 border border-white/10 group-hover:rotate-6 transition-transform">
           <span className="text-white font-black text-xl">ث</span>
         </div>
         <div className="hidden lg:flex flex-col opacity-0 lg:opacity-100 transition-opacity duration-300">
-           <span className="text-xl font-black text-foreground tracking-tighter uppercase leading-none">Thabat</span>
-           <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mt-1 leading-none">Holy Quran</span>
+           <span className="text-xl font-black text-zinc-950 dark:text-foreground tracking-tighter uppercase leading-none">Thabat</span>
+           <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.2em] mt-1 leading-none">Holy Quran</span>
         </div>
       </div>
 
-      <nav className="flex-1 px-3 space-y-2 mt-4">
+      <nav className="flex-1 px-3 space-y-1.5 mt-4">
         {navItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             end={item.exact}
             className={({ isActive }) =>
-              `relative flex items-center gap-4 p-3 rounded-2xl transition-all duration-300 group/item ${
+              `relative flex items-center gap-4 p-3.5 rounded-2xl transition-all duration-300 group/item ${
                 isActive 
-                  ? 'bg-emerald-500/10 text-emerald-900 dark:text-emerald-400 font-bold' 
-                  : 'text-zinc-500 dark:text-slate-400 hover:bg-zinc-100/50 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-slate-200'
+                  ? 'bg-emerald-500/10 text-emerald-950 dark:text-emerald-400 font-bold' 
+                  : 'text-zinc-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-zinc-950 dark:hover:text-slate-200'
               }`
             }
           >

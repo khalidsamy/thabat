@@ -5,12 +5,12 @@ import { MILESTONES } from '../utils/rankManager';
 const AchievementBadges = ({ pages = 0 }) => {
   const { t } = useTranslation();
   return (
-    <div className="bg-card dark:bg-card/50 border border-gray-100 dark:border-white/5 rounded-3xl p-8 shadow-sm">
+    <div className="bg-white dark:bg-card/40 border border-slate-200 dark:border-white/5 rounded-3xl p-8 shadow-xl shadow-slate-200/40 transition-all duration-300">
       <div className="flex items-center justify-between mb-8">
-        <h3 className="text-xl font-bold text-foreground">
+        <h3 className="text-xl font-black text-zinc-950 dark:text-foreground uppercase tracking-tight">
           {t('achievements.title')}
         </h3>
-        <p className="text-xs font-medium text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full uppercase tracking-widest">
+        <p className="text-[10px] font-black text-zinc-400 bg-slate-50 dark:bg-slate-900 px-4 py-2 rounded-full border border-slate-100 dark:border-white/5 uppercase tracking-widest">
           {MILESTONES.filter(m => pages >= m.pages).length} / {MILESTONES.length} {t('achievements.unlocked')}
         </p>
       </div>

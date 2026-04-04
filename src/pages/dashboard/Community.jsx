@@ -93,45 +93,46 @@ const Community = (props) => {
   const canPost = progress?.doneToday >= progress?.dailyTarget;
 
   return (
-    <div className="space-y-8 pb-32">
-      <motion.section variants={itemVariants} className="text-center max-w-2xl mx-auto py-4">
-        <h2 className="text-3xl font-extrabold text-foreground mb-2">{t('community.title')}</h2>
-        <p className="text-secondary-foreground opacity-70">{t('community.subtitle')}</p>
+    <div className="space-y-12 pb-32 animate-fade-in bg-background min-h-screen">
+      <motion.section variants={itemVariants} className="text-center max-w-2xl mx-auto py-8">
+        <h2 className="text-4xl font-black text-zinc-950 dark:text-foreground tracking-tight mb-4 uppercase">{t('community.title')}</h2>
+        <p className="text-sm font-bold text-zinc-500 uppercase tracking-[0.2em] leading-relaxed">{t('community.subtitle')}</p>
       </motion.section>
 
       <motion.section variants={itemVariants} className="max-w-2xl mx-auto w-full">
-        <div className={`bg-card rounded-[2rem] border-2 p-8 shadow-xl transition-all duration-500 ${
-          canPost ? 'border-emerald-500/20 shadow-emerald-500/5' : 'border-amber-500/20 bg-amber-500/5 opacity-80'
+        <div className={`bg-white dark:bg-card/40 rounded-3xl border border-slate-200 dark:border-white/5 p-10 shadow-xl shadow-slate-200/50 transition-all duration-500 ${
+          canPost ? 'shadow-emerald-500/5' : 'bg-amber-50/50 dark:bg-amber-500/5 opacity-90'
         }`}>
           {!canPost ? (
-            <div className="text-center space-y-4">
-               <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Sparkles className="h-8 w-8 text-amber-600" />
+            <div className="text-center space-y-6">
+               <div className="w-20 h-20 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                  <Sparkles className="h-10 w-10 text-amber-600" />
                </div>
-               <p className="text-amber-800 dark:text-amber-200 font-bold">
+               <p className="text-zinc-950 dark:text-amber-200 font-black text-lg uppercase tracking-tight">
                  {t('community.goal_required')}
                </p>
+               <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest leading-relaxed">Complete your daily Hifz target to unlock spiritual sharing.</p>
             </div>
           ) : (
-            <form onSubmit={handlePostReflection} className="space-y-4">
+            <form onSubmit={handlePostReflection} className="space-y-6">
               <textarea
                 value={newReflection}
                 onChange={(e) => setNewReflection(e.target.value)}
                 placeholder={t('community.placeholder')}
                 maxLength={200}
-                className="w-full h-32 bg-slate-50 dark:bg-slate-900 shadow-inner rounded-2xl p-4 text-foreground border-none focus:ring-2 focus:ring-emerald-500 transition-all resize-none font-medium"
+                className="w-full h-40 bg-slate-50 dark:bg-slate-900 shadow-inner rounded-3xl p-6 text-zinc-950 dark:text-foreground border-none focus:ring-4 focus:ring-emerald-500/10 transition-all resize-none font-bold text-xl leading-relaxed text-center"
               />
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-400">
-                  {newReflection.length}/200
+                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">
+                  {newReflection.length} / 200 CHARACTERS
                 </span>
                 <Button 
                   type="submit" 
                   disabled={isPosting || !newReflection.trim()} 
                   isLoading={isPosting}
-                  className="px-8"
+                  className="h-14 px-10 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-black uppercase tracking-widest shadow-xl shadow-zinc-950/20 active:scale-95 transition-all"
                 >
-                  <Send className="h-4 w-4 me-2" />
+                  <Send className="h-4 w-4 me-3" />
                   {t('community.post')}
                 </Button>
               </div>
