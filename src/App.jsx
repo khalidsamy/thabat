@@ -8,6 +8,8 @@ import { ToastProvider } from './context/ToastContext';
 import Navbar from './components/Navbar';
 import Toast from './components/Toast';
 import Footer from './components/Footer';
+import { useContext } from 'react';
+import { AuthContext } from './context/AuthContext';
 
 // Pages
 import Register from './pages/Register';
@@ -39,6 +41,9 @@ function App() {
             <div className="min-h-screen bg-background">
               <Toast />
               <Routes>
+                {/* Global Root Transition Logic */}
+                <Route path="/" element={<RootRedirect />} />
+
                 {/* Public Routes with standalone layout */}
                 <Route 
                   path="/register" 
@@ -64,8 +69,6 @@ function App() {
 
                 {/* Unified Dashboard Hub */}
                 <Route element={<ProtectedRoute><ResponsiveLayout /></ProtectedRoute>}>
-                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                  
                   <Route path="/dashboard" element={<Dashboard />}>
                     <Route index element={<Home />} />
                     <Route path="progress" element={<Progress />} />
@@ -90,6 +93,12 @@ function App() {
       </ToastProvider>
     </ThemeProvider>
   );
+}
+
+function RootRedirect() {
+  const { token, loading } = useContext(AuthContext);
+  if (loading) return null; // Avoid flickering during bootstrap
+  return token ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />;
 }
 
 export default App;

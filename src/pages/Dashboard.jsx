@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Routes, Route, useLocation, Navigate, Outlet, useOutletContext } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Heart, Flame, CalendarCheck } from 'lucide-react';
+import { Share2, Heart, Flame, CalendarCheck, Loader2 } from 'lucide-react';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -29,6 +29,11 @@ const Dashboard = () => {
   const [progress, setProgress] = useState(null);
   const [user, setUser] = useState(authUser || {});
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Sync the local user state with AuthContext (Live Updates)
+  useEffect(() => {
+    if (authUser) setUser(authUser);
+  }, [authUser]);
   const [error, setError] = useState(null);
   const [dailyVerse, setDailyVerse] = useState(null);
   const [hasNotifiedToday, setHasNotifiedToday] = useState(false);
@@ -146,7 +151,7 @@ const Dashboard = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center">
-        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} className="h-10 w-10 border-4 border-emerald-500 border-t-transparent rounded-full mb-4" />
+        <Loader2 className="h-10 w-10 text-emerald-500 animate-spin mb-4" />
         <p className="text-secondary-foreground font-medium animate-pulse">{t('dashboard.loading')}</p>
       </div>
     );

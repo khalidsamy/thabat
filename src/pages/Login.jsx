@@ -86,7 +86,7 @@ const Login = () => {
       if (response.data.success) {
         const { token, user } = response.data;
         login(token, user);
-        showSuccess(t('auth.welcome_back', { name: user.name }));
+        showSuccess(t('auth.welcome_back', { name: user?.name }));
         navigate('/dashboard');
       }
     } catch (err) {
