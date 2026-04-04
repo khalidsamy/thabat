@@ -231,7 +231,7 @@ const Dashboard = () => {
   const isDashboardRoot = location.pathname === '/dashboard' || location.pathname === '/dashboard/';
 
   return (
-    <div className="dashboard-main relative w-full h-full">
+    <div className="dashboard-main relative w-full h-full overflow-x-hidden">
         {/* Unified Grid: ONLY for Desktop AND the main overview route */}
         {isDashboardRoot ? (
           <>
@@ -281,12 +281,12 @@ const Dashboard = () => {
           </AnimatePresence>
         )}
 
-        {/* Floating Heart FAB - Repositioned for Sidebar accessibility */}
+        {/* Floating Heart FAB - Repositioned for BottomNav safety */}
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsHeartOpen(true)}
-          className="fixed bottom-24 md:bottom-8 right-8 z-40 w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full shadow-2xl flex items-center justify-center group border-2 border-white/20"
+          className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] md:bottom-10 right-6 md:right-10 z-40 w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full shadow-2xl flex items-center justify-center group border-2 border-white/20"
         >
           <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.2, 0.5] }} transition={{ duration: 3, repeat: Infinity }} className="absolute inset-0 bg-amber-400 rounded-full" />
           <Heart className="relative h-7 w-7 text-white fill-white group-hover:scale-110" />

@@ -51,7 +51,7 @@ const RecoveryCard = ({ onStartSmall }) => {
             </p>
           </div>
 
-          <div className="bg-white/50 dark:bg-black/20 backdrop-blur-sm rounded-3xl p-6 border border-white dark:border-white/5">
+          <div className="bg-white/50 dark:bg-black/20 backdrop-blur-sm rounded-3xl p-6 border border-white dark:border-white/5 mb-6">
             <p className="text-xl font-bold text-foreground mb-2 leading-relaxed" dir="rtl">
                "{hadith.text}"
             </p>
@@ -61,6 +61,22 @@ const RecoveryCard = ({ onStartSmall }) => {
             <p className="text-xs font-medium text-slate-400 italic">
               {hadith.translation}
             </p>
+          </div>
+
+          {/* Surah Progress Indicator */}
+          <div className="px-2">
+             <div className="flex justify-between items-end mb-2">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Current Surah Goal</span>
+                <span className="text-xs font-bold text-rose-500">Recovery Phase</span>
+             </div>
+             <div className="h-1.5 w-full bg-rose-100 dark:bg-rose-900/20 rounded-full overflow-hidden">
+                <motion.div 
+                   initial={{ width: 0 }}
+                   animate={{ width: '35%' }}
+                   transition={{ duration: 1.5, ease: "easeOut" }}
+                   className="h-full bg-rose-500 rounded-full shadow-[0_0_10px_rgba(244,63,94,0.3)]" 
+                />
+             </div>
           </div>
         </div>
 

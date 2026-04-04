@@ -35,24 +35,35 @@ const VoiceRecitation = ({ onComplete }) => {
             </h3>
         </div>
 
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={isListening ? stopListening : startListening}
-          className={`w-24 h-24 sm:w-32 sm:h-32 rounded-full flex items-center justify-center text-white shadow-2xl transition-all duration-500 ${
-            isListening 
-              ? 'bg-rose-500 shadow-rose-500/40' 
-              : 'bg-emerald-500 shadow-emerald-500/30'
-          }`}
-        >
-          {isListening ? (
-            <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity }}>
-              <MicOff className="h-10 w-10 sm:h-14 sm:w-14" />
-            </motion.div>
-          ) : (
-            <Mic className="h-10 w-10 sm:h-14 sm:w-14" />
-          )}
-        </motion.button>
+        <div className="relative group/btn">
+          {/* Constant 'Main Star Action' Pulse Animation */}
+          <motion.div 
+            animate={{ scale: [1, 1.15, 1], opacity: [0.15, 0.05, 0.15] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            className={`absolute -inset-10 rounded-full blur-3xl transition-colors duration-500 ${
+              isListening ? 'bg-rose-500' : 'bg-emerald-500'
+            }`}
+          />
+          
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={isListening ? stopListening : startListening}
+            className={`w-36 h-36 sm:w-48 sm:h-48 rounded-full flex items-center justify-center text-white shadow-[0_20px_50px_rgba(16,185,129,0.3)] transition-all duration-500 relative z-10 ${
+              isListening 
+                ? 'bg-rose-500 shadow-rose-500/40 ring-8 ring-rose-500/10' 
+                : 'bg-emerald-500 shadow-emerald-500/30 ring-8 ring-emerald-500/10 hover:shadow-emerald-500/50'
+            }`}
+          >
+            {isListening ? (
+              <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity }}>
+                <MicOff className="h-14 w-14 sm:h-20 sm:w-20" />
+              </motion.div>
+            ) : (
+              <Mic className="h-14 w-14 sm:h-20 sm:w-20" />
+            )}
+          </motion.button>
+        </div>
 
         <div className="min-h-[60px] flex flex-col items-center justify-center">
             <AnimatePresence mode="wait">

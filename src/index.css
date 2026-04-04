@@ -45,7 +45,7 @@
   /* Prevent double scrollbars and layout shifts */
   #root {
     overflow-x: hidden;
-    width: 100vw;
+    width: 100%;
     min-height: 100vh;
   }
 }

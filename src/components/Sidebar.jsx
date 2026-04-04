@@ -36,11 +36,14 @@ const Sidebar = () => {
       }`}
       dir={t('dir') || (i18n.language === 'ar' ? 'rtl' : 'ltr')}
     >
-      <div className="p-6 flex items-center gap-3">
-        <div className="w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
-          <span className="text-white font-black">ث</span>
+      <div className="p-6 flex items-center gap-4 overflow-hidden min-h-[80px]">
+        <div className="w-10 h-10 bg-emerald-600 rounded-[1rem] flex items-center justify-center shrink-0 shadow-xl shadow-emerald-500/20 border border-white/10 group-hover:rotate-6 transition-transform">
+          <span className="text-white font-black text-xl">ث</span>
         </div>
-        <span className="hidden lg:block text-xl font-black text-foreground tracking-tighter uppercase">Thabat</span>
+        <div className="hidden lg:flex flex-col opacity-0 lg:opacity-100 transition-opacity duration-300">
+           <span className="text-xl font-black text-foreground tracking-tighter uppercase leading-none">Thabat</span>
+           <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mt-1 leading-none">Holy Quran</span>
+        </div>
       </div>
 
       <nav className="flex-1 px-3 space-y-2 mt-4">
@@ -51,8 +54,6 @@ const Sidebar = () => {
             end={item.exact}
             className={({ isActive }) =>
               `relative flex items-center gap-4 p-3 rounded-2xl transition-all duration-300 group/item ${
-                i18n.language === 'ar' ? 'flex-row-reverse' : 'flex-row'
-              } ${
                 isActive 
                   ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
                   : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-600 dark:hover:text-slate-200'
@@ -62,7 +63,7 @@ const Sidebar = () => {
             {({ isActive }) => (
               <>
                 <item.icon className={`h-6 w-6 shrink-0 ${isActive ? 'scale-110' : 'scale-100'} transition-transform duration-300`} />
-                <span className="hidden lg:block text-sm font-bold truncate opacity-0 lg:opacity-100 transition-opacity duration-300">
+                <span className="hidden lg:block text-sm font-bold truncate transition-all duration-300">
                   {item.label}
                 </span>
                 {isActive && (
@@ -83,9 +84,7 @@ const Sidebar = () => {
           <NavLink
             key={item.path}
             to={item.path}
-            className={`flex items-center gap-4 p-3 rounded-2xl text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-600 dark:hover:text-slate-200 transition-all duration-300 ${
-              i18n.language === 'ar' ? 'flex-row-reverse text-right' : 'flex-row text-left'
-            }`}
+            className="flex items-center gap-4 p-3 rounded-2xl text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-600 dark:hover:text-slate-200 transition-all duration-300"
           >
             <item.icon className="h-6 w-6 shrink-0" />
             <span className="hidden lg:block text-sm font-bold truncate">
@@ -96,9 +95,7 @@ const Sidebar = () => {
         
         <button 
           onClick={handleLogout}
-          className={`w-full flex items-center gap-4 p-3 rounded-2xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 transition-all duration-300 ${
-            i18n.language === 'ar' ? 'flex-row-reverse text-right' : 'flex-row text-left'
-          }`}
+          className="w-full flex items-center gap-4 p-3 rounded-2xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 transition-all duration-300"
         >
           <LogOut className="h-6 w-6 shrink-0" />
           <span className="hidden lg:block text-sm font-bold truncate">

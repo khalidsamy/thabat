@@ -9,7 +9,7 @@ const StatCard = ({ title, value, icon, subtitle, className = "" }) => {
         y: -5,
         transition: { duration: 0.2, ease: "easeOut" }
       }}
-      className={`glass-card dark:glass-card rounded-2xl p-6 transition-all duration-300 hover:shadow-2xl hover:glow-border flex flex-col justify-between group ${className}`}
+      className={`glass-card dark:glass-card rounded-[1.5rem] p-6 transition-all duration-300 hover:shadow-2xl hover:glow-border flex flex-col justify-between group overflow-hidden border border-gray-100 dark:border-white/5 ${className}`}
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">

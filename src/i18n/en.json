@@ -64,7 +64,10 @@
     "sunnah_log": "Log Completion Now",
     "golden_rule": "Golden Rule:",
     "golden_rule_msg": "Don't recite what you learned today to your teacher yet! Test yourself every 8 hours, and recite tomorrow for long-term mastery.",
-    "start_journey": "Start your journey!"
+    "start_journey": "Start your journey!",
+    "review_tools": "Review Tools",
+    "syncing": "Syncing your data...",
+    "loading_subtitle": "Synchronizing your spiritual journey."
   },
   "chart": {
     "title": "Memorization History",
