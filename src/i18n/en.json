@@ -42,29 +42,70 @@
     "number_of_pages": "Number of Pages",
     "placeholder_pages": "e.g., 2",
     "save_progress": "Save Progress",
+    "saving": "Saving...",
     "invalid_input": "Please enter a valid positive number of pages.",
-    "success_update": "Fantastic! You've memorized {{count}} page today.",
-    "success_update_plural": "Fantastic! You've memorized {{count}} pages today."
+    "success_update": "Fantastic! You've memorized {{count}} page(s) today.",
+    "daily_verse": "Daily Verse",
+    "overall_mastery": "Overall Mastery",
+    "share": "Share Achievement",
+    "streak_saved": "Streak Saved! 🔥",
+    "streak_saved_msg": "Masha'Allah! Even with the delay, you did it. We're proud of you!",
+    "stabilization_tasks": "Stabilization Tasks",
+    "pages": "pages",
+    "hifz_stats": "Hifz Status",
+    "distant_review_card": "Distant Review (Old)",
+    "intensive_review_card": "Intensive Review (New)",
+    "days_system": "{{days}} Days System",
+    "intensive_system": "3 Days System (Intensive)",
+    "sunnah_question": "Did you recite your new hifz in Sunnah/Nawafil prayers today?",
+    "sunnah_desc": "Reciting in Sunnah prayers is the ultimate stabilization technique.",
+    "sunnah_done": "Logged in Sunnah",
+    "sunnah_log": "Log Completion Now",
+    "golden_rule": "Golden Rule:",
+    "golden_rule_msg": "Don't recite what you learned today to your teacher yet! Test yourself every 8 hours, and recite tomorrow for long-term mastery."
   },
   "chart": {
     "title": "Memorization History"
   },
   "achievements": {
-    "title": "Your Achievements",
-    "names": {
-      "Beginner": "Beginner",
-      "Consistent": "Consistent",
-      "Warrior": "Warrior",
-      "Halfway": "Halfway",
-      "Master": "Master"
-    }
+    "title": "Achievements & Badges",
+    "unlocked": "Unlocked",
+    "progress": "Progress"
   },
-  "leaderboard": {
-    "title": "Global Hall of Fame",
-    "longest_streak": "Longest Streak:",
-    "days": "days",
-    "pages": "Pages",
-    "no_records": "No standing records yet!",
-    "you": "You"
+  "ranks": {
+    "murabit": "Murabit",
+    "mujahid": "Mujahid",
+    "saffir": "Saffir",
+    "hafiz": "Hafiz",
+    "mutqin": "Mutqin"
+  },
+  "streaks": {
+    "days_streak": "Days Streak",
+    "excited": "On the Right Path! 🔥",
+    "waiting": "Waiting for you... ⏳",
+    "anxious": "We're with you! 😟",
+    "newbie": "Blessed Start 🌱"
+  },
+  "recovery": {
+    "doctor_mode": "Spiritual Doctor Mode",
+    "doctor_title": "It's okay, let's start fresh with a small step",
+    "doctor_subtitle": "Stumbling is not the end; returning to the Quran is the true victory.",
+    "cta": "Start with one verse now"
+  },
+  "voice": {
+    "title": "Recite to Me (Voice Recitation)",
+    "listening": "Listening...",
+    "click_to_start": "Click the button and start reciting",
+    "confirm_and_log": "Confirm & Log"
+  },
+  "tasks": {
+    "new_hifz": "New Hifz",
+    "intensive_review": "Intensive Review",
+    "distant_review": "Distant Review",
+    "weekly_review": "Weekly Review"
+  },
+  "heart": {
+    "title": "Message to Your Heart",
+    "another_message": "Another Message"
   }
 }

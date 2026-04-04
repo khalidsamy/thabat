@@ -1,21 +1,59 @@
-import React from 'react';
-import { Flame, Star, Trophy, Calendar, CheckCircle2 } from 'lucide-react';
+import { Flame, Star, Trophy, Calendar, CheckCircle2, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+import { getStreakMood, getMoodVariants, MOODS } from '../utils/streakMoods';
 
-const HifzStreaks = ({ streak = 7, totalDays = 14, currentSurah = "Al-Kahf", completion = 65 }) => {
-  // Mock data for a 7-day view
-  const days = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-  const activity = [true, true, true, false, true, true, true];
+const HifzStreaks = ({ streak = 0, isCompletedToday = false, wasActiveYesterday = true, currentSurah = "Al-Kahf", completion = 65 }) => {
+  const { t, i18n } = useTranslation();
+  const mood = getStreakMood(streak, isCompletedToday, wasActiveYesterday);
+  const moodVariant = getMoodVariants(mood.id);
+
+  // Localization for mood labels
+  const moodLabels = {
+    excited: t('streaks.excited'),
+    waiting: t('streaks.waiting'),
+    anxious: t('streaks.anxious'),
+    newbie: t('streaks.newbie'),
+  };
+
+  // Days localization
+  const days = i18n.language === 'ar' 
+    ? ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة']
+    : ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+    
+  const activity = [true, true, true, false, true, true, isCompletedToday];
 
   return (
-    <div className="bg-card dark:bg-card/50 border border-gray-100 dark:border-white/5 rounded-2xl p-6 shadow-sm">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
-          <Flame className="h-5 w-5 text-emerald-500 fill-emerald-500/20" />
-          معسكر التثبيت (Daily Streak)
-        </h3>
-        <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-3 py-1 rounded-full">
-          {streak} Days Active
-        </span>
+    <div className="bg-card dark:bg-card/50 border border-gray-100 dark:border-white/5 rounded-2xl p-6 shadow-sm overflow-hidden relative group">
+      {/* Dynamic Background Glow Based on Mood */}
+      <div className={`absolute top-0 right-0 w-64 h-64 -mr-32 -mt-32 blur-3xl opacity-20 transition-colors duration-1000 ${
+        mood.bgColor.replace('/10', '/30')
+      }`}></div>
+
+      <div className="relative flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          <motion.div
+            {...moodVariant}
+            className={`w-14 h-14 ${mood.bgColor} rounded-2xl flex items-center justify-center text-3xl shadow-sm border border-white/10`}
+          >
+            {mood.emoji}
+          </motion.div>
+          <div>
+            <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+              {moodLabels[mood.id]}
+            </h3>
+            <p className="text-xs text-slate-400 font-medium">{mood.desc}</p>
+          </div>
+        </div>
+        
+        <div className="flex flex-col items-end">
+          <span className={`text-2xl font-black ${mood.color} tabular-nums drop-shadow-sm`}>
+            {streak}
+          </span>
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 opacity-60">
+            {t('streaks.days_streak')}
+          </span>
+        </div>
       </div>
 
       {/* Week View Visualizer */}

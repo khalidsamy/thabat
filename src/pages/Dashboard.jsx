@@ -11,6 +11,19 @@ import Leaderboard from '../components/Leaderboard';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import SpiritualCarousel from '../components/SpiritualCarousel';
+import HifzStreaks from '../components/HifzStreaks';
+import HifzProgress from '../components/HifzProgress';
+import AchievementBadges from '../components/AchievementBadges';
+import { QURAN_VERSES } from '../utils/verses';
+import { motion } from 'framer-motion';
+import { getDailyTasks } from '../utils/PlanManager';
+import { getUserRank } from '../utils/rankManager';
+import RecoveryCard from '../components/RecoveryCard';
+import VoiceRecitation from '../components/VoiceRecitation';
+import HeartMessage from '../components/HeartMessage';
+import confetti from 'canvas-confetti';
+import { queueOfflineAction } from '../services/offlineSync';
+import { Share2, Heart } from 'lucide-react';
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -21,6 +34,9 @@ const Dashboard = () => {
   const [progress, setProgress] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [dailyVerse, setDailyVerse] = useState(null);
+  const [hasNotifiedToday, setHasNotifiedToday] = useState(false);
+  const [isHeartOpen, setIsHeartOpen] = useState(false);
 
   // Update State
   const [pagesInput, setPagesInput] = useState('');
@@ -47,10 +63,77 @@ const Dashboard = () => {
     const loadInitialData = async () => {
       setIsLoading(true);
       await fetchProgress();
+      // Pick a random verse
+      const randomIndex = Math.floor(Math.random() * QURAN_VERSES.length);
+      setDailyVerse(QURAN_VERSES[randomIndex]);
+      
+      // Request Notification Permission
+      if ("Notification" in window && Notification.permission === "default") {
+        await Notification.requestPermission();
+      }
+      
       setIsLoading(false);
     };
     loadInitialData();
   }, [fetchProgress]);
+
+  // Proactive Notifications Check (5:00 PM)
+  useEffect(() => {
+    const checkNotification = () => {
+      const now = new Date();
+      const hours = now.getHours();
+      
+      if (hours >= 17 && !progress?.completedToday && !hasNotifiedToday && Notification.permission === "granted") {
+        new Notification(t('dashboard.streak_saved'), {
+          body: t('dashboard.streak_saved_msg'),
+          icon: "/ThabatLogo.png"
+        });
+        setHasNotifiedToday(true);
+      }
+    };
+
+    const timer = setInterval(checkNotification, 60000); // Check every minute
+    return () => clearInterval(timer);
+  }, [progress?.completedToday, hasNotifiedToday]);
+
+  const fireConfetti = () => {
+    const end = Date.now() + (1.5 * 1000);
+    const colors = ['#10B981', '#F59E0B', '#FFFFFF'];
+
+    (function frame() {
+      confetti({
+        particleCount: 3,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: colors
+      });
+      confetti({
+        particleCount: 3,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: colors
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    }());
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { staggerChildren: 0.15 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
 
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
@@ -70,9 +153,18 @@ const Dashboard = () => {
       if (response.data.success) {
         setPagesInput('');
         
-        const successMessage = "تم الحفظ مبدئياً. موعد التسميع غداً إن شاء الله!";
+        const successMessage = t('dashboard.success_update', { count: pages });
           
         showSuccess(successMessage);
+        fireConfetti();
+
+        // Streak Saved Logic
+        if (hasNotifiedToday) {
+           new Notification(t('dashboard.streak_saved'), {
+             body: t('dashboard.streak_saved_msg'),
+             icon: "/ThabatLogo.png"
+           });
+        }
         
         // Silently re-fetch progress data in background to refresh all stat cards
         await fetchProgress();
@@ -102,6 +194,34 @@ const Dashboard = () => {
     } finally {
       setIsTogglingSunnah(false);
     }
+  };
+
+  const shareProgress = async () => {
+    const rank = getUserRank(progress?.totalMemorized);
+    const text = i18n.language === 'ar' 
+      ? `الحمد لله! حققت لقب "${t(`ranks.${rank.id}`)}" في تطبيق ثبات (Thabat) لحفظ القرآن الكريم. استمراريتي: ${progress?.streak} أيام. انضم إلينا! 📖✨`
+      : `Alhamdullilah! I achieved the rank "${t(`ranks.${rank.id}`)}" in Thabat App. My streak: ${progress?.streak} days. Join us! 📖✨`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: t('dashboard.share'),
+          text: text,
+          url: window.location.origin
+        });
+      } catch (err) {
+        console.error('Share failed:', err);
+      }
+    } else {
+      // Fallback: Copy to clipboard
+      navigator.clipboard.writeText(text);
+      showSuccess(t('dashboard.success_update', { count: 0 })); // Reuse for copy feedback
+    }
+  };
+
+  const handleVoiceComplete = async (transcript) => {
+      // Simplified: Just log progress for now. In reality, we'd verify the verse.
+      handleUpdateSubmit({ preventDefault: () => {} });
   };
 
   if (isLoading) {
@@ -138,17 +258,32 @@ const Dashboard = () => {
       {/* Structural Header */}
       <header className="bg-card dark:bg-card/50 border-b border-gray-100 dark:border-white/5 shadow-sm transition-colors duration-300">
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-foreground drop-shadow-sm">
-              {t('auth.welcome_back', { name: user?.name || '' })}
-            </h1>
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
+            <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-extrabold tracking-tight text-foreground drop-shadow-sm">
+                {t('auth.welcome_back', { name: user?.name || '' })}
+                </h1>
+                <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-sm border border-white/10 flex items-center gap-2 ${
+                    getUserRank(progress?.totalMemorized).bgColor
+                } ${getUserRank(progress?.totalMemorized).color}`}>
+                    <span className="text-sm">{getUserRank(progress?.totalMemorized).icon}</span>
+                    {t(`ranks.${getUserRank(progress?.totalMemorized).id}`)}
+                </div>
+            </div>
             <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400 mt-1 opacity-90">
               {t('dashboard.quote')}
             </p>
-          </div>
+          </motion.div>
           
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full border border-emerald-500/10">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-wrap items-center gap-3"
+          >
+            <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full border border-emerald-500/10 scale-110 md:scale-100 origin-left">
               <Flame className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
               <span className="text-sm font-bold text-emerald-700 dark:text-emerald-300">
                 {progress?.streak || 0} {t('dashboard.days')} {t('dashboard.active_streak')}
@@ -160,18 +295,128 @@ const Dashboard = () => {
                 {planLabels[reviewPace]}
               </span>
             </div>
-          </div>
+          </motion.div>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={shareProgress}
+            className="flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-bold shadow-lg shadow-emerald-500/20 transition-all border border-white/10"
+          >
+            <Share2 className="h-4 w-4" />
+            <span>{t('dashboard.share')}</span>
+          </motion.button>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <SpiritualCarousel />
+      <motion.main 
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8"
+      >
+        {/* Recovery Mode (Broken Streak) */}
+        {progress?.streak === 0 && (
+          <motion.div variants={itemVariants}>
+            <RecoveryCard onStartSmall={() => {
+              const el = document.getElementById('pages');
+              el?.focus();
+              el?.scrollIntoView({ behavior: 'smooth' });
+            }} />
+          </motion.div>
+        )}
+
+        {/* Daily Motivation Verse */}
+        {dailyVerse && (
+          <motion.section 
+            variants={itemVariants}
+            className="mb-8"
+          >
+            <div className="relative overflow-hidden bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-8 shadow-2xl shadow-emerald-500/20 group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl transition-transform duration-1000 group-hover:scale-110"></div>
+              <div className="relative flex flex-col md:flex-row items-center gap-8">
+                <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/20 shrink-0 shadow-xl shadow-black/20">
+                  <Sparkles className="h-8 w-8 text-white animate-pulse" />
+                </div>
+                <div className="flex-1 text-center md:text-right">
+                  <p className="text-2xl md:text-3xl font-bold text-white mb-3" dir="rtl">
+                    {dailyVerse.arabic}
+                  </p>
+                  <p className="text-xs font-black text-emerald-100/60 uppercase tracking-widest mb-2" dir="rtl">
+                    — {dailyVerse.reference}
+                  </p>
+                  <p className="text-sm md:text-base font-medium text-white/80 italic leading-relaxed max-w-2xl md:ml-auto">
+                    {dailyVerse.english}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.section>
+        )}
+
+        <motion.div variants={itemVariants}>
+          <SpiritualCarousel />
+        </motion.div>
         
-        {/* Statistics Grid */}
-        <section className="mb-10">
+        {/* Foundation: Progress Visualizers */}
+        <motion.section variants={itemVariants} className="mb-10">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold tracking-tight text-foreground">
-              {t('dashboard.current_journey')}
+              الخطة والهدف (Consistency & Journey)
+            </h2>
+            <div className="h-px flex-1 bg-gradient-to-r from-emerald-500/20 to-transparent ms-4"></div>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <HifzStreaks 
+                streak={progress?.streak} 
+                isCompletedToday={progress?.completedToday} 
+                wasActiveYesterday={progress?.streak > 0 || (progress?.lastEntryDate && new Date(progress.lastEntryDate).toDateString() === new Date(Date.now() - 86400000).toDateString())}
+              />
+            </div>
+            <div className="lg:col-span-1">
+              <HifzProgress current={progress?.totalMemorized} total={604} label={t('dashboard.overall_mastery')} />
+            </div>
+          </div>
+        </motion.section>
+
+        {/* Alaa Hamed's Thabat Schedule */}
+        <motion.section variants={itemVariants} className="mb-10">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-amber-500" />
+              {t('dashboard.stabilization_tasks')}
+            </h2>
+            <div className="h-px flex-1 bg-gradient-to-r from-amber-500/20 to-transparent ms-4"></div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {getDailyTasks(progress?.totalMemorized, progress?.currentPage).map((task) => (
+              <div key={task.id} className="bg-card dark:bg-card/50 border border-gray-100 dark:border-white/5 rounded-2xl p-5 hover:border-amber-500/30 transition-colors group">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="p-2.5 bg-amber-500/10 rounded-xl text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
+                    {task.id === 'new_hifz' ? <BookOpen className="h-5 w-5" /> : task.id === 'intensive_review' ? <Flame className="h-5 w-5" /> : <Calendar className="h-5 w-5" />}
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-foreground">{t(`tasks.${task.id}`)}</h4>
+                    <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">{task.pages} {t('dashboard.pages')}</span>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-400 leading-relaxed font-medium">{task.desc}</p>
+              </div>
+            ))}
+          </div>
+        </motion.section>
+
+        {/* Achievement Badges Milestone Section */}
+        <motion.section variants={itemVariants} className="mb-10">
+          <AchievementBadges pages={progress?.totalMemorized || 0} />
+        </motion.section>
+
+        {/* Statistics Grid */}
+        <motion.section variants={itemVariants} className="mb-10">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold tracking-tight text-foreground">
+              {t('dashboard.hifz_stats')}
             </h2>
             <div className="h-px flex-1 bg-gradient-to-r from-emerald-500/20 to-transparent ms-4"></div>
           </div>
@@ -195,24 +440,24 @@ const Dashboard = () => {
               subtitle={t('dashboard.keep_momentum')}
             />
             <StatCard 
-              title="ورد المراجعة (القديم)"
-              value={`${oldDailyTarget} صفحة`} 
+              title={t('dashboard.distant_review_card')}
+              value={`${oldDailyTarget} ${t('dashboard.pages')}`} 
               icon={<CalendarCheck className="h-6 w-6 text-sky-500" />}
-              subtitle={`نظام الـ ${reviewPace} أيام`}
+              subtitle={t('dashboard.days_system', { days: reviewPace })}
               className="border-sky-500/20 dark:border-sky-500/10"
             />
             <StatCard 
-              title="ورد التثبيت (الجديد)"
-              value={`${newDailyTarget} صفحة`} 
+              title={t('dashboard.intensive_review_card')}
+              value={`${newDailyTarget} ${t('dashboard.pages')}`} 
               icon={<Flame className="h-6 w-6 text-emerald-500" />}
-              subtitle="نظام الـ 3 أيام (مكثف)"
+              subtitle={t('dashboard.intensive_system')}
               className="border-emerald-500/40 dark:border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/20"
             />
           </div>
-        </section>
+        </motion.section>
 
         {/* Daily Habit Tracker */}
-        <section className="mb-10">
+        <motion.section variants={itemVariants} className="mb-10">
           <div 
             className={`relative overflow-hidden group p-6 rounded-2xl border-2 transition-all duration-500 backdrop-blur-md ${
               progress?.sunnahCompletedToday 
@@ -235,10 +480,10 @@ const Dashboard = () => {
                 </div>
                 <div className="text-center md:text-left">
                   <h3 className="text-lg font-bold text-foreground">
-                    هل قرأت ورد التثبيت الجديد في صلوات النوافل اليوم؟
+                    {t('dashboard.sunnah_question')}
                   </h3>
                   <p className="text-sm text-secondary-foreground mt-1 opacity-80">
-                    Reciting your new review in Sunnah/Nawafil prayers is the ultimate stabilization technique.
+                    {t('dashboard.sunnah_desc')}
                   </p>
                 </div>
               </div>
@@ -255,21 +500,21 @@ const Dashboard = () => {
                 {progress?.sunnahCompletedToday ? (
                   <>
                     <CheckCircle2 className="h-5 w-5" />
-                    تم التثبيت في النوافل
+                    {t('dashboard.sunnah_done')}
                   </>
                 ) : (
                   <>
                     <Sparkles className="h-5 w-5" />
-                    سجّل الإتمام الآن
+                    {t('dashboard.sunnah_log')}
                   </>
                 )}
               </button>
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Scalable Layout Scaffolding */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* Action Area: Update Progress */}
           <div className="lg:col-span-1 flex flex-col">
@@ -282,7 +527,7 @@ const Dashboard = () => {
                 <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 p-4 rounded-xl flex items-start gap-3 shadow-sm">
                   <Lightbulb className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                   <p className="text-sm font-medium text-amber-800 dark:text-amber-200 leading-relaxed">
-                    <span className="font-bold underline decoration-amber-500/50">قاعدة ذهبية:</span> لا تُسمّع ما حفظته اليوم لشيخك! اختبر نفسك كل 8 ساعات، وسمّعه غداً لضمان ثباته في الذاكرة طويلة المدى.
+                    <span className="font-bold underline decoration-amber-500/50">{t('dashboard.golden_rule')}</span> {t('dashboard.golden_rule_msg')}
                   </p>
                 </div>
 
@@ -308,21 +553,43 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="lg:col-span-2 flex flex-col min-h-[300px]">
+          <div className="lg:col-span-2 flex flex-col min-h-[300px] gap-8">
+            <VoiceRecitation onComplete={handleVoiceComplete} />
             <ProgressChart refreshTrigger={refreshKey} />
           </div>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+        <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
           <div className="lg:col-span-2 flex flex-col min-h-[300px]">
             <Achievements refreshTrigger={refreshKey} />
           </div>
           <div className="lg:col-span-1 flex flex-col min-h-[300px]">
             <Leaderboard />
           </div>
-        </div>
+        </motion.div>
 
-      </main>
+        {/* Floating Action Button (Message to Your Heart) */}
+        <motion.button
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setIsHeartOpen(true)}
+          className="fixed bottom-8 right-8 z-40 w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full shadow-2xl shadow-amber-500/40 flex items-center justify-center group border-2 border-white/20"
+        >
+          {/* Breathing Pulse Animation */}
+          <motion.div
+            animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.2, 0.5] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute inset-0 bg-amber-400 rounded-full"
+          />
+          <Heart className="relative h-7 w-7 text-white fill-white group-hover:scale-110 transition-transform" />
+        </motion.button>
+
+        {/* Soulful Heart Modal */}
+        <HeartMessage isOpen={isHeartOpen} onClose={() => setIsHeartOpen(false)} />
+
+      </motion.main>
     </div>
   );
 };

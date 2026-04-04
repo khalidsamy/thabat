@@ -42,29 +42,70 @@
     "number_of_pages": "عدد الصفحات",
     "placeholder_pages": "مثل، ٢",
     "save_progress": "حفظ الإنجاز",
+    "saving": "جاري الحفظ...",
     "invalid_input": "يرجى إدخال عدد صحيح موجب للصفحات.",
-    "success_update": "رائع! لقد أتممت حفظ صفحة واحدة اليوم.",
-    "success_update_plural": "رائع! لقد أتممت حفظ {{count}} صفحات اليوم."
+    "success_update": "رائع! لقد أتممت حفظ {{count}} صفحات اليوم.",
+    "daily_verse": "آية اليوم",
+    "overall_mastery": "نسبة الإتقان الكلية",
+    "share": "شارك إنجازك",
+    "streak_saved": "تم إنقاذ التحدي! 🔥",
+    "streak_saved_msg": "ما شاء الله، رغم التأخير إلا أنك استطعت الإنجاز. فخورون بك!",
+    "stabilization_tasks": "خطة التثبيت اليومية",
+    "pages": "صفحات",
+    "hifz_stats": "إحصائيات الحفظ",
+    "distant_review_card": "ورد المراجعة (القديم)",
+    "intensive_review_card": "ورد التثبيت (الجديد)",
+    "days_system": "نظام الـ {{days}} أيام",
+    "intensive_system": "نظام الـ ٣ أيام (مكثف)",
+    "sunnah_question": "هل قرأت ورد التثبيت الجديد في صلوات النوافل اليوم؟",
+    "sunnah_desc": "تسميع المحفوظ الجديد في صلوات النوافل هو أقوى وسيلة لتثبيته.",
+    "sunnah_done": "تم التثبيت في النوافل",
+    "sunnah_log": "سجّل الإتمام الآن",
+    "golden_rule": "قاعدة ذهبية:",
+    "golden_rule_msg": "لا تُسمّع ما حفظته اليوم لشيخك! اختبر نفسك كل ٨ ساعات، وسمّعه غداً لضمان ثباته في الذاكرة طويلة المدى."
   },
   "chart": {
     "title": "سجل الحفظ"
   },
   "achievements": {
-    "title": "إنجازاتك",
-    "names": {
-      "Beginner": "مبتدئ",
-      "Consistent": "مستمر",
-      "Warrior": "محارب",
-      "Halfway": "منتصف الطريق",
-      "Master": "متقن"
-    }
+    "title": "الأوسمة والجوائز",
+    "unlocked": "مفتوح",
+    "progress": "التقدم"
   },
-  "leaderboard": {
-    "title": "لوحة الصدارة العالمية",
-    "longest_streak": "أطول استمرارية:",
-    "days": "أيام",
-    "pages": "صفحة",
-    "no_records": "لا توجد سجلات بعد!",
-    "you": "أنت"
+  "ranks": {
+    "murabit": "المرابط",
+    "mujahid": "المجاهد",
+    "saffir": "السفير",
+    "hafiz": "الحافظ",
+    "mutqin": "المتقن"
+  },
+  "streaks": {
+    "days_streak": "استمرارية",
+    "excited": "على الطريق الصحيح! 🔥",
+    "waiting": "بانتظارك... ⏳",
+    "anxious": "نحن معك! 😟",
+    "newbie": "بداية مباركة 🌱"
+  },
+  "recovery": {
+    "doctor_mode": "وضع الطبيب المعنوي",
+    "doctor_title": "لا بأس، لنبدأ من جديد بخطوة صغيرة",
+    "doctor_subtitle": "التعثر ليس النهاية، العودة للقرآن هي الفوز الحقيقي.",
+    "cta": "ابدأ بآية واحدة الآن"
+  },
+  "voice": {
+    "title": "سمّع لي (Voice Recitation)",
+    "listening": "جاري الاستماع...",
+    "click_to_start": "اضغط على الزر وابدأ بالتسميع",
+    "confirm_and_log": "تثبيت الحفظ (Confirm & Log)"
+  },
+  "tasks": {
+    "new_hifz": "الحفظ الجديد",
+    "intensive_review": "المراجعة القريبة",
+    "distant_review": "المراجعة البعيدة",
+    "weekly_review": "مراجعة الأسبوع"
+  },
+  "heart": {
+    "title": "رسالة لقلبك",
+    "another_message": "رسالة أخرى"
   }
 }
