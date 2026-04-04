@@ -4,7 +4,7 @@ const Button = ({ children, isLoading, className = '', ...props }) => {
   return (
     <button
       disabled={isLoading}
-      className={`w-full flex justify-center items-center py-3.5 px-4 rounded-xl shadow-md text-sm font-bold text-white tracking-wide bg-gradient-to-r from-emerald-600 to-primary hover:from-emerald-500 hover:to-emerald-400 focus:outline-none focus:ring-4 focus:ring-primary/30 active:scale-[0.98] hover:scale-[1.01] hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-md transition-all duration-300 ${className}`}
+      className={`w-full flex justify-center items-center py-3 sm:py-3.5 px-4 rounded-xl shadow-md text-xs sm:text-sm font-bold text-white tracking-wide bg-gradient-to-r from-emerald-600 to-primary hover:from-emerald-500 hover:to-emerald-400 focus:outline-none focus:ring-4 focus:ring-primary/30 active:scale-[0.98] hover:scale-[1.01] hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-md transition-all duration-300 ${className}`}
       {...props}
     >
       {isLoading ? (

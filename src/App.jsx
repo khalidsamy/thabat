@@ -6,7 +6,6 @@ import { ToastProvider } from './context/ToastContext';
 
 // Components
 import Navbar from './components/Navbar';
-import BottomNav from './components/BottomNav';
 import Toast from './components/Toast';
 import Footer from './components/Footer';
 
@@ -144,7 +143,6 @@ function App() {
               </main>
 
               <Footer />
-              <BottomNav />
             </div>
         </Router>
       </AuthProvider>

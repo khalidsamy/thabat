@@ -177,6 +177,41 @@ const Dashboard = () => {
     planLabels: { 7: 'المثالي (7 أيام)', 10: 'المتوسط (10 أيام)', 14: 'الحد الأدنى (14 يوماً)' }
   };
 
+  return (
+    <div className="min-h-screen bg-background transition-colors duration-300">
+      {/* Universal Header */}
+      <header className="bg-card dark:bg-card/50 border-b border-gray-100 dark:border-white/5 shadow-sm sticky top-0 z-30 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+                {t('auth.welcome_back', { name: currentUser?.name || '' })}
+              </h1>
+              <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-sm border border-white/10 flex items-center gap-2 ${getUserRank(progress?.totalMemorized || 0).bgColor} ${getUserRank(progress?.totalMemorized || 0).color}`}>
+                <span className="text-sm">{getUserRank(progress?.totalMemorized || 0).icon}</span>
+                {t(`ranks.${getUserRank(progress?.totalMemorized || 0).id}`)}
+              </div>
+            </div>
+          </motion.div>
+          
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:flex items-center gap-3">
+              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-full border border-emerald-500/10">
+                <Flame className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-sm font-bold text-emerald-700 dark:text-emerald-300">{progress?.streak || 0} {t('dashboard.days')}</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 rounded-full border border-blue-500/10">
+                <CalendarCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-sm font-bold text-blue-700 dark:text-blue-300">{sharedProps.planLabels[reviewPace]}</span>
+              </div>
+            </div>
+            <button onClick={shareProgress} className="p-3 bg-emerald-500 text-white rounded-2xl shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all outline-none border border-white/10">
+              <Share2 className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      </header>
+
       <main className="dashboard-container">
         <AnimatePresence mode="wait">
             <motion.div
