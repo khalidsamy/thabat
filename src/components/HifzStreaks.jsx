@@ -41,99 +41,48 @@ const HifzStreaks = ({ streak = 0, isCompletedToday = false, wasActiveYesterday 
   activity[6] = isCompletedToday;
 
   return (
-    <div className="bg-card dark:bg-card/50 border border-gray-100 dark:border-white/5 rounded-2xl p-6 shadow-sm overflow-hidden relative group">
-      {/* Dynamic Background Glow Based on Mood */}
-      <div className={`absolute top-0 right-0 w-64 h-64 -mr-32 -mt-32 blur-3xl opacity-20 transition-colors duration-1000 ${
-        mood.bgColor.replace('/10', '/30')
-      }`}></div>
+    <div className="lg:col-span-4 group h-full">
+      <div className="bg-card dark:bg-card/40 border border-gray-100 dark:border-white/5 rounded-[2.5rem] p-8 shadow-xl shadow-black/5 h-full min-h-[320px] flex flex-col justify-between transition-all duration-300 hover:shadow-emerald-500/10 relative overflow-hidden group">
+        {/* Dynamic Background Glow Based on Mood */}
+        <div className={`absolute top-0 right-0 w-64 h-64 -mr-32 -mt-32 blur-3xl opacity-20 transition-colors duration-1000 ${
+          mood.bgColor.replace('/10', '/30')
+        }`}></div>
 
-      <div className="relative flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <motion.div
-            {...moodVariant}
-            className={`w-14 h-14 ${mood.bgColor} rounded-2xl flex items-center justify-center text-3xl shadow-sm border border-white/10`}
-          >
-            {mood.emoji}
-          </motion.div>
-          <div>
-            <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
-              {moodLabels[mood.id]}
-            </h3>
-            <p className="text-xs text-slate-400 font-medium">{mood.desc}</p>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          <div className="flex flex-col items-end">
-            <span className={`text-2xl font-black ${mood.color} tabular-nums drop-shadow-sm leading-none`}>
-              {streak}
+        <div className="relative flex items-start justify-between mb-2">
+          <div className="flex flex-col">
+            <span className="text-[10px] font-black text-slate-400 dark:text-emerald-500/40 uppercase tracking-[0.4em] mb-1 px-1">
+              {t('dashboard.active_streak_label') || 'ACTIVE STREAK'}
             </span>
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 opacity-60">
-              {t('streaks.days_streak')}
-            </span>
-          </div>
-
-          {onVisualize && (
-              <button 
-                  onClick={onVisualize}
-                  className="p-3 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-500 hover:text-white transition-all shadow-sm border border-indigo-500/10 active:scale-95"
-                  title="Visualize Surah"
-              >
-                  <Sparkles className="h-5 w-5" />
-              </button>
-          )}
-        </div>
-      </div>
-
-      {/* Week View Visualizer */}
-      <div className="grid grid-cols-7 gap-2 mb-8">
-        {days.map((day, i) => (
-          <div key={day} className="flex flex-col items-center gap-2">
-            <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">{day}</span>
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
-              activity[i] 
-                ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' 
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-300'
-            }`}>
-              {activity[i] ? <CheckCircle2 className="h-5 w-5" /> : <div className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600" />}
+            <div className="flex items-center gap-3">
+               <span className="text-5xl font-black text-foreground drop-shadow-sm">{streak}</span>
+               <span className="text-xl font-bold text-slate-400 mt-2">{t('dashboard.days') || 'days'}</span>
+               <div className="ms-2">
+                  <Sparkles className="h-5 w-5 text-amber-500 animate-pulse" />
+               </div>
             </div>
           </div>
-        ))}
-      </div>
 
-      <hr className="border-gray-100 dark:border-white/5 mb-6" />
-
-      {/* Granular Surah Progress */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-50 dark:bg-amber-950/30 rounded-lg">
-              <Star className="h-4 w-4 text-amber-500" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-foreground">{currentSurah || t('dashboard.start_journey')}</p>
-              <p className="text-[10px] text-slate-400 capitalize">{t('dashboard.current_journey')}</p>
-            </div>
+          <div className="flex items-center gap-2">
+            {onVisualize && (
+                <button 
+                    onClick={onVisualize}
+                    className="p-3 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-2xl hover:bg-emerald-500 hover:text-white transition-all shadow-xl shadow-black/5 border border-white/10 active:scale-95 group/btn"
+                    title="Visualize Surah"
+                >
+                    <Sparkles className="h-5 w-5 group-hover/btn:animate-spin" />
+                </button>
+            )}
           </div>
-          <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">{completion}%</span>
         </div>
-        
-        <div className="relative h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-          <div 
-            className="absolute top-0 left-0 h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-1000"
-            style={{ width: `${completion}%` }}
-          />
-        </div>
-      </div>
 
-      {/* Upcoming Milestone */}
-      <div className="mt-8 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700 flex items-center gap-4">
-        <div className="h-10 w-10 flex-shrink-0 bg-white dark:bg-slate-700 rounded-full flex items-center justify-center shadow-sm">
-          <Trophy className="h-5 w-5 text-amber-500" />
-        </div>
-        <div className="flex-1">
-          <p className="text-xs font-bold text-foreground">{t('achievements.next_milestone')}: {streak < 7 ? t('ranks.murabit') : t('ranks.mujahid')}</p>
-          <p className="text-[10px] text-slate-400">{t('achievements.keep_going')}</p>
+        {/* Action Button: Visualize (as shown in image) */}
+        <div className="relative mt-auto">
+            <button
+                onClick={onVisualize}
+                className="w-full bg-slate-900 border border-white/10 text-white font-black py-4 rounded-3xl shadow-xl shadow-black/20 hover:bg-slate-800 transition-all flex items-center justify-center gap-2 active:scale-95"
+            >
+                <span>{t('dashboard.visualize') || 'Visualize'}</span>
+            </button>
         </div>
       </div>
     </div>

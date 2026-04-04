@@ -247,31 +247,9 @@ const Dashboard = () => {
                 className="w-full h-full"
             >
                 {isDashboardRoot ? (
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
-                        {/* Main Stream: Left Column (Home / Primary Tools) */}
-                        <div className="lg:col-span-8 flex flex-col gap-10">
-                            <Home {...sharedProps} />
-                            
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                                <Recite {...sharedProps} />
-                                <Progress {...sharedProps} />
-                            </div>
-                        </div>
-
-                        {/* Sidebar Stream: Right Column (Support Tools) */}
-                        <div className="lg:col-span-4 flex flex-col gap-10">
-                            <div className="order-2 lg:order-1">
-                                <Review {...sharedProps} />
-                            </div>
-                            <div className="order-1 lg:order-2">
-                                <Community {...sharedProps} />
-                            </div>
-                        </div>
-                    </div>
+                    <Home {...sharedProps} />
                 ) : (
-                    <div className="max-w-5xl mx-auto">
-                        <Outlet context={sharedProps} />
-                    </div>
+                    <Outlet context={sharedProps} />
                 )}
             </motion.div>
         </AnimatePresence>
