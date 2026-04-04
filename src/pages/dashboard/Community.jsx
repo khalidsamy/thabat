@@ -10,7 +10,7 @@ import Button from '../../components/Button';
 const Community = (props) => {
   const { t } = useTranslation();
   const context = useOutletContext() || {};
-  const { progress, itemVariants } = { ...context, ...props };
+  const { progress, user, itemVariants } = { ...context, ...props };
   const { showSuccess, showError } = useToast();
   const [reflections, setReflections] = useState([]);
   const [newReflection, setNewReflection] = useState('');
