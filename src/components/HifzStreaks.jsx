@@ -1,4 +1,4 @@
-import { Flame, Star, Trophy, Calendar, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Flame, Star, Trophy, Calendar, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { getStreakMood, getMoodVariants, MOODS } from '../utils/streakMoods';
