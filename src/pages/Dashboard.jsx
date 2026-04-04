@@ -1,3 +1,5 @@
+import React, { useState, useEffect, useContext, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Routes, Route, useLocation, Navigate, Outlet, useOutletContext } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Share2, Heart, Flame, CalendarCheck } from 'lucide-react';
