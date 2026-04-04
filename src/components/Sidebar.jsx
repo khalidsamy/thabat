@@ -31,8 +31,8 @@ const Sidebar = () => {
 
   return (
     <aside 
-      className={`hidden md:flex flex-col h-screen sticky top-0 z-40 bg-white/60 dark:bg-card/50 backdrop-blur-md border-gray-100 dark:border-white/5 transition-all duration-300 w-20 lg:w-64 overflow-y-auto overflow-x-hidden group shrink-0 ${
-        i18n.language === 'ar' ? 'border-s' : 'border-e'
+      className={`hidden md:flex flex-col h-screen sticky top-0 z-40 bg-white/60 dark:bg-card/50 backdrop-blur-xl border-zinc-200 dark:border-white/5 transition-all duration-300 w-20 lg:w-64 overflow-y-auto overflow-x-hidden group shrink-0 ${
+        i18n.language === 'ar' ? 'border-s shadow-[-10px_0_30px_rgba(0,0,0,0.02)]' : 'border-e shadow-[10px_0_30px_rgba(0,0,0,0.02)]'
       }`}
       dir={t('direction') || (i18n.language === 'ar' ? 'rtl' : 'ltr')}
     >
@@ -55,8 +55,8 @@ const Sidebar = () => {
             className={({ isActive }) =>
               `relative flex items-center gap-4 p-3 rounded-2xl transition-all duration-300 group/item ${
                 isActive 
-                  ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' 
-                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200'
+                  ? 'bg-emerald-500/10 text-emerald-900 dark:text-emerald-400 font-bold' 
+                  : 'text-zinc-500 dark:text-slate-400 hover:bg-zinc-100/50 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-slate-200'
               }`
             }
           >

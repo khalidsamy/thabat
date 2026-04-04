@@ -13,9 +13,9 @@ const MemorizedGaugeCard = ({ percentage, itemVariants }) => {
       variants={itemVariants}
       className="lg:col-span-4 group h-full"
     >
-      <div className="bg-card dark:bg-card/40 border border-gray-100 dark:border-white/5 rounded-[2.5rem] p-8 shadow-xl shadow-black/5 h-full min-h-[320px] flex flex-col justify-between transition-all duration-300 hover:shadow-emerald-500/10">
+      <div className="bg-white/80 dark:bg-card/40 border border-zinc-200 dark:border-white/5 rounded-[2.5rem] p-8 shadow-xl shadow-zinc-200/50 dark:shadow-black/5 h-full min-h-[320px] flex flex-col justify-between transition-all duration-300 hover:shadow-emerald-500/10 backdrop-blur-md">
         <div className="flex flex-col">
-          <span className="text-[10px] font-black text-slate-400 dark:text-emerald-500/40 uppercase tracking-[0.4em] mb-2 px-1">
+          <span className="text-[10px] font-black text-emerald-800/40 dark:text-emerald-500/40 uppercase tracking-[0.4em] mb-2 px-1">
             {t('dashboard.total_memorized_label') || 'TOTAL MEMORIZED'}
           </span>
         </div>
@@ -30,7 +30,7 @@ const MemorizedGaugeCard = ({ percentage, itemVariants }) => {
               stroke="currentColor"
               strokeWidth="14"
               fill="transparent"
-              className="text-slate-100 dark:text-slate-800"
+              className="text-zinc-100 dark:text-slate-800"
             />
             {/* Progress Circle with Glow */}
             <motion.circle
@@ -51,13 +51,13 @@ const MemorizedGaugeCard = ({ percentage, itemVariants }) => {
           
           {/* Percentage Text */}
           <div className="absolute flex flex-col items-center">
-            <span className="text-4xl font-black text-foreground">{percentage}%</span>
+            <span className="text-4xl font-black text-zinc-900 dark:text-white">{percentage}%</span>
           </div>
         </div>
 
         <div className="flex items-center justify-center mt-2">
             <div className="py-1 px-4 bg-emerald-500/10 rounded-full border border-emerald-500/10">
-                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest leading-none">Complete</span>
+                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-500 uppercase tracking-widest leading-none">Complete</span>
             </div>
         </div>
       </div>

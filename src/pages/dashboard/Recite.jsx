@@ -162,7 +162,7 @@ const Recite = (props) => {
             >
               {/* STEP 1: TARGET RANGE SELECTION (4 COLS) */}
               <div className="lg:col-span-4 space-y-8">
-                <div className="bg-white/70 dark:bg-card/40 backdrop-blur-xl border border-white dark:border-white/5 rounded-[2.5rem] p-8 shadow-2xl shadow-emerald-900/5 animate-slide-in">
+                <div className="bg-white/80 dark:bg-card/40 backdrop-blur-xl border border-zinc-200 dark:border-white/5 rounded-[2.5rem] p-8 shadow-2xl shadow-zinc-200/50 dark:shadow-black/5 animate-slide-in">
                   <div className="flex items-center gap-3 mb-8">
                     <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-600 dark:text-emerald-400">
                       <Search className="h-6 w-6" />
@@ -174,11 +174,11 @@ const Recite = (props) => {
 
                   <div className="space-y-6">
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-emerald-600/40 dark:text-emerald-500/40 uppercase tracking-[0.3em] px-1">Surah Selection</label>
+                       <label className="text-[10px] font-black text-emerald-800/40 dark:text-emerald-500/40 uppercase tracking-[0.3em] px-1">Surah Selection</label>
                        <select 
                           value={selectedSurah}
                           onChange={(e) => setSelectedSurah(parseInt(e.target.value))}
-                          className="w-full h-14 bg-emerald-50/30 dark:bg-slate-900 border border-emerald-100 dark:border-white/5 rounded-2xl px-4 font-bold text-zinc-900 dark:text-foreground focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all outline-none"
+                          className="w-full h-14 bg-zinc-50 dark:bg-slate-900 border border-zinc-200 dark:border-white/5 rounded-2xl px-4 font-bold text-zinc-900 dark:text-foreground focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all outline-none"
                        >
                           {surahs.map(s => (
                             <option key={s.number} value={s.number}>{s.number}. {s.englishName}</option>
@@ -188,23 +188,23 @@ const Recite = (props) => {
 
                     <div className="grid grid-cols-2 gap-4">
                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-emerald-600/40 dark:text-emerald-500/40 uppercase tracking-[0.3em] px-1">From Ayah</label>
+                          <label className="text-[10px] font-black text-emerald-800/40 dark:text-emerald-500/40 uppercase tracking-[0.3em] px-1">From Ayah</label>
                           <input 
                             type="number"
                             min="1"
                             value={ayahFrom}
                             onChange={(e) => setAyahFrom(parseInt(e.target.value))}
-                            className="w-full h-14 bg-emerald-50/30 dark:bg-slate-900 border border-emerald-100 dark:border-white/5 rounded-2xl px-4 font-bold text-zinc-900 dark:text-foreground focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none"
+                            className="w-full h-14 bg-zinc-50 dark:bg-slate-900 border border-zinc-200 dark:border-white/5 rounded-2xl px-4 font-bold text-zinc-900 dark:text-foreground focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none"
                           />
                        </div>
                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-emerald-600/40 dark:text-emerald-500/40 uppercase tracking-[0.3em] px-1">To Ayah</label>
+                          <label className="text-[10px] font-black text-emerald-800/40 dark:text-emerald-500/40 uppercase tracking-[0.3em] px-1">To Ayah</label>
                           <input 
                             type="number"
                             min="1"
                             value={ayahTo}
                             onChange={(e) => setAyahTo(parseInt(e.target.value))}
-                            className="w-full h-14 bg-emerald-50/30 dark:bg-slate-900 border border-emerald-100 dark:border-white/5 rounded-2xl px-4 font-bold text-zinc-900 dark:text-foreground focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none"
+                            className="w-full h-14 bg-zinc-50 dark:bg-slate-900 border border-zinc-200 dark:border-white/5 rounded-2xl px-4 font-bold text-zinc-900 dark:text-foreground focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none"
                           />
                        </div>
                     </div>
@@ -248,7 +248,7 @@ const Recite = (props) => {
 
               {/* STEP 2 & 3: CONTINUOUS AI RECITER (8 COLS) */}
               <div className="lg:col-span-8 space-y-8">
-                <div className="bg-white/80 dark:bg-card/40 backdrop-blur-xl border border-white dark:border-white/5 rounded-[3rem] p-10 lg:p-14 shadow-2xl shadow-zinc-900/5 flex flex-col items-center justify-between min-h-[750px] relative overflow-hidden">
+                <div className="bg-white/80 dark:bg-card/40 backdrop-blur-xl border border-zinc-200 dark:border-white/5 rounded-[3rem] p-10 lg:p-14 shadow-2xl shadow-zinc-200/50 dark:shadow-zinc-900/5 flex flex-col items-center justify-between min-h-[750px] relative overflow-hidden">
                     
                     {/* Header: Range Display */}
                     <div className="relative w-full flex items-center justify-between mb-8">
@@ -267,7 +267,7 @@ const Recite = (props) => {
                     </div>
 
                     {/* LIVE TRANSCRIPT: Above the Mic */}
-                    <div className="w-full bg-[#f8fafb] dark:bg-slate-900 border-2 border-emerald-500 shadow-[0_0_40px_rgba(16,185,129,0.05)] rounded-[2.5rem] p-8 lg:p-12 min-h-[280px] flex flex-wrap items-center justify-center gap-x-6 gap-y-4 shadow-inner text-center relative z-20" dir="rtl">
+                    <div className="w-full bg-zinc-50 dark:bg-slate-900 border-2 border-emerald-500 shadow-[0_0_40px_rgba(16,185,129,0.05)] rounded-[2.5rem] p-8 lg:p-12 min-h-[280px] flex flex-wrap items-center justify-center gap-x-6 gap-y-4 shadow-inner text-center relative z-20" dir="rtl">
                         {targetVerses.length > 0 ? (
                            matches.map((word, i) => (
                              <motion.span 
@@ -360,7 +360,7 @@ const Recite = (props) => {
                key="tutor-summary"
                initial={{ opacity: 0, scale: 0.95 }}
                animate={{ opacity: 1, scale: 1 }}
-               className="max-w-2xl mx-auto bg-white/70 dark:bg-card/40 backdrop-blur-3xl rounded-[4rem] p-12 lg:p-16 text-center shadow-2xl border border-white dark:border-white/5 relative overflow-hidden"
+               className="max-w-2xl mx-auto bg-white/80 dark:bg-card/40 backdrop-blur-3xl rounded-[4rem] p-12 lg:p-16 text-center shadow-2xl border border-zinc-200 dark:border-white/5 relative overflow-hidden"
             >
               {/* Glassmorphism Accents */}
               <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/5 rounded-full -mr-40 -mt-40 blur-3xl"></div>
@@ -378,12 +378,12 @@ const Recite = (props) => {
               <p className="text-xl text-zinc-500 font-medium mb-12">Recitation complete. Your effort has been logged to your progress history.</p>
               
               <div className="grid grid-cols-2 gap-8 mb-12">
-                  <div className="bg-emerald-50/50 dark:bg-slate-900/50 p-8 rounded-[2.5rem] border border-emerald-100/50 dark:border-white/5">
-                      <span className="text-[10px] font-black text-emerald-600/40 uppercase tracking-widest block mb-1 px-1">Mastery Score</span>
+                  <div className="bg-zinc-50 dark:bg-slate-900/50 p-8 rounded-[2.5rem] border border-zinc-200 dark:border-white/5 shadow-inner">
+                      <span className="text-[10px] font-black text-emerald-800/40 dark:text-emerald-600/40 uppercase tracking-widest block mb-1 px-1">Mastery Score</span>
                       <span className="text-5xl font-black text-emerald-600">{masteryScore}%</span>
                   </div>
-                  <div className="bg-rose-50/50 dark:bg-slate-900/50 p-8 rounded-[2.5rem] border border-rose-100/50 dark:border-white/5">
-                      <span className="text-[10px] font-black text-rose-600/40 uppercase tracking-widest block mb-1 px-1">Mistakes Found</span>
+                  <div className="bg-zinc-50 dark:bg-slate-900/50 p-8 rounded-[2.5rem] border border-zinc-200 dark:border-white/5 shadow-inner">
+                      <span className="text-[10px] font-black text-rose-800/40 dark:text-rose-600/40 uppercase tracking-widest block mb-1 px-1">Mistakes Found</span>
                       <span className="text-5xl font-black text-rose-600">{matches.filter(m => m.status === 'wrong').length}</span>
                   </div>
               </div>

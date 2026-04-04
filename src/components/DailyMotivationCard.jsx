@@ -11,7 +11,7 @@ const DailyMotivationCard = ({ dailyVerse, itemVariants }) => {
       variants={itemVariants}
       className="lg:col-span-8 group h-full"
     >
-      <div className="relative h-full min-h-[400px] max-h-[480px] overflow-hidden bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-600 dark:to-teal-700 rounded-[3rem] p-8 sm:p-10 shadow-2xl shadow-emerald-500/5 dark:shadow-emerald-500/10 border border-emerald-100/50 dark:border-white/10 flex flex-col justify-between transition-all duration-500 hover:shadow-emerald-500/10">
+      <div className="relative h-full min-h-[400px] overflow-hidden bg-white/80 dark:bg-gradient-to-br dark:from-emerald-600 dark:to-teal-700 rounded-[3rem] p-8 sm:p-10 shadow-2xl shadow-zinc-200/50 dark:shadow-emerald-500/10 border border-zinc-200 dark:border-white/10 flex flex-col justify-between transition-all duration-500 hover:shadow-emerald-500/10 backdrop-blur-md">
         {/* Glassmorphism Accents */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-200/20 dark:bg-white/5 rounded-full -mr-40 -mt-40 blur-3xl transition-transform duration-1000 group-hover:scale-110"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-100/10 dark:bg-black/10 rounded-full -ml-32 -mb-32 blur-3xl"></div>
@@ -33,37 +33,37 @@ const DailyMotivationCard = ({ dailyVerse, itemVariants }) => {
 
         {/* Content: Verse */}
         <div className="relative py-6">
-          <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white leading-[1.4] drop-shadow-lg mb-4 text-center sm:text-right" dir="rtl">
+          <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-zinc-900 dark:text-white leading-[1.4] drop-shadow-sm mb-4 text-center sm:text-right" dir="rtl">
             {dailyVerse?.arabic}
           </p>
           <div className="flex flex-col items-center sm:items-end gap-2">
-            <p className="text-[11px] font-black text-emerald-100/60 uppercase tracking-[0.2em]" dir="rtl">
+            <p className="text-[11px] font-black text-emerald-800/40 dark:text-emerald-100/60 uppercase tracking-[0.2em]" dir="rtl">
               — {dailyVerse?.reference}
             </p>
-            <p className="text-sm sm:text-base font-medium text-white/80 italic leading-relaxed max-w-xl text-center sm:text-right">
+            <p className="text-sm sm:text-base font-medium text-zinc-600 dark:text-white/80 italic leading-relaxed max-w-xl text-center sm:text-right">
               {dailyVerse?.english}
             </p>
           </div>
         </div>
 
         {/* Footer: Spiritual Status Icons */}
-        <div className="relative pt-6 border-t border-white/10">
+        <div className="relative pt-6 border-t border-zinc-200 dark:border-white/10">
           <div className="flex items-center justify-between sm:justify-start gap-4 sm:gap-6">
             <div className="flex flex-col max-sm:items-center">
-              <span className="text-[9px] font-black text-emerald-100/30 uppercase tracking-widest mb-3">
+              <span className="text-[9px] font-black text-zinc-400 dark:text-emerald-100/30 uppercase tracking-widest mb-3 px-1">
                 {t('dashboard.spiritual_status') || 'Spiritual Status'}
               </span>
               <div className="flex items-center gap-3">
                 {[
-                  { icon: Heart, color: 'text-rose-400', bg: 'bg-rose-400/10' },
-                  { icon: Star, color: 'text-amber-400', bg: 'bg-amber-400/10' },
-                  { icon: Sparkles, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
-                  { icon: Trophy, color: 'text-indigo-400', bg: 'bg-indigo-400/10' }
+                  { icon: Heart, color: 'text-rose-500', bg: 'bg-rose-500/10' },
+                  { icon: Star, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+                  { icon: Sparkles, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+                  { icon: Trophy, color: 'text-indigo-500', bg: 'bg-indigo-500/10' }
                 ].map((item, i) => (
                   <motion.div
                     key={i}
                     whileHover={{ y: -4, scale: 1.1 }}
-                    className={`w-10 h-10 ${item.bg} rounded-xl flex items-center justify-center border border-white/5 cursor-pointer transition-all shadow-lg shadow-black/5 hover:border-white/20`}
+                    className={`w-10 h-10 ${item.bg} rounded-xl flex items-center justify-center border border-zinc-200 dark:border-white/5 cursor-pointer transition-all shadow-lg shadow-zinc-200/20 dark:shadow-black/5 hover:border-emerald-500/30`}
                   >
                     <item.icon className={`h-5 w-5 ${item.color}`} />
                   </motion.div>

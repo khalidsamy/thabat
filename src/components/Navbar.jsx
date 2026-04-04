@@ -30,7 +30,7 @@ const Navbar = () => {
   if (!user) return null;
 
   return (
-    <nav className="bg-card border-b border-gray-100 dark:border-gray-800 transition-colors duration-300 sticky top-0 z-50 shadow-sm">
+    <nav className="bg-white/80 dark:bg-card backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 transition-all duration-300 sticky top-0 z-50 shadow-sm shadow-zinc-200/50 dark:shadow-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           
@@ -52,7 +52,7 @@ const Navbar = () => {
                 className={({ isActive }) => `flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${
                   isActive 
                     ? `bg-emerald-500/10 ${item.color} shadow-sm border border-emerald-500/10 scale-105` 
-                    : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-600'
+                    : 'text-zinc-400 dark:text-slate-400 hover:bg-zinc-50 dark:hover:bg-white/5 hover:text-zinc-900'
                 }`}
               >
                 <item.icon className="h-4 w-4" />
@@ -114,7 +114,7 @@ const Navbar = () => {
             {/* Logout Mechanism */}
             <button 
               onClick={logout}
-              className="hidden sm:flex group items-center gap-1.5 text-sm font-bold text-slate-400 hover:text-rose-500 transition-colors px-4 py-2 rounded-xl hover:bg-rose-500/10"
+              className="hidden sm:flex group items-center gap-1.5 text-sm font-bold text-zinc-400 dark:text-slate-400 hover:text-rose-500 transition-colors px-4 py-2 rounded-xl hover:bg-rose-500/10"
             >
               <LogOut className="h-4 w-4 rtl:rotate-180" />
               <span>{t('navbar.logout')}</span>
@@ -146,7 +146,7 @@ const Navbar = () => {
               animate={{ x: 0 }}
               exit={{ x: i18n.language === 'ar' ? '100%' : '-100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className={`fixed inset-y-0 ${i18n.language === 'ar' ? 'right-0' : 'left-0'} w-80 z-[101] bg-card/95 backdrop-blur-2xl border-x border-white/10 p-8 lg:hidden shadow-2xl flex flex-col h-screen`}
+              className={`fixed inset-y-0 ${i18n.language === 'ar' ? 'right-0' : 'left-0'} w-80 z-[101] bg-white/95 dark:bg-card/95 backdrop-blur-3xl border-x border-zinc-200 dark:border-white/10 p-8 lg:hidden shadow-2xl flex flex-col h-screen`}
             >
               <div className="flex items-center justify-between mb-10">
                  <div className="flex items-center gap-3">
