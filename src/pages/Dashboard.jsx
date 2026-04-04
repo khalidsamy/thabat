@@ -50,32 +50,34 @@ const Dashboard = () => {
     }
   }, [t]);
 
-  useEffect(() => {
-    const loadInitialData = async () => {
-      setIsLoading(true);
-      try {
-        const [progressRes, userRes] = await Promise.all([
-          api.get('/progress'),
-          api.get('/user/profile')
-        ]);
-        
-        if (progressRes.data.success) setProgress(progressRes.data.progress);
-        if (userRes.data.success) setCurrentUser(userRes.data.data || userRes.data.user);
-        
-        const randomIndex = Math.floor(Math.random() * QURAN_VERSES.length);
-        setDailyVerse(QURAN_VERSES[randomIndex]);
-        
-        if ("Notification" in window && Notification.permission === "default") {
-          await Notification.requestPermission();
-        }
-      } catch (err) {
-        console.error('Initial load failed:', err);
-      } finally {
-        setIsLoading(false);
+  const loadInitialData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [progressRes, userRes] = await Promise.all([
+        api.get('/progress'),
+        api.get('/user/profile')
+      ]);
+      
+      if (progressRes.data.success) setProgress(progressRes.data.progress);
+      if (userRes.data.success) setCurrentUser(userRes.data.data || userRes.data.user);
+      
+      const randomIndex = Math.floor(Math.random() * QURAN_VERSES.length);
+      setDailyVerse(QURAN_VERSES[randomIndex]);
+      
+      if ("Notification" in window && Notification.permission === "default") {
+        await Notification.requestPermission();
       }
-    };
+    } catch (err) {
+      console.error('Initial load failed:', err);
+      setError(t('dashboard.fetch_error'));
+    } finally {
+      setIsLoading(false);
+    }
+  }, [t]);
+
+  useEffect(() => {
     loadInitialData();
-  }, [fetchProgress]);
+  }, [loadInitialData]);
 
   const fireConfetti = () => {
     const end = Date.now() + (1.5 * 1000);
