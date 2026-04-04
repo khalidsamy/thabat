@@ -1,18 +1,0 @@
-
-> thabat-frontend@0.0.0 build
-> vite build
-
-[36mvite v8.0.3 [32mbuilding client environment for production...[36m[39m
-[2Ktransforming...✓ 2387 modules transformed.
-rendering chunks...
-computing gzip size...
-dist/index.html                   0.46 kB │ gzip:   0.30 kB
-dist/assets/index-DPJ_LYla.css   77.44 kB │ gzip:  11.83 kB
-dist/assets/index-B66L3yY7.js   756.48 kB │ gzip: 226.87 kB
-
-[32m✓ built in 1.51s[39m
-[33m[plugin builtin:vite-reporter] 
-(!) Some chunks are larger than 500 kB after minification. Consider:
-- Using dynamic import() to code-split the application
-- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
-- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
