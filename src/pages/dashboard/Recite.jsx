@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import VoiceRecitation from '../../components/VoiceRecitation';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
-import MindMapModal from '../../components/MindMapModal';
+import Button from '../../components/Button';
 import { AuthContext } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import api from '../../services/api';
@@ -23,7 +23,7 @@ const Recite = (props) => {
   const { showSuccess, showError } = useToast();
   const [targetInput, setTargetInput] = useState(user?.currentTargetSurah || '');
   const [isChangingTarget, setIsChangingTarget] = useState(false);
-  const [isMindMapOpen, setIsMindMapOpen] = useState(false);
+  const onVisualize = context.onVisualize;
 
   // Sync target input if user profile loads late
   React.useEffect(() => {
@@ -78,10 +78,11 @@ const Recite = (props) => {
             </div>
 
             <button 
-                onClick={() => setIsMindMapOpen(true)}
-                className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 border border-white/10 w-full sm:w-auto justify-center"
+                onClick={onVisualize}
+                className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 border border-white/10 w-full sm:w-auto justify-center"
             >
-                <span>Visualize Surah 🧠</span>
+                <Sparkles className="h-5 w-5" />
+                <span>Visualize Surah</span>
             </button>
         </div>
         
@@ -185,12 +186,6 @@ const Recite = (props) => {
            </div>
         </div>
       </motion.section>
-      
-      <MindMapModal 
-          isOpen={isMindMapOpen} 
-          onClose={() => setIsMindMapOpen(false)} 
-          pageNumber={progress?.currentPage}
-      />
     </div>
   );
 };

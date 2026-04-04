@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { getStreakMood, getMoodVariants, MOODS } from '../utils/streakMoods';
 
-const HifzStreaks = ({ streak = 0, isCompletedToday = false, wasActiveYesterday = true, currentSurah = "", completion = 0, history = [] }) => {
+const HifzStreaks = ({ streak = 0, isCompletedToday = false, wasActiveYesterday = true, currentSurah = "", completion = 0, history = [], onVisualize }) => {
   const { t, i18n } = useTranslation();
   const mood = getStreakMood(streak, isCompletedToday, wasActiveYesterday);
   const moodVariant = getMoodVariants(mood.id);
@@ -63,13 +63,25 @@ const HifzStreaks = ({ streak = 0, isCompletedToday = false, wasActiveYesterday 
           </div>
         </div>
         
-        <div className="flex flex-col items-end">
-          <span className={`text-2xl font-black ${mood.color} tabular-nums drop-shadow-sm`}>
-            {streak}
-          </span>
-          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 opacity-60">
-            {t('streaks.days_streak')}
-          </span>
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col items-end">
+            <span className={`text-2xl font-black ${mood.color} tabular-nums drop-shadow-sm leading-none`}>
+              {streak}
+            </span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 opacity-60">
+              {t('streaks.days_streak')}
+            </span>
+          </div>
+
+          {onVisualize && (
+              <button 
+                  onClick={onVisualize}
+                  className="p-3 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-500 hover:text-white transition-all shadow-sm border border-indigo-500/10 active:scale-95"
+                  title="Visualize Surah"
+              >
+                  <Sparkles className="h-5 w-5" />
+              </button>
+          )}
         </div>
       </div>
 

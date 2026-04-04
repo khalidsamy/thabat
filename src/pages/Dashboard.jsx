@@ -11,6 +11,7 @@ import { getUserRank } from '../utils/rankManager';
 import confetti from 'canvas-confetti';
 import HeartMessage from '../components/HeartMessage';
 import BottomNav from '../components/BottomNav';
+import MindMapModal from '../components/MindMapModal';
 
 // Sub-pages (Adaptive)
 import Home from './dashboard/Home';
@@ -38,6 +39,7 @@ const Dashboard = () => {
   const [dailyVerse, setDailyVerse] = useState(null);
   const [hasNotifiedToday, setHasNotifiedToday] = useState(false);
   const [isHeartOpen, setIsHeartOpen] = useState(false);
+  const [isMindMapOpen, setIsMindMapOpen] = useState(false);
   const [pagesInput, setPagesInput] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [isTogglingSunnah, setIsTogglingSunnah] = useState(false);
@@ -220,6 +222,7 @@ const Dashboard = () => {
         if (score > 90) showSuccess(t('voice.perfect_match') || 'Perfect recitation! Recorded.');
     },
     refreshData: loadInitialData,
+    onVisualize: () => setIsMindMapOpen(true),
     itemVariants: { 
         hidden: { opacity: 0, y: 20 }, 
         visible: { opacity: 1, y: 0 },
@@ -241,43 +244,56 @@ const Dashboard = () => {
                 exit="exit"
                 variants={sharedProps.itemVariants}
                 transition={{ duration: 0.3 }}
-                className="w-full"
+                className="w-full h-full"
             >
                 {isDashboardRoot ? (
-                    <div className="space-y-12">
-                        {/* THE HOME COMPONENT (Overview) */}
-                        <Home {...sharedProps} />
-
-                        {/* Secondary View: Mobile/Tablet = Stacked, Desktop = 2-column */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            <div className="space-y-12">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+                        {/* Main Stream: Left Column (Home / Primary Tools) */}
+                        <div className="lg:col-span-8 flex flex-col gap-10">
+                            <Home {...sharedProps} />
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                                 <Recite {...sharedProps} />
                                 <Progress {...sharedProps} />
                             </div>
-                            <div className="space-y-12">
+                        </div>
+
+                        {/* Sidebar Stream: Right Column (Support Tools) */}
+                        <div className="lg:col-span-4 flex flex-col gap-10">
+                            <div className="order-2 lg:order-1">
                                 <Review {...sharedProps} />
+                            </div>
+                            <div className="order-1 lg:order-2">
                                 <Community {...sharedProps} />
                             </div>
                         </div>
                     </div>
                 ) : (
-                    <Outlet context={sharedProps} />
+                    <div className="max-w-5xl mx-auto">
+                        <Outlet context={sharedProps} />
+                    </div>
                 )}
             </motion.div>
         </AnimatePresence>
 
-        {/* Floating Heart FAB - Repositioned for BottomNav safety */}
+        {/* Floating Heart FAB - Professionally Integrated */}
         <motion.button
-          whileHover={{ scale: 1.1 }}
+          whileHover={{ scale: 1.1, rotate: 12 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsHeartOpen(true)}
-          className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] md:bottom-10 right-6 md:right-10 z-40 w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full shadow-2xl flex items-center justify-center group border-2 border-white/20"
+          className="fixed bottom-8 sm:bottom-10 right-8 sm:right-10 z-[100] w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-3xl shadow-[0_20px_50px_rgba(245,158,11,0.3)] flex items-center justify-center group border-2 border-white/20 active:scale-95 transition-all"
         >
-          <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.2, 0.5] }} transition={{ duration: 3, repeat: Infinity }} className="absolute inset-0 bg-amber-400 rounded-full" />
-          <Heart className="relative h-7 w-7 text-white fill-white group-hover:scale-110" />
+          <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.1, 0.3] }} transition={{ duration: 4, repeat: Infinity }} className="absolute inset-0 bg-amber-300 rounded-3xl" />
+          <Heart className="relative h-6 w-6 sm:h-7 sm:w-7 text-white fill-white group-hover:scale-110 transition-transform" />
         </motion.button>
 
         <HeartMessage isOpen={isHeartOpen} onClose={() => setIsHeartOpen(false)} />
+        
+        <MindMapModal 
+          isOpen={isMindMapOpen} 
+          onClose={() => setIsMindMapOpen(false)} 
+          pageNumber={progress?.currentPage}
+        />
     </div>
   );
 };
