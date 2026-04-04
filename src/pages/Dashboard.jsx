@@ -26,6 +26,7 @@ const Dashboard = () => {
   
   // Shared State
   const [progress, setProgress] = useState(null);
+  const [currentUser, setCurrentUser] = useState(user);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dailyVerse, setDailyVerse] = useState(null);
@@ -51,14 +52,26 @@ const Dashboard = () => {
   useEffect(() => {
     const loadInitialData = async () => {
       setIsLoading(true);
-      await fetchProgress();
-      const randomIndex = Math.floor(Math.random() * QURAN_VERSES.length);
-      setDailyVerse(QURAN_VERSES[randomIndex]);
-      
-      if ("Notification" in window && Notification.permission === "default") {
-        await Notification.requestPermission();
+      try {
+        const [progressRes, userRes] = await Promise.all([
+          api.get('/progress'),
+          api.get('/user/profile')
+        ]);
+        
+        if (progressRes.data.success) setProgress(progressRes.data.progress);
+        if (userRes.data.success) setCurrentUser(userRes.data.user);
+        
+        const randomIndex = Math.floor(Math.random() * QURAN_VERSES.length);
+        setDailyVerse(QURAN_VERSES[randomIndex]);
+        
+        if ("Notification" in window && Notification.permission === "default") {
+          await Notification.requestPermission();
+        }
+      } catch (err) {
+        console.error('Initial load failed:', err);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
     loadInitialData();
   }, [fetchProgress]);
@@ -143,9 +156,20 @@ const Dashboard = () => {
   const newDailyTarget = Math.ceil(Math.min(totalMemorized, 20) / 3);
 
   const sharedProps = {
-    progress, dailyVerse, refreshKey, oldDailyTarget, newDailyTarget, reviewPace,
-    pagesInput, setPagesInput, handleUpdateSubmit, isUpdating,
-    handleSunnahToggle, isTogglingSunnah, handleVoiceComplete: () => handleUpdateSubmit(),
+    progress, 
+    user: currentUser,
+    dailyVerse, 
+    refreshKey, 
+    oldDailyTarget, 
+    newDailyTarget, 
+    reviewPace,
+    pagesInput, 
+    setPagesInput, 
+    handleUpdateSubmit, 
+    isUpdating,
+    handleSunnahToggle, 
+    isTogglingSunnah, 
+    handleVoiceComplete: () => handleUpdateSubmit(),
     itemVariants: { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } },
     planLabels: { 7: 'المثالي (7 أيام)', 10: 'المتوسط (10 أيام)', 14: 'الحد الأدنى (14 يوماً)' }
   };

@@ -66,8 +66,11 @@ const HomeTab = ({ progress, dailyVerse, itemVariants }) => {
         <div className="grid grid-cols-1 gap-6">
           <HifzStreaks 
             streak={progress?.streak} 
-            isCompletedToday={progress?.completedToday} 
-            wasActiveYesterday={progress?.streak > 0 || (progress?.lastEntryDate && new Date(progress.lastEntryDate).toDateString() === new Date(Date.now() - 86400000).toDateString())}
+            isCompletedToday={progress?.doneToday >= progress?.dailyTarget} 
+            wasActiveYesterday={progress?.streak > 0}
+            currentSurah={progress?.currentTargetSurah || 'Al-Baqarah'}
+            completion={progress?.masteryPercent || 0}
+            history={progress?.history || []}
           />
         </div>
       </motion.section>

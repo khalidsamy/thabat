@@ -1,20 +1,65 @@
-import Button from '../Button';
+import { AuthContext } from '../../context/AuthContext';
 import MindMapModal from '../MindMapModal';
 
-const ReciteTab = ({ progress, pagesInput, setPagesInput, handleUpdateSubmit, isUpdating, handleSunnahToggle, isTogglingSunnah, handleVoiceComplete, itemVariants }) => {
+const ReciteTab = ({ progress, user, pagesInput, setPagesInput, handleUpdateSubmit, isUpdating, handleSunnahToggle, isTogglingSunnah, handleVoiceComplete, itemVariants }) => {
   const { t } = useTranslation();
+  const { updateUser } = useContext(AuthContext);
+  const { showSuccess, showError } = useToast();
   const [isMindMapOpen, setIsMindMapOpen] = useState(false);
+  const [isChangingTarget, setIsChangingTarget] = useState(false);
+  const [targetInput, setTargetInput] = useState(user?.currentTargetSurah || '');
 
   return (
     <div className="space-y-8 pb-32">
       <motion.section variants={itemVariants} className="flex flex-col gap-8">
-        <div className="flex justify-center">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
             <button 
                 onClick={() => setIsMindMapOpen(true)}
                 className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 border border-white/10"
             >
                 <span>Visualize Current Surah 🧠</span>
             </button>
+            
+            <div className="flex items-center gap-2 bg-card border border-gray-100 dark:border-white/5 p-1 rounded-2xl shadow-sm">
+                {!isChangingTarget ? (
+                    <div className="flex items-center gap-3 px-4 py-2">
+                        <span className="text-sm font-bold text-foreground">Target: {user?.currentTargetSurah} 🎯</span>
+                        <button 
+                            onClick={() => setIsChangingTarget(true)}
+                            className="text-[10px] font-black uppercase text-emerald-600 hover:text-emerald-700 underline"
+                        >
+                            Change
+                        </button>
+                    </div>
+                ) : (
+                    <form 
+                        onSubmit={async (e) => {
+                            e.preventDefault();
+                            try {
+                                const res = await api.patch('/user/profile', { currentTargetSurah: targetInput });
+                                if (res.data.success) {
+                                    updateUser({ currentTargetSurah: targetInput });
+                                    setIsChangingTarget(false);
+                                    showSuccess('Target Surah updated!');
+                                }
+                            } catch (err) {
+                                showError(err.message);
+                            }
+                        }}
+                        className="flex items-center gap-2"
+                    >
+                        <input 
+                            value={targetInput}
+                            onChange={(e) => setTargetInput(e.target.value)}
+                            className="bg-transparent border-none text-sm font-bold focus:ring-0 w-32 px-4"
+                            autoFocus
+                        />
+                        <button type="submit" className="p-2 bg-emerald-500 text-white rounded-xl">
+                            <CheckCircle2 className="h-4 w-4" />
+                        </button>
+                    </form>
+                )}
+            </div>
         </div>
         {/* Dedicated Voice Recitation Section */}
         <div className="w-full max-w-2xl mx-auto">

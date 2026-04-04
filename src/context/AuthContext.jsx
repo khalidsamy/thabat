@@ -37,12 +37,19 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('thabat_user');
   };
 
+  const updateUser = (updatedUserData) => {
+    const newUser = { ...user, ...updatedUserData };
+    setUser(newUser);
+    localStorage.setItem('thabat_user', JSON.stringify(newUser));
+  };
+
   const value = {
     user,
     token,
     loading,
     login,
     logout,
+    updateUser,
   };
 
   return (

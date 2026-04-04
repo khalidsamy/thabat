@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { getStreakMood, getMoodVariants, MOODS } from '../utils/streakMoods';
 
-const HifzStreaks = ({ streak = 0, isCompletedToday = false, wasActiveYesterday = true, currentSurah = "Al-Kahf", completion = 65 }) => {
+const HifzStreaks = ({ streak = 0, isCompletedToday = false, wasActiveYesterday = true, currentSurah = "Al-Baqarah", completion = 0, history = [] }) => {
   const { t, i18n } = useTranslation();
   const mood = getStreakMood(streak, isCompletedToday, wasActiveYesterday);
   const moodVariant = getMoodVariants(mood.id);
@@ -21,7 +21,24 @@ const HifzStreaks = ({ streak = 0, isCompletedToday = false, wasActiveYesterday 
     ? ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة']
     : ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
     
-  const activity = [true, true, true, false, true, true, isCompletedToday];
+  // Activity: Generate from history for the last 7 days
+  const activity = Array(7).fill(false);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  
+  for (let i = 0; i < 7; i++) {
+    const targetDate = new Date(today.getTime() - (6 - i) * 24 * 60 * 60 * 1000);
+    const dateStr = targetDate.toDateString();
+    
+    // Check history for this date
+    const dayEntry = history.find(entry => new Date(entry.date).toDateString() === dateStr);
+    if (dayEntry && dayEntry.pages > 0) {
+      activity[i] = true;
+    }
+  }
+  
+  // Ensure today's live state is reflected
+  activity[6] = isCompletedToday;
 
   return (
     <div className="bg-card dark:bg-card/50 border border-gray-100 dark:border-white/5 rounded-2xl p-6 shadow-sm overflow-hidden relative group">
