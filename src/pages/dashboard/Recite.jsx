@@ -71,7 +71,7 @@ const Recite = (props) => {
     }
   };
 
-  const playErrorChime = () => {
+  const playErrorChime = useCallback(() => {
     try {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       const oscillator = audioCtx.createOscillator();
@@ -93,7 +93,20 @@ const Recite = (props) => {
     } catch (e) {
       console.error('Audio chime failed', e);
     }
-  };
+  }, []);
+
+  const handleRecitationError = useCallback((word) => {
+    // 1. Physical Haptic Feedback (Compatibility Check)
+    if ("vibrate" in navigator) {
+      navigator.vibrate([200, 100, 200]);
+    }
+
+    // 2. Audible subtle cue
+    playErrorChime();
+
+    // 3. Professional Visual Alert (Arabic)
+    showError("خطأ في التلاوة، يرجى إعادة الآية");
+  }, [showError, playErrorChime]);
 
   const handleLog = async () => {
     stopListening();
@@ -301,7 +314,7 @@ const Recite = (props) => {
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.9 }}
-                            onClick={isListening ? stopListening : () => startListening(playErrorChime)}
+                            onClick={isListening ? stopListening : () => startListening(handleRecitationError)}
                             className={`w-44 h-44 lg:w-52 lg:h-52 rounded-full flex items-center justify-center text-white shadow-2xl transition-all duration-700 relative z-30 ring-[15px] ${
                                 isListening 
                                     ? 'bg-rose-600 shadow-rose-600/40 ring-rose-500/5' 

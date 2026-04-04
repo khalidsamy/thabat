@@ -69,13 +69,15 @@ export const useVoiceCorrection = (targetVerses = [], onComplete) => {
   const updateMatches = useCallback((finalSpeech, onError) => {
     const speechWords = normalize(finalSpeech).split(/\s+/).filter(w => w.length > 0);
     
+    let errorDetected = false;
+    
     setMatches(prev => {
       const updated = [...prev];
       const threshold = 0.8; // 80% Similarity Threshold
       let localIndex = currentIndex;
       
       speechWords.forEach(sWord => {
-        if (localIndex >= updated.length) return;
+        if (localIndex >= updated.length || errorDetected) return;
 
         // 1. Try to match the CURRENT word
         const currentSim = getSimilarity(updated[localIndex].normalized, sWord);
@@ -92,18 +94,20 @@ export const useVoiceCorrection = (targetVerses = [], onComplete) => {
                     // Mark current as 'wrong' (skipped/mistake) and next as 'correct'
                     updated[localIndex].status = 'wrong';
                     updated[nextIdx].status = 'correct';
+                    errorDetected = true; // Error found
                     if (onError) onError(updated[localIndex].text); // Alert trigger
                     localIndex = nextIdx + 1;
                 } else {
                     // 3. This is a clear mistake on the current word
                     updated[localIndex].status = 'wrong';
+                    errorDetected = true; // Error found
                     if (onError) onError(updated[localIndex].text); // Alert trigger
-                    localIndex++;
+                    // Stop index here - forcing repetition
                 }
             } else {
                 updated[localIndex].status = 'wrong';
+                errorDetected = true; // Error found
                 if (onError) onError(updated[localIndex].text);
-                localIndex++;
             }
         }
       });
@@ -117,6 +121,8 @@ export const useVoiceCorrection = (targetVerses = [], onComplete) => {
 
       return updated;
     });
+
+    return errorDetected;
   }, [normalize, currentIndex]);
 
   const startListening = useCallback((onWordError) => {
@@ -144,7 +150,11 @@ export const useVoiceCorrection = (targetVerses = [], onComplete) => {
         if (event.results[i].isFinal) {
           const speech = event.results[i][0].transcript;
           finalText += speech + ' ';
-          updateMatches(speech, onWordError);
+          const hasError = updateMatches(speech, onWordError);
+          if (hasError) {
+              recognition.stop();
+              return; // Exit stream immediately
+          }
         } else {
           interimText += event.results[i][0].transcript;
         }
