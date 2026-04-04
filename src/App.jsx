@@ -4,7 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './context/ToastContext';
 
-// Standard Structure
+// Components
 import Navbar from './components/Navbar';
 import Toast from './components/Toast';
 import Footer from './components/Footer';
@@ -19,7 +19,7 @@ import ReviewSession from './pages/ReviewSession';
 import MutashabihatLog from './pages/MutashabihatLog';
 import MutashabihatReview from './pages/MutashabihatReview';
 
-// Route Barriers
+// Auth Guards
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicOnlyRoute from './components/PublicOnlyRoute';
 
@@ -35,7 +35,6 @@ function App() {
               
               <main className="flex-grow">
                 <Routes>
-                  {/* Base URL automatically drops user into dashboard */}
                   <Route path="/" element={<Navigate to="/dashboard" replace />} />
               
                   <Route 

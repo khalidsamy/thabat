@@ -12,13 +12,13 @@ const Profile = () => {
   const { user, login } = useContext(AuthContext);
   const { showSuccess, showError } = useToast();
 
-  // ── Personal Info State ──────────────────────────────────────
+  // State management for personal and plan info
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [reviewPace, setReviewPace] = useState(user?.reviewPace || 10);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
-  // ── Password State ───────────────────────────────────────────
+  // Password update state
   const [passwords, setPasswords] = useState({
     currentPassword: '',
     newPassword: '',
@@ -56,7 +56,7 @@ const Profile = () => {
         reviewPace
       });
       if (res.data.success) {
-        // Update the global AuthContext so the Navbar reflects the new name instantly
+        // Synchronize global auth state
         const currentToken = localStorage.getItem('thabat_token');
         login(currentToken, res.data.user);
         showSuccess('Profile updated successfully!');
@@ -117,7 +117,7 @@ const Profile = () => {
           </p>
         </div>
 
-        {/* ── CARD 1: Personal Information ─────────────────────── */}
+        {/* Personal Information */}
         <div className="bg-white/90 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-slate-700 shadow-lg shadow-black/5 dark:shadow-black/30 mb-6 overflow-hidden">
           
           {/* Card Header */}
@@ -175,7 +175,7 @@ const Profile = () => {
           </form>
         </div>
 
-        {/* ── CARD 2: Review Plan (Sheikh Alaa Methodology) ────── */}
+        {/* Review Plan Selection */}
         <div className="bg-white/90 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-slate-700 shadow-lg shadow-black/5 dark:shadow-black/30 mb-6 overflow-hidden">
           
           {/* Card Header */}
@@ -185,7 +185,7 @@ const Profile = () => {
             </div>
             <div>
               <h2 className="text-base font-bold text-foreground">Review Plan (خطة المراجعة)</h2>
-              <p className="text-xs text-secondary-foreground">Based on Sheikh Alaa Hamed's methodology</p>
+              <p className="text-xs text-secondary-foreground">Select your daily target preference</p>
             </div>
           </div>
 
@@ -229,7 +229,7 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* ── CARD 2: Security / Change Password ───────────────── */}
+        {/* Security Settings */}
         <div className="bg-white/90 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl border border-gray-100 dark:border-slate-700 shadow-lg shadow-black/5 dark:shadow-black/30 overflow-hidden">
 
           {/* Card Header */}

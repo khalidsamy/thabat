@@ -116,17 +116,16 @@ const Dashboard = () => {
     );
   }
 
-  // ── Milestone 2: Old vs. New Split ────────────────────────────
+  // Calculate review targets based on portioning
   const reviewPace = user?.reviewPace || 10;
   const totalMemorized = progress?.totalMemorized || 0;
   
-  // Calculate Portions
-  const newPortion = Math.min(totalMemorized, 20); // Last 20 pages
-  const oldPortion = Math.max(totalMemorized - 20, 0); // Everything before last 20
+  // Last 20 pages are treated as 'new progress' with intensive review
+  const newPortion = Math.min(totalMemorized, 20);
+  const oldPortion = Math.max(totalMemorized - 20, 0);
   
-  // Calculate Targets
   const oldDailyTarget = Math.ceil(oldPortion / reviewPace);
-  const newDailyTarget = Math.ceil(newPortion / 3); // Fixed intensive 3-day pace for new hifz
+  const newDailyTarget = Math.ceil(newPortion / 3);
 
   const planLabels = {
     7: 'المثالي (7 أيام)',
@@ -165,13 +164,10 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {/* Main Content Blueprint */}
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        
-        {/* New! Spiritual Carousel */}
         <SpiritualCarousel />
         
-        {/* Foundation: Progress Statistics */}
+        {/* Statistics Grid */}
         <section className="mb-10">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold tracking-tight text-foreground">
@@ -215,7 +211,7 @@ const Dashboard = () => {
           </div>
         </section>
 
-        {/* ── Milestone 3: Sunnah Habit Tracker ─────────────────── */}
+        {/* Daily Habit Tracker */}
         <section className="mb-10">
           <div 
             className={`relative overflow-hidden group p-6 rounded-2xl border-2 transition-all duration-500 backdrop-blur-md ${
@@ -224,7 +220,6 @@ const Dashboard = () => {
                 : 'bg-white/80 dark:bg-slate-800/80 border-gray-100 dark:border-slate-700 shadow-lg shadow-black/5'
             }`}
           >
-            {/* Background Accent */}
             <div className={`absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 rounded-full transition-all duration-500 ${
               progress?.sunnahCompletedToday ? 'bg-emerald-500/10' : 'bg-blue-500/5'
             }`}></div>
@@ -283,7 +278,7 @@ const Dashboard = () => {
               <p className="text-sm text-secondary-foreground mb-6">{t('dashboard.update_subtitle')}</p>
 
               <form onSubmit={handleUpdateSubmit} className="max-w-md space-y-4">
-                {/* ── Milestone 4: Golden Rule Banner ────────────────── */}
+                {/* 24-hour stabilization rule tip */}
                 <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 p-4 rounded-xl flex items-start gap-3 shadow-sm">
                   <Lightbulb className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                   <p className="text-sm font-medium text-amber-800 dark:text-amber-200 leading-relaxed">
