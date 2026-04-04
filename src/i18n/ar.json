@@ -1,0 +1,70 @@
+{
+  "navbar": {
+    "app_name": "ثبات",
+    "logout": "تسجيل الخروج"
+  },
+  "auth": {
+    "welcome_back": "مرحباً، {{name}}!",
+    "registration_success": "تم التسجيل بنجاح! جاري التوجيه لتسجيل الدخول...",
+    "register_title": "إنشاء حساب جديد",
+    "register_subtitle": "تتبع مسيرتك في حفظ القرآن الكريم مع ثبات",
+    "login_title": "تسجيل الدخول إلى ثبات",
+    "login_subtitle": "مرحبًا بعودتك لمواصلة حفظ القرآن الكريم",
+    "full_name": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "name_placeholder": "مثل: خالد سامي",
+    "email_placeholder": "مثل: mail@example.com",
+    "password_placeholder": "••••••••",
+    "create_account": "إنشاء حساب",
+    "sign_in": "تسجيل الدخول",
+    "saving": "جاري المعالجة...",
+    "already_have_account": "لديك حساب بالفعل؟ سجل دخولك",
+    "dont_have_account": "ليس لديك حساب؟ أنشئ حسابًا"
+  },
+  "dashboard": {
+    "quote": "«اقرؤوا القرآن فإنه يأتي يوم القيامة شفيعًا لأصحابه»",
+    "loading": "جاري تحميل لوحة التحكم...",
+    "fetch_error": "عذرًا، تعذر تحميل بيانات الإنجاز في الوقت الحالي.",
+    "refresh_msg": "يرجى تحديث الصفحة أو تسجيل الدخول مرة أخرى.",
+    "current_journey": "مسيرتك الحالية",
+    "current_page": "الصفحة الحالية",
+    "out_of": "من أصل ٦٠٤",
+    "total_memorized": "إجمالي المحفوظ",
+    "pages_committed": "صفحة تم حفظها",
+    "active_streak": "الاستمرارية النشطة",
+    "keep_momentum": "حافظ على زخمک!",
+    "done_today": "إنجاز اليوم",
+    "daily_target": "الهدف اليومي: {{target}} صفحة",
+    "days": "أيام",
+    "update_progress": "تحديث الإنجاز",
+    "update_subtitle": "سجّل عدد الصفحات التي حفظتها اليوم للحفاظ على استمراريتك.",
+    "number_of_pages": "عدد الصفحات",
+    "placeholder_pages": "مثل، ٢",
+    "save_progress": "حفظ الإنجاز",
+    "invalid_input": "يرجى إدخال عدد صحيح موجب للصفحات.",
+    "success_update": "رائع! لقد أتممت حفظ صفحة واحدة اليوم.",
+    "success_update_plural": "رائع! لقد أتممت حفظ {{count}} صفحات اليوم."
+  },
+  "chart": {
+    "title": "سجل الحفظ"
+  },
+  "achievements": {
+    "title": "إنجازاتك",
+    "names": {
+      "Beginner": "مبتدئ",
+      "Consistent": "مستمر",
+      "Warrior": "محارب",
+      "Halfway": "منتصف الطريق",
+      "Master": "متقن"
+    }
+  },
+  "leaderboard": {
+    "title": "لوحة الصدارة العالمية",
+    "longest_streak": "أطول استمرارية:",
+    "days": "أيام",
+    "pages": "صفحة",
+    "no_records": "لا توجد سجلات بعد!",
+    "you": "أنت"
+  }
+}

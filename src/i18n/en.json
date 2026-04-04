@@ -1,0 +1,70 @@
+{
+  "navbar": {
+    "app_name": "Thabat",
+    "logout": "Sign Out"
+  },
+  "auth": {
+    "welcome_back": "Hello, {{name}}!",
+    "registration_success": "Registration successful! Taking you to login...",
+    "register_title": "Create your account",
+    "register_subtitle": "Track your Quran memorization journey with Thabat",
+    "login_title": "Sign in to Thabat",
+    "login_subtitle": "Welcome back to your Quran memorization journey",
+    "full_name": "Full Name",
+    "email": "Email address",
+    "password": "Password",
+    "name_placeholder": "e.g., Khalid Samy",
+    "email_placeholder": "e.g., mail@example.com",
+    "password_placeholder": "••••••••",
+    "create_account": "Create account",
+    "sign_in": "Sign in",
+    "saving": "Processing...",
+    "already_have_account": "Already have an account? Sign in",
+    "dont_have_account": "Don't have an account? Create one"
+  },
+  "dashboard": {
+    "quote": "\"Read the Quran, for it will come as an intercessor for its reciters on the Day of Resurrection.\"",
+    "loading": "Loading your dashboard...",
+    "fetch_error": "Unable to load your progress data at this time.",
+    "refresh_msg": "Please refresh the page or try logging in again.",
+    "current_journey": "Current Journey",
+    "current_page": "Current Page",
+    "out_of": "Out of 604",
+    "total_memorized": "Total Memorized",
+    "pages_committed": "Pages committed",
+    "active_streak": "Active Streak",
+    "keep_momentum": "Keep the momentum!",
+    "done_today": "Done Today",
+    "daily_target": "Daily Target: {{target}} Page(s)",
+    "days": "Days",
+    "update_progress": "Update Progress",
+    "update_subtitle": "Log the pages you've memorized today to maintain your streak.",
+    "number_of_pages": "Number of Pages",
+    "placeholder_pages": "e.g., 2",
+    "save_progress": "Save Progress",
+    "invalid_input": "Please enter a valid positive number of pages.",
+    "success_update": "Fantastic! You've memorized {{count}} page today.",
+    "success_update_plural": "Fantastic! You've memorized {{count}} pages today."
+  },
+  "chart": {
+    "title": "Memorization History"
+  },
+  "achievements": {
+    "title": "Your Achievements",
+    "names": {
+      "Beginner": "Beginner",
+      "Consistent": "Consistent",
+      "Warrior": "Warrior",
+      "Halfway": "Halfway",
+      "Master": "Master"
+    }
+  },
+  "leaderboard": {
+    "title": "Global Hall of Fame",
+    "longest_streak": "Longest Streak:",
+    "days": "days",
+    "pages": "Pages",
+    "no_records": "No standing records yet!",
+    "you": "You"
+  }
+}
