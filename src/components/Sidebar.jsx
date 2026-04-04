@@ -32,7 +32,7 @@ const Sidebar = () => {
   return (
     <aside 
       className={`hidden md:flex flex-col h-screen sticky top-0 z-40 bg-card dark:bg-card/50 border-gray-100 dark:border-white/5 transition-all duration-300 w-20 lg:w-64 overflow-y-auto overflow-x-hidden group shrink-0 ${
-        i18n.language === 'ar' ? 'right-0 border-s' : 'left-0 border-e'
+        i18n.language === 'ar' ? 'border-s' : 'border-e'
       }`}
       dir={t('dir') || (i18n.language === 'ar' ? 'rtl' : 'ltr')}
     >

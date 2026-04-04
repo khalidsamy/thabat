@@ -131,7 +131,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu Drawer */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
@@ -140,56 +139,61 @@ const Navbar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm lg:hidden h-screen w-screen"
             />
             <motion.div
               initial={{ x: i18n.language === 'ar' ? '100%' : '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: i18n.language === 'ar' ? '100%' : '-100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className={`fixed inset-y-0 ${i18n.language === 'ar' ? 'right-0' : 'left-0'} w-72 z-50 bg-card/90 backdrop-blur-xl border-x border-white/10 p-6 lg:hidden shadow-2xl flex flex-col`}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className={`fixed inset-y-0 ${i18n.language === 'ar' ? 'right-0' : 'left-0'} w-80 z-[101] bg-card/95 backdrop-blur-2xl border-x border-white/10 p-8 lg:hidden shadow-2xl flex flex-col h-screen`}
             >
-              <div className="flex items-center justify-between mb-8">
-                 <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
-                       <span className="text-white font-black text-lg">ث</span>
+              <div className="flex items-center justify-between mb-10">
+                 <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                       <span className="text-white font-black text-xl">ث</span>
                     </div>
-                    <span className="font-bold text-foreground">Menu</span>
+                    <span className="font-black text-xl text-foreground tracking-tight">Thabat</span>
                  </div>
-                 <button onClick={() => setIsMenuOpen(false)} className="p-2 text-slate-400 hover:text-foreground transition-colors">
-                    <X className="h-5 w-5" />
+                 <button onClick={() => setIsMenuOpen(false)} className="p-2.5 bg-gray-100 dark:bg-white/5 rounded-xl text-slate-400 hover:text-foreground transition-all">
+                    <X className="h-6 w-6" />
                  </button>
               </div>
 
-              <nav className="flex-1 space-y-2">
+              <div className="flex-1 overflow-y-auto -mx-2 px-2 py-4 space-y-3">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 px-4 italic">Navigation</p>
                 {menuItems.map((item) => (
                   <NavLink
                     key={item.path}
                     to={item.path}
                     onClick={() => setIsMenuOpen(false)}
-                    className={({ isActive }) => `flex items-center gap-4 p-4 rounded-2xl text-sm font-bold transition-all ${
+                    className={({ isActive }) => `flex items-center gap-5 p-5 rounded-[1.5rem] text-sm font-bold transition-all duration-300 ${
                       isActive 
-                        ? `bg-emerald-500/10 ${item.color} shadow-sm border border-emerald-500/10` 
+                        ? `bg-emerald-500/10 ${item.color} shadow-sm border border-emerald-500/10 scale-[1.02]` 
                         : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5'
                     }`}
                   >
-                    <item.icon className="h-5 w-5" />
+                    <div className={`p-2.5 rounded-xl ${isActive ? 'bg-white shadow-sm' : 'bg-transparent'}`}>
+                      <item.icon className="h-5 w-5" />
+                    </div>
                     {item.label}
                   </NavLink>
                 ))}
-              </nav>
+              </div>
 
-              <div className="pt-6 border-t border-white/5 space-y-4">
+              <div className="mt-auto pt-8 border-t border-white/5 space-y-4">
                  <button 
                    onClick={() => { toggleTheme(); setIsMenuOpen(false); }}
-                   className="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
+                   className="w-full flex items-center gap-5 p-5 rounded-[1.5rem] text-sm font-bold text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-all"
                  >
-                   {isDarkMode ? <Sun className="h-5 w-5 text-yellow-400" /> : <Moon className="h-5 w-5" />}
+                   <div className="p-2.5 bg-yellow-500/10 rounded-xl">
+                      {isDarkMode ? <Sun className="h-5 w-5 text-yellow-500" /> : <Moon className="h-5 w-5 text-slate-400" />}
+                   </div>
                    {isDarkMode ? 'Light Mode' : 'Dark Mode'}
                  </button>
                  <button 
                    onClick={logout}
-                   className="w-full flex items-center gap-4 p-4 rounded-2xl text-sm font-bold text-rose-500 hover:bg-rose-500/10 transition-all"
+                   className="w-full flex items-center justify-center gap-3 p-5 rounded-[1.5rem] text-sm font-black text-white bg-rose-500 hover:bg-rose-600 shadow-xl shadow-rose-500/20 active:scale-95 transition-all"
                  >
                    <LogOut className="h-5 w-5 rtl:rotate-180" />
                    {t('navbar.logout')}

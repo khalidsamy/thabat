@@ -231,55 +231,40 @@ const Dashboard = () => {
   const isDashboardRoot = location.pathname === '/dashboard' || location.pathname === '/dashboard/';
 
   return (
-    <div className="dashboard-main relative w-full h-full overflow-x-hidden">
-        {/* Unified Grid: ONLY for Desktop AND the main overview route */}
-        {isDashboardRoot ? (
-          <>
-            <div className="hidden lg:grid grid-cols-3 gap-8 mb-12">
-                <div className="col-span-2 space-y-8">
-                    <Home {...sharedProps} />
-                    <div className="grid grid-cols-2 gap-8">
-                        <Recite {...sharedProps} />
-                        <Progress {...sharedProps} />
-                    </div>
-                </div>
-                <div className="col-span-1 space-y-8">
-                    <Review {...sharedProps} />
-                    <Community {...sharedProps} />
-                </div>
-            </div>
-
-            {/* Mobile/Tablet Tabbed View for Root */}
-            <div className="lg:hidden">
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={location.pathname}
-                        initial="hidden"
-                        animate="visible"
-                        exit="exit"
-                        variants={sharedProps.itemVariants}
-                        transition={{ duration: 0.3 }}
-                    >
+    <div className="dashboard-main relative w-full h-full">
+        {/* Unified Responsive Content Area */}
+        <AnimatePresence mode="wait">
+            <motion.div
+                key={location.pathname}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                variants={sharedProps.itemVariants}
+                transition={{ duration: 0.3 }}
+                className="w-full"
+            >
+                {isDashboardRoot ? (
+                    <div className="space-y-12">
+                        {/* THE HOME COMPONENT (Overview) */}
                         <Home {...sharedProps} />
-                    </motion.div>
-                </AnimatePresence>
-            </div>
-          </>
-        ) : (
-          /* Sub-routes (Progress, Recite, etc.) render their specific content via Outlet on ALL devices */
-          <AnimatePresence mode="wait">
-              <motion.div
-                  key={location.pathname}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  variants={sharedProps.itemVariants}
-                  transition={{ duration: 0.3 }}
-              >
-                  <Outlet context={sharedProps} />
-              </motion.div>
-          </AnimatePresence>
-        )}
+
+                        {/* Secondary View: Mobile/Tablet = Stacked, Desktop = 2-column */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div className="space-y-12">
+                                <Recite {...sharedProps} />
+                                <Progress {...sharedProps} />
+                            </div>
+                            <div className="space-y-12">
+                                <Review {...sharedProps} />
+                                <Community {...sharedProps} />
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <Outlet context={sharedProps} />
+                )}
+            </motion.div>
+        </AnimatePresence>
 
         {/* Floating Heart FAB - Repositioned for BottomNav safety */}
         <motion.button

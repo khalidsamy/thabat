@@ -6,22 +6,21 @@ import Navbar from '../Navbar';
 
 const ResponsiveLayout = () => {
   return (
-    <div className="flex min-h-screen bg-background transition-colors duration-300">
+    <div className="flex h-screen bg-background transition-colors duration-300 overflow-hidden">
       {/* Sidebar for Desktop/Tablet (md+) */}
       <Sidebar />
 
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Navbar */}
+      {/* Main Container: Correct Content Isolation */}
+      <div className="flex-1 flex flex-col min-w-0 h-full relative overflow-hidden">
         <Navbar />
 
-        {/* Main Content Area */}
-        <main className="flex-1 relative">
-          <div className="max-w-7xl mx-auto w-full h-full p-4 md:p-6 lg:p-8">
+        {/* Scrollable Main Area */}
+        <main className="flex-1 h-full overflow-y-auto overflow-x-hidden">
+          <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-12 w-full">
             <Outlet />
           </div>
         </main>
 
-        {/* Bottom Nav for Mobile (below md) */}
         <BottomNav />
       </div>
     </div>
