@@ -21,13 +21,13 @@ import Review from './dashboard/Review';
 
 const Dashboard = () => {
   const { t, i18n } = useTranslation();
-  const { user } = useContext(AuthContext);
+  const { user: authUser } = useContext(AuthContext);
   const { showSuccess, showError } = useToast();
   const location = useLocation();
   
-  // Shared State
+  // Shared State (Reactive & Live)
   const [progress, setProgress] = useState(null);
-  const [currentUser, setCurrentUser] = useState(user);
+  const [user, setUser] = useState(authUser || {});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dailyVerse, setDailyVerse] = useState(null);
@@ -59,7 +59,7 @@ const Dashboard = () => {
       ]);
       
       if (progressRes.data.success) setProgress(progressRes.data.progress);
-      if (userRes.data.success) setCurrentUser(userRes.data.data || userRes.data.user);
+      if (userRes.data.success) setUser(userRes.data.data || userRes.data.user);
       
       const randomIndex = Math.floor(Math.random() * QURAN_VERSES.length);
       setDailyVerse(QURAN_VERSES[randomIndex]);
@@ -160,7 +160,7 @@ const Dashboard = () => {
 
   const sharedProps = {
     progress, 
-    user: currentUser,
+    user,
     dailyVerse, 
     refreshKey, 
     oldDailyTarget, 
