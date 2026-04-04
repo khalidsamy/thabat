@@ -69,32 +69,33 @@ const Register = () => {
           <div className="w-20 h-20 bg-emerald-500 rounded-[2.5rem] flex items-center justify-center shadow-[0_20px_50px_rgba(16,185,129,0.3)] mb-6 animate-bounce-slow">
             <span className="text-white font-black text-4xl">ث</span>
           </div>
-          <h1 className="text-4xl font-black text-zinc-950 tracking-tighter uppercase mb-2">Thabat</h1>
+          <h1 className="text-4xl font-black text-foreground tracking-tighter uppercase mb-2">Thabat</h1>
           <div className="h-1 w-12 bg-emerald-500 rounded-full"></div>
         </div>
 
-        <div className="text-center mb-8 p-6 bg-emerald-50/50 rounded-3xl border border-emerald-100/50">
-          <p className="text-xl font-black text-zinc-950 leading-loose" dir="rtl">
+        <div className="text-center mb-8 p-6 bg-emerald-900/10 rounded-3xl border border-white/5">
+          <p className="text-xl font-black text-white leading-loose" dir="rtl">
             {QURAN_VERSE.arabic}
           </p>
-          <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mt-2" dir="rtl">
+          <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mt-2" dir="rtl">
             {QURAN_VERSE.reference}
           </p>
         </div>
 
-        <div className="bg-white dark:bg-card/80 border border-slate-200 dark:border-white/5 rounded-[3rem] shadow-[0_30px_60px_rgba(0,0,0,0.08)] px-10 py-12 transition-all duration-500 hover:shadow-[0_40px_80px_rgba(0,0,0,0.12)]">
+        <div className="bg-card/80 border border-white/5 rounded-[3rem] shadow-[0_30px_60px_rgba(0,0,0,0.5)] px-10 py-12 transition-all duration-500 hover:shadow-[0_40px_80px_rgba(0,0,0,0.6)]">
           <style>{`
             .elite-input input {
               height: 64px !important;
               border-radius: 20px !important;
-              background: #F8FAFC !important;
+              background: #0f172a !important; /* Slate-900 */
               border: 2px solid transparent !important;
               font-weight: 700 !important;
               font-size: 1rem !important;
+              color: #f8fafc !important;
               transition: all 0.3s ease !important;
             }
             .elite-input input:focus {
-              background: white !important;
+              background: #1e293b !important; /* Slate-800 */
               border-color: #10b981 !important;
               box-shadow: 0 10px 30px rgba(16,185,129,0.1) !important;
             }
@@ -108,10 +109,10 @@ const Register = () => {
           `}</style>
 
           <div className="text-center mb-10">
-            <h2 className="text-xl font-black text-zinc-950 dark:text-foreground uppercase tracking-tight">
+            <h2 className="text-xl font-black text-foreground uppercase tracking-tight">
               {t('auth.register_title')}
             </h2>
-            <p className="mt-2 text-xs font-bold text-zinc-400 uppercase tracking-widest">{t('auth.register_subtitle')}</p>
+            <p className="mt-2 text-xs font-bold text-slate-500 uppercase tracking-widest">{t('auth.register_subtitle')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -135,24 +136,24 @@ const Register = () => {
             </div>
 
             <div className="pt-4">
-              <Button type="submit" isLoading={isLoading} disabled={isLoading} className="h-16 w-full bg-zinc-950 hover:bg-zinc-800 text-white font-black text-lg rounded-2xl shadow-xl shadow-zinc-950/20 active:scale-95 transition-all uppercase tracking-widest">
+              <Button type="submit" isLoading={isLoading} disabled={isLoading} className="h-16 w-full bg-white text-zinc-950 font-black text-lg rounded-2xl shadow-xl shadow-black/20 active:scale-95 transition-all uppercase tracking-widest hover:bg-slate-100">
                 {isLoading ? t('auth.saving') : t('auth.create_account')}
               </Button>
             </div>
           </form>
 
           <div className="mt-10 text-center">
-            <p className="text-sm font-bold text-zinc-400 uppercase tracking-tight">
+            <p className="text-sm font-bold text-slate-500 uppercase tracking-tight">
               {t('auth.already_have_account')}{' '}
               <Link to="/login"
-                className="font-black text-emerald-600 hover:text-emerald-500 transition-colors underline underline-offset-[6px] decoration-4 decoration-emerald-500/20">
+                className="font-black text-emerald-400 hover:text-emerald-300 transition-colors underline underline-offset-[6px] decoration-4 decoration-emerald-500/20">
                 {t('auth.sign_in')}
               </Link>
             </p>
           </div>
         </div>
 
-        <p className="text-center text-zinc-300 font-bold text-[10px] mt-10 tracking-[0.4em] uppercase">
+        <p className="text-center text-zinc-700 font-bold text-[10px] mt-10 tracking-[0.4em] uppercase">
           ثَبِّتْنَا عَلَى حِفْظِ كِتَابِكَ
         </p>
       </div>

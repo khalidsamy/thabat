@@ -31,7 +31,7 @@ const Sidebar = () => {
 
   return (
     <aside 
-      className={`hidden md:flex flex-col h-screen sticky top-0 z-40 bg-white/60 dark:bg-card/50 backdrop-blur-md border-slate-200 dark:border-white/5 transition-all duration-300 w-20 lg:w-64 overflow-y-auto overflow-x-hidden group shrink-0 ${
+      className={`hidden md:flex flex-col h-screen sticky top-0 z-40 bg-card/50 backdrop-blur-md border-white/5 transition-all duration-300 w-20 lg:w-64 overflow-y-auto overflow-x-hidden group shrink-0 ${
         i18n.language === 'ar' ? 'border-s shadow-[-10px_0_30px_rgba(0,0,0,0.01)]' : 'border-e shadow-[10px_0_30px_rgba(0,0,0,0.01)]'
       }`}
       dir={t('direction') || (i18n.language === 'ar' ? 'rtl' : 'ltr')}
@@ -41,8 +41,8 @@ const Sidebar = () => {
           <span className="text-white font-black text-xl">ث</span>
         </div>
         <div className="hidden lg:flex flex-col opacity-0 lg:opacity-100 transition-opacity duration-300">
-           <span className="text-xl font-black text-zinc-950 dark:text-foreground tracking-tighter uppercase leading-none">Thabat</span>
-           <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.2em] mt-1 leading-none">Holy Quran</span>
+           <span className="text-xl font-black text-foreground tracking-tighter uppercase leading-none">Thabat</span>
+           <span className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em] mt-1 leading-none">Holy Quran</span>
         </div>
       </div>
 
@@ -55,8 +55,8 @@ const Sidebar = () => {
             className={({ isActive }) =>
               `relative flex items-center gap-4 p-3.5 rounded-2xl transition-all duration-300 group/item ${
                 isActive 
-                  ? 'bg-emerald-500/10 text-emerald-950 dark:text-emerald-400 font-bold' 
-                  : 'text-zinc-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-zinc-950 dark:hover:text-slate-200'
+                  ? 'bg-emerald-500/10 text-emerald-400 font-bold' 
+                  : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
               }`
             }
           >
@@ -79,12 +79,12 @@ const Sidebar = () => {
         ))}
       </nav>
 
-      <div className="px-3 space-y-2 mb-8 border-t border-gray-100 dark:border-white/5 pt-6">
+      <div className="px-3 space-y-2 mb-8 border-t border-white/5 pt-6">
         {secondaryItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
-            className="flex items-center gap-4 p-3 rounded-2xl text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200 transition-all duration-300"
+            className="flex items-center gap-4 p-3 rounded-2xl text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-all duration-300"
           >
             <item.icon className="h-6 w-6 shrink-0" />
             <span className="hidden lg:block text-sm font-bold truncate">
@@ -95,7 +95,7 @@ const Sidebar = () => {
         
         <button 
           onClick={handleLogout}
-          className="w-full flex items-center gap-4 p-3 rounded-2xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 transition-all duration-300"
+          className="w-full flex items-center gap-4 p-3 rounded-2xl text-rose-500 hover:bg-rose-500/10 hover:text-rose-600 transition-all duration-300"
         >
           <LogOut className="h-6 w-6 shrink-0" />
           <span className="hidden lg:block text-sm font-bold truncate">

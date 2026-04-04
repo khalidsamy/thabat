@@ -19,16 +19,14 @@ const Recite = (props) => {
   };
   const { showSuccess, showError } = useToast();
 
-  // State Management
   const [surahs, setSurahs] = useState([]);
-  const [selectedSurah, setSelectedSurah] = useState(1); // Default Al-Fatihah
+  const [selectedSurah, setSelectedSurah] = useState(1);
   const [ayahFrom, setAyahFrom] = useState(1);
   const [ayahTo, setAyahTo] = useState(7);
   const [targetVerses, setTargetVerses] = useState([]);
   const [isLoadingVerses, setIsLoadingVerses] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
 
-  // Voice Correction Hook
   const { 
     isListening, 
     transcript, 
@@ -40,7 +38,6 @@ const Recite = (props) => {
     resetCorrection 
   } = useVoiceCorrection(targetVerses);
 
-  // Fetch Surahs on Mount
   useEffect(() => {
     const fetchSurahs = async () => {
       try {
@@ -53,7 +50,6 @@ const Recite = (props) => {
     fetchSurahs();
   }, [showError]);
 
-  // Fetch Target Verses when selection changes
   const loadTargetVerses = async () => {
     setIsLoadingVerses(true);
     try {
@@ -75,7 +71,6 @@ const Recite = (props) => {
     }
   };
 
-  // Audio Utility: Professional Error Chime (Web Audio API)
   const playErrorChime = () => {
     try {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -83,11 +78,11 @@ const Recite = (props) => {
       const gainNode = audioCtx.createGain();
 
       oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // High-frequency soft chime
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
       oscillator.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.1);
 
       gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.01); // Very subtle
+      gainNode.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.01);
       gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
 
       oscillator.connect(gainNode);
@@ -105,30 +100,26 @@ const Recite = (props) => {
     try {
       const surahName = surahs.find(s => s.number === selectedSurah)?.englishName || '';
       
-      // 1. Log the mastery score to user history
       await api.post('/progress/mastery', { 
         score: masteryScore,
         surah: surahName
       });
 
-      // 2. Update the actual progress pages in the tracker
       const pagesToLog = Math.ceil(targetVerses.length / 2) || 1;
       await api.post('/progress/update', { 
         pages: pagesToLog
       });
 
-      // 3. Automatic Error Logging (The 'Error Book' Integration)
       const wrongWords = matches.filter(m => m.status === 'wrong');
       if (wrongWords.length > 0) {
-        // Log unique errors only to avoid duplicates
         const uniqueWrongTexts = [...new Set(wrongWords.map(m => m.text))];
         
         for (const wordText of uniqueWrongTexts) {
             await api.post('/errors', {
                 surah: surahName,
-                verse: ayahFrom, // Simplification: log to the starting verse of range
+                verse: ayahFrom,
                 wrongText: wordText,
-                correctText: wordText, // We use the same for mapping in the error book
+                correctText: wordText,
                 type: 'pronunciation',
                 note: `Automatically logged during AI Recitation session (${masteryScore}% accuracy)`
             }).catch(err => console.error("Failed to log error:", err));
@@ -138,7 +129,6 @@ const Recite = (props) => {
       showSuccess(t('dashboard.progress_logged') || 'Recitation mastery logged successfully!');
       setShowSummary(true);
       
-      // Update global context/state
       if (handleVoiceComplete) {
         handleVoiceComplete(masteryScore, surahName);
       }
@@ -160,25 +150,25 @@ const Recite = (props) => {
               exit={{ opacity: 0, scale: 0.98 }}
               className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10"
             >
-              {/* STEP 1: TARGET RANGE SELECTION (4 COLS) */}
+              {/* STEP 1: TARGET RANGE SELECTION */}
               <div className="lg:col-span-4 space-y-8">
-                <div className="bg-white dark:bg-card/40 border border-slate-200 dark:border-white/5 rounded-3xl p-8 shadow-xl shadow-slate-200/50 dark:shadow-black/5 animate-slide-in">
+                <div className="bg-card/40 border border-white/5 rounded-3xl p-8 shadow-xl shadow-black/5 animate-slide-in">
                   <div className="flex items-center gap-3 mb-8">
-                    <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-600 dark:text-emerald-400">
+                    <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-400">
                       <Search className="h-6 w-6" />
                     </div>
-                    <h3 className="text-xl font-black tracking-tight text-zinc-950 dark:text-foreground">
+                    <h3 className="text-xl font-black tracking-tight text-foreground">
                       Target Range
                     </h3>
                   </div>
 
                   <div className="space-y-6">
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-emerald-800/40 dark:text-emerald-500/40 uppercase tracking-[0.3em] px-1">Surah Selection</label>
+                       <label className="text-[10px] font-black text-emerald-500/40 uppercase tracking-[0.3em] px-1">Surah Selection</label>
                        <select 
                           value={selectedSurah}
                           onChange={(e) => setSelectedSurah(parseInt(e.target.value))}
-                          className="w-full h-14 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl px-4 font-bold text-zinc-950 dark:text-foreground focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all outline-none"
+                          className="w-full h-14 bg-slate-900 border border-white/5 rounded-2xl px-4 font-bold text-foreground focus:ring-2 focus:ring-emerald-500 transition-all outline-none"
                        >
                           {surahs.map(s => (
                             <option key={s.number} value={s.number}>{s.number}. {s.englishName}</option>
@@ -188,23 +178,23 @@ const Recite = (props) => {
 
                     <div className="grid grid-cols-2 gap-4">
                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-emerald-800/40 dark:text-emerald-500/40 uppercase tracking-[0.3em] px-1">From Ayah</label>
+                          <label className="text-[10px] font-black text-emerald-500/40 uppercase tracking-[0.3em] px-1">From Ayah</label>
                           <input 
                             type="number"
                             min="1"
                             value={ayahFrom}
                             onChange={(e) => setAyahFrom(parseInt(e.target.value))}
-                            className="w-full h-14 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl px-4 font-bold text-zinc-950 dark:text-foreground focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none"
+                            className="w-full h-14 bg-slate-900 border border-white/5 rounded-2xl px-4 font-bold text-foreground focus:ring-2 focus:ring-emerald-500 outline-none"
                           />
                        </div>
                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-emerald-800/40 dark:text-emerald-500/40 uppercase tracking-[0.3em] px-1">To Ayah</label>
+                          <label className="text-[10px] font-black text-emerald-500/40 uppercase tracking-[0.3em] px-1">To Ayah</label>
                           <input 
                             type="number"
                             min="1"
                             value={ayahTo}
                             onChange={(e) => setAyahTo(parseInt(e.target.value))}
-                            className="w-full h-14 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl px-4 font-bold text-zinc-950 dark:text-foreground focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none"
+                            className="w-full h-14 bg-slate-900 border border-white/5 rounded-2xl px-4 font-bold text-foreground focus:ring-2 focus:ring-emerald-500 outline-none"
                           />
                        </div>
                     </div>
@@ -227,7 +217,7 @@ const Recite = (props) => {
                 </div>
 
                 {/* Live Accuracy Metric */}
-                <div className="bg-gradient-to-br from-emerald-600 to-emerald-800 dark:from-emerald-900 dark:to-emerald-950 rounded-3xl p-8 shadow-2xl shadow-emerald-900/10 border border-white/10 text-white overflow-hidden relative group">
+                <div className="bg-gradient-to-br from-emerald-900 to-emerald-950 rounded-3xl p-8 shadow-2xl shadow-emerald-900/10 border border-white/10 text-white overflow-hidden relative group">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-1000"></div>
                     <div className="relative">
                         <span className="text-[10px] font-black text-emerald-100/40 uppercase tracking-[0.4em] mb-1 block">Recitation Mastery</span>
@@ -246,28 +236,26 @@ const Recite = (props) => {
                 </div>
               </div>
 
-              {/* STEP 2 & 3: CONTINUOUS AI RECITER (8 COLS) */}
+              {/* STEP 2 & 3: CONTINUOUS AI RECITER */}
               <div className="lg:col-span-8 space-y-8">
-                <div className="bg-white dark:bg-card/40 border border-slate-200 dark:border-white/5 rounded-[2.5rem] p-10 lg:p-14 shadow-xl shadow-slate-200/50 dark:shadow-zinc-900/5 flex flex-col items-center justify-between min-h-[750px] relative overflow-hidden group/tutor">
+                <div className="bg-card/40 border border-white/5 rounded-[2.5rem] p-10 lg:p-14 shadow-xl shadow-zinc-900/5 flex flex-col items-center justify-between min-h-[750px] relative overflow-hidden group/tutor">
                     
-                    {/* Header: Range Display */}
                     <div className="relative w-full flex flex-col items-center mb-8">
-                        <h4 className="text-2xl font-black text-zinc-950 dark:text-foreground mb-4">Al Quran Tutor</h4>
+                        <h4 className="text-2xl font-black text-foreground mb-4">Al Quran Tutor</h4>
                         <div className="flex items-center gap-4">
-                            <div className="px-6 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl flex items-center gap-3">
+                            <div className="px-6 py-2.5 bg-slate-900 border border-white/10 rounded-2xl flex items-center gap-3">
                                 <Volume2 className="h-5 w-5 text-emerald-600" />
-                                <span className="text-sm font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">
+                                <span className="text-sm font-black text-emerald-400 uppercase tracking-widest">
                                   {surahs.find(s => s.number === selectedSurah)?.englishName || "Surah Selection"}
                                 </span>
                             </div>
-                            <div className="px-6 py-2.5 bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 rounded-2xl">
+                            <div className="px-6 py-2.5 bg-emerald-500/20 border border-emerald-500/20 rounded-2xl">
                                 <span className="text-sm font-black text-emerald-600 uppercase tracking-widest">Verses {ayahFrom}-{ayahTo}</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* LIVE TRANSCRIPT: Above the Mic */}
-                    <div className="w-full bg-slate-50 dark:bg-slate-900/50 border-2 border-slate-100 dark:border-white/5 shadow-inner rounded-3xl p-8 lg:p-12 min-h-[320px] flex flex-wrap items-center justify-center gap-x-6 gap-y-4 text-center relative z-20" dir="rtl">
+                    <div className="w-full bg-slate-900/50 border-2 border-white/5 shadow-inner rounded-3xl p-8 lg:p-12 min-h-[320px] flex flex-wrap items-center justify-center gap-x-6 gap-y-4 text-center relative z-20" dir="rtl">
                         {targetVerses.length > 0 ? (
                            matches.map((word, i) => (
                              <motion.span 
@@ -281,7 +269,7 @@ const Recite = (props) => {
                                 className={`text-4xl lg:text-5xl font-quran font-black transition-all duration-500 tracking-tight leading-relaxed ${
                                   word.status === 'correct' ? 'text-emerald-500 drop-shadow-[0_0_12px_rgba(16,185,129,0.3)]' :
                                   word.status === 'wrong' ? 'text-rose-600 drop-shadow-[0_0_12px_rgba(225,29,72,0.3)]' :
-                                  'text-zinc-300 dark:text-zinc-800'
+                                  'text-zinc-800'
                                 }`}
                              >
                                {word.text}
@@ -290,12 +278,11 @@ const Recite = (props) => {
                         ) : (
                           <div className="flex flex-col items-center gap-4 py-10 opacity-40">
                               <Sparkles className="h-10 w-10 text-emerald-500" />
-                              <p className="text-zinc-950 font-black italic text-2xl uppercase tracking-widest" dir="ltr">Range Not Loaded</p>
+                              <p className="text-foreground font-black italic text-2xl uppercase tracking-widest" dir="ltr">Range Not Loaded</p>
                           </div>
                         )}
                     </div>
 
-                    {/* DYNAMIC PULSING MICROPHONE */}
                     <div className="relative flex flex-col items-center gap-6 mt-12 mb-8">
                         <AnimatePresence>
                             {isListening && (
@@ -337,14 +324,13 @@ const Recite = (props) => {
                         <p className="text-zinc-400 font-bold text-xs uppercase tracking-[0.2em]">{isListening ? 'Stream Active' : 'Tap to Start AI'}</p>
                     </div>
 
-                    {/* STICKY ACTION: LOGGING (Visible only when meaningful progress made) */}
                     <div className="w-full flex justify-center py-6">
                         {targetVerses.length > 0 && masteryScore > 0 && !isListening && (
                             <motion.button
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 onClick={handleLog}
-                                className="px-12 py-6 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-3xl font-black text-sm uppercase tracking-[0.3em] shadow-2xl shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-4"
+                                className="px-12 py-6 bg-white text-zinc-950 rounded-3xl font-black text-sm uppercase tracking-[0.3em] shadow-2xl shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-4"
                             >
                                 <Sparkles className="h-6 w-6 text-emerald-400" />
                                 <span>Analyze & End Session</span>
@@ -355,14 +341,12 @@ const Recite = (props) => {
               </div>
             </motion.div>
           ) : (
-            /* STEP 4: INTEGRATED MASTERY SUMMARY */
             <motion.div 
                key="tutor-summary"
                initial={{ opacity: 0, scale: 0.95 }}
                animate={{ opacity: 1, scale: 1 }}
-               className="max-w-2xl mx-auto bg-white dark:bg-card/40 rounded-[3rem] p-12 lg:p-16 text-center shadow-2xl border border-slate-200 dark:border-white/5 relative overflow-hidden"
+               className="max-w-2xl mx-auto bg-card/40 rounded-[3rem] p-12 lg:p-16 text-center shadow-2xl border border-white/5 relative overflow-hidden"
             >
-              {/* Glassmorphism Accents */}
               <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/5 rounded-full -mr-40 -mt-40 blur-3xl"></div>
               
               <div className="w-28 h-28 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner relative">
@@ -374,16 +358,16 @@ const Recite = (props) => {
                 />
               </div>
 
-              <h2 className="text-5xl font-black text-zinc-950 dark:text-foreground tracking-tighter mb-4">Allahuma Barik!</h2>
+              <h2 className="text-5xl font-black text-foreground tracking-tighter mb-4">Allahuma Barik!</h2>
               <p className="text-xl text-zinc-500 font-medium mb-12">Recitation complete. Your effort has been logged to your progress history.</p>
               
               <div className="grid grid-cols-2 gap-8 mb-12">
-                  <div className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-3xl border border-slate-200 dark:border-white/5 shadow-inner">
-                      <span className="text-[10px] font-black text-emerald-800/60 dark:text-emerald-600/40 uppercase tracking-widest block mb-1 px-1">Mastery Score</span>
+                  <div className="bg-slate-900/50 p-8 rounded-3xl border border-white/5 shadow-inner">
+                      <span className="text-[10px] font-black text-emerald-600/40 uppercase tracking-widest block mb-1 px-1">Mastery Score</span>
                       <span className="text-5xl font-black text-emerald-600">{masteryScore}%</span>
                   </div>
-                  <div className="bg-slate-50 dark:bg-slate-900/50 p-8 rounded-3xl border border-slate-200 dark:border-white/5 shadow-inner">
-                      <span className="text-[10px] font-black text-rose-800/60 dark:text-rose-600/40 uppercase tracking-widest block mb-1 px-1">Mistakes Found</span>
+                  <div className="bg-slate-900/50 p-8 rounded-3xl border border-white/5 shadow-inner">
+                      <span className="text-[10px] font-black text-rose-600/40 uppercase tracking-widest block mb-1 px-1">Mistakes Found</span>
                       <span className="text-5xl font-black text-rose-600">{matches.filter(m => m.status === 'wrong').length}</span>
                   </div>
               </div>
@@ -391,7 +375,7 @@ const Recite = (props) => {
               <div className="space-y-4">
                   <button 
                     onClick={() => setShowSummary(false)}
-                    className="w-full h-20 bg-zinc-950 text-white rounded-3xl font-black text-lg shadow-2xl shadow-emerald-500/30 hover:bg-zinc-800 transition-all active:scale-95 flex items-center justify-center gap-3"
+                    className="w-full h-20 bg-white text-zinc-950 rounded-3xl font-black text-lg shadow-2xl shadow-emerald-500/30 hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-3"
                   >
                     <span>Log to Streak</span>
                     <ChevronRight className="h-6 w-6" />

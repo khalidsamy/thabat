@@ -17,7 +17,7 @@ const BottomNav = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden px-4 pb-6 pt-2">
-      <div className="mx-auto max-w-md bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-white/5 rounded-3xl shadow-2xl shadow-black/10 flex items-center justify-around p-2 relative overflow-hidden">
+      <div className="mx-auto max-w-md bg-slate-900/70 backdrop-blur-xl border border-white/5 rounded-3xl shadow-2xl shadow-black/40 flex items-center justify-around p-2 relative overflow-hidden">
         {navItems.map((item) => (
           <NavLink
             key={item.path}
@@ -25,7 +25,7 @@ const BottomNav = () => {
             end={item.exact}
             className={({ isActive }) =>
               `relative flex flex-col items-center gap-1 p-3 rounded-2xl transition-all duration-300 ${
-                isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                isActive ? 'text-emerald-400' : 'text-slate-500 hover:text-slate-200'
               }`
             }
           >
@@ -34,7 +34,7 @@ const BottomNav = () => {
                 {isActive && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute inset-0 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-2xl"
+                    className="absolute inset-0 bg-emerald-500/20 rounded-2xl"
                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   />
                 )}

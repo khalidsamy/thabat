@@ -14,20 +14,20 @@ const Toast = () => {
         let icon = null;
 
         if (toast.type === 'success') {
-          bgColor = 'bg-emerald-50 border-emerald-500 text-emerald-800 dark:bg-emerald-950/40 dark:border-emerald-500/50 dark:text-emerald-200';
+          bgColor = 'bg-emerald-950/40 border-emerald-500/50 text-emerald-200';
           icon = <CheckCircle className="h-5 w-5 text-emerald-500 mr-3" />;
         } else if (toast.type === 'error') {
-          bgColor = 'bg-red-50 border-red-500 text-red-800 dark:bg-red-950/40 dark:border-red-500/50 dark:text-red-200';
-          icon = <AlertCircle className="h-5 w-5 text-red-500 mr-3" />;
+          bgColor = 'bg-red-950/40 border-red-500/50 text-rose-200';
+          icon = <AlertCircle className="h-5 w-5 text-rose-500 mr-3" />;
         } else {
-          bgColor = 'bg-blue-50 border-blue-500 text-blue-800 dark:bg-blue-950/40 dark:border-blue-500/50 dark:text-blue-200';
+          bgColor = 'bg-blue-950/40 border-blue-500/50 text-blue-200';
           icon = <Info className="h-5 w-5 text-blue-500 mr-3" />;
         }
 
         return (
           <div
             key={toast.id}
-            className={`flex items-center p-4 border-l-4 rounded-md shadow-lg pointer-events-auto transform transition-all duration-300 ease-in-out hover:shadow-xl ${bgColor}`}
+            className={`flex items-center p-4 border-l-4 rounded-md shadow-lg pointer-events-auto transform transition-all duration-300 ease-in-out hover:shadow-xl backdrop-blur-md ${bgColor}`}
             style={{ 
               animation: 'slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards' 
             }}
@@ -47,7 +47,7 @@ const Toast = () => {
             
             <button
               onClick={() => removeToast(toast.id)}
-              className="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors focus:outline-none p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/10"
+              className="flex-shrink-0 text-slate-500 hover:text-slate-200 transition-colors focus:outline-none p-1 rounded-full hover:bg-white/10"
             >
               <X className="h-4 w-4" />
             </button>

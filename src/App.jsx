@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './context/ToastContext';
 
 // Components
@@ -34,64 +33,62 @@ import ResponsiveLayout from './components/layout/ResponsiveLayout';
 
 function App() {
   return (
-    <ThemeProvider>
-      <ToastProvider>
-        <AuthProvider>
-          <Router>
-            <div className="min-h-screen bg-background">
-              <Toast />
-              <Routes>
-                {/* Global Root Transition Logic */}
-                <Route path="/" element={<RootRedirect />} />
+    <ToastProvider>
+      <AuthProvider>
+        <Router>
+          <div className="min-h-screen bg-background">
+            <Toast />
+            <Routes>
+              {/* Global Root Transition Logic */}
+              <Route path="/" element={<RootRedirect />} />
 
-                {/* Public Routes with standalone layout */}
-                <Route 
-                  path="/register" 
-                  element={
-                    <PublicOnlyRoute>
-                      <AnimatedPage>
-                        <Register />
-                      </AnimatedPage>
-                    </PublicOnlyRoute>
-                  } 
-                />
-                
-                <Route 
-                  path="/login" 
-                  element={
-                    <PublicOnlyRoute>
-                      <AnimatedPage>
-                        <Login />
-                      </AnimatedPage>
-                    </PublicOnlyRoute>
-                  } 
-                />
+              {/* Public Routes with standalone layout */}
+              <Route 
+                path="/register" 
+                element={
+                  <PublicOnlyRoute>
+                    <AnimatedPage>
+                      <Register />
+                    </AnimatedPage>
+                  </PublicOnlyRoute>
+                } 
+              />
+              
+              <Route 
+                path="/login" 
+                element={
+                  <PublicOnlyRoute>
+                    <AnimatedPage>
+                      <Login />
+                    </AnimatedPage>
+                  </PublicOnlyRoute>
+                } 
+              />
 
-                {/* Unified Dashboard Hub */}
-                <Route element={<ProtectedRoute><ResponsiveLayout /></ProtectedRoute>}>
-                  <Route path="/dashboard" element={<Dashboard />}>
-                    <Route index element={<Home />} />
-                    <Route path="progress" element={<Progress />} />
-                    <Route path="recite" element={<Recite />} />
-                    <Route path="community" element={<Community />} />
-                    <Route path="review" element={<Review />} />
-                    
-                    {/* Specialized Tools Consolidated Under Dashboard Layout */}
-                    <Route path="errors" element={<ErrorLog />} />
-                    <Route path="review-session" element={<ReviewSession />} />
-                    <Route path="mutashabihat" element={<MutashabihatLog />} />
-                    <Route path="mutashabihat-review" element={<MutashabihatReview />} />
-                    <Route path="profile" element={<Profile />} />
-                  </Route>
+              {/* Unified Dashboard Hub */}
+              <Route element={<ProtectedRoute><ResponsiveLayout /></ProtectedRoute>}>
+                <Route path="/dashboard" element={<Dashboard />}>
+                  <Route index element={<Home />} />
+                  <Route path="progress" element={<Progress />} />
+                  <Route path="recite" element={<Recite />} />
+                  <Route path="community" element={<Community />} />
+                  <Route path="review" element={<Review />} />
+                  
+                  {/* Specialized Tools Consolidated Under Dashboard Layout */}
+                  <Route path="errors" element={<ErrorLog />} />
+                  <Route path="review-session" element={<ReviewSession />} />
+                  <Route path="mutashabihat" element={<MutashabihatLog />} />
+                  <Route path="mutashabihat-review" element={<MutashabihatReview />} />
+                  <Route path="profile" element={<Profile />} />
                 </Route>
+              </Route>
 
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
-              </Routes>
-            </div>
-          </Router>
-      </AuthProvider>
-      </ToastProvider>
-    </ThemeProvider>
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </div>
+        </Router>
+    </AuthProvider>
+    </ToastProvider>
   );
 }
 

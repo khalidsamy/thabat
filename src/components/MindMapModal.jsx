@@ -9,12 +9,11 @@ const MindMapModal = ({ isOpen, onClose, pageNumber = 1 }) => {
   const [surahData, setSurahData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Approximate Surah by Page (Simplified mapping)
   const getSurahFromPage = (page) => {
-    if (page <= 1) return 1; // Al-Fatihah
-    if (page <= 50) return 2; // Al-Baqarah
-    if (page <= 76) return 3; // Al-Imran
-    return 114; // Fallback to shorten test logic
+    if (page <= 1) return 1;
+    if (page <= 50) return 2;
+    if (page <= 76) return 3;
+    return 114;
   };
 
   useEffect(() => {
@@ -47,14 +46,14 @@ const MindMapModal = ({ isOpen, onClose, pageNumber = 1 }) => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         />
         
         <motion.div
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/20"
+          className="relative w-full max-w-2xl bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5"
         >
           {/* Header */}
           <div className="bg-gradient-to-r from-emerald-600 to-teal-700 p-8 text-white relative">
@@ -79,29 +78,29 @@ const MindMapModal = ({ isOpen, onClose, pageNumber = 1 }) => {
           {/* Content */}
           <div className="p-8">
             {isLoading ? (
-              <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+              <div className="flex flex-col items-center justify-center py-20 text-slate-500">
                 <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} className="h-10 w-10 border-4 border-emerald-500 border-t-transparent rounded-full mb-4" />
                 <p className="animate-pulse">{i18n.language === 'ar' ? 'جاري بناء الخارطة...' : 'Building Map...'}</p>
               </div>
             ) : surahData ? (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-100 dark:border-white/5 group hover:border-emerald-500/20 transition-all">
+                  <div className="bg-slate-800/50 p-6 rounded-3xl border border-white/5 group hover:border-emerald-500/20 transition-all">
                     <div className="flex items-center gap-3 mb-4">
-                      <BookOpen className="h-5 w-5 text-emerald-500" />
+                      <BookOpen className="h-5 w-5 text-emerald-400" />
                       <h4 className="font-bold text-foreground">{i18n.language === 'ar' ? 'اسم السورة' : 'Surah Name'}</h4>
                     </div>
-                    <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400" dir="rtl">
+                    <p className="text-2xl font-black text-emerald-400" dir="rtl">
                       {surahData.name} ({surahData.englishName})
                     </p>
                   </div>
 
-                  <div className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-100 dark:border-white/5 group hover:border-emerald-500/20 transition-all">
+                  <div className="bg-slate-800/50 p-6 rounded-3xl border border-white/5 group hover:border-emerald-500/20 transition-all">
                     <div className="flex items-center gap-3 mb-4">
-                      <Layers className="h-5 w-5 text-emerald-500" />
+                      <Layers className="h-5 w-5 text-emerald-400" />
                       <h4 className="font-bold text-foreground">{i18n.language === 'ar' ? 'عدد الآيات' : 'Total Verses'}</h4>
                     </div>
-                    <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+                    <p className="text-2xl font-black text-emerald-400">
                       {surahData.numberOfAyahs} {i18n.language === 'ar' ? 'آية' : 'Ayahs'}
                     </p>
                   </div>
@@ -116,12 +115,12 @@ const MindMapModal = ({ isOpen, onClose, pageNumber = 1 }) => {
                         <Type className="h-5 w-5 text-emerald-500" />
                         <h4 className="font-bold text-foreground">{i18n.language === 'ar' ? 'النزول والنمط' : 'Revelation & Type'}</h4>
                       </div>
-                      <p className="text-lg font-bold text-emerald-700 dark:text-emerald-300">
+                      <p className="text-lg font-bold text-emerald-300">
                         {i18n.language === 'ar' 
                           ? `${surahData.revelationType === 'Meccan' ? 'مكية' : 'مدنية'} - نزلت بترتيب ${surahData.number}` 
                           : `${surahData.revelationType} - Revelation order: ${surahData.number}`}
                       </p>
-                      <p className="mt-4 text-sm text-secondary-foreground leading-relaxed">
+                      <p className="mt-4 text-sm text-slate-400 leading-relaxed">
                         {i18n.language === 'ar'
                           ? 'هذه الخارطة تساعدك على تثبيت المحفوظ من خلال فهم السياق التاريخي والهيكلي للسورة.'
                           : 'This map helps stabilize your memorization by understanding the historical and structural context.'}

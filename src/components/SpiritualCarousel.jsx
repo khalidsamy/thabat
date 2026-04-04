@@ -35,30 +35,30 @@ const SpiritualCarousel = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % ITEMS.length);
-    }, 8000); // 8 seconds per slide for peaceful reading
+    }, 8000);
     return () => clearInterval(interval);
   }, []);
 
   const item = ITEMS[current];
 
   return (
-    <div className="w-full relative overflow-hidden glass-card dark:glass-card rounded-2xl p-6 mb-8 min-h-[160px] flex flex-col justify-center transition-all duration-500 ease-in-out border border-emerald-500/10 dark:border-emerald-500/20">
+    <div className="w-full relative overflow-hidden glass-card rounded-2xl p-6 mb-8 min-h-[160px] flex flex-col justify-center transition-all duration-500 ease-in-out border border-emerald-500/20">
       {/* Decorative Background Quote Icon */}
-      <Quote className="absolute -top-4 -right-4 h-32 w-32 text-emerald-500/5 dark:text-emerald-500/5 rotate-12 -z-10" />
+      <Quote className="absolute -top-4 -right-4 h-32 w-32 text-emerald-500/5 rotate-12 -z-10" />
       
       <div className="text-center transition-opacity duration-1000">
         <p 
-          className="text-xl md:text-2xl font-bold text-emerald-700 dark:text-emerald-400 mb-2 leading-relaxed" 
+          className="text-xl md:text-2xl font-bold text-emerald-400 mb-2 leading-relaxed" 
           dir="rtl"
         >
           {item.arabic}
         </p>
         
-        <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-500/80 mb-3 tracking-wider" dir="rtl">
+        <p className="text-xs font-semibold text-emerald-500/80 mb-3 tracking-wider" dir="rtl">
           — {item.reference}
         </p>
         
-        <p className="text-sm font-medium text-slate-600 dark:text-slate-300 italic opacity-80 leading-snug">
+        <p className="text-sm font-medium text-slate-300 italic opacity-80 leading-snug">
           {item.english}
         </p>
       </div>
@@ -70,7 +70,7 @@ const SpiritualCarousel = () => {
             key={i}
             onClick={() => setCurrent(i)}
             className={`h-1.5 rounded-full transition-all duration-300 ${
-              i === current ? 'w-6 bg-emerald-500' : 'w-1.5 bg-emerald-200 dark:bg-emerald-900/50'
+              i === current ? 'w-6 bg-emerald-500' : 'w-1.5 bg-emerald-900/50'
             }`}
             aria-label={`Go to slide ${i + 1}`}
           />

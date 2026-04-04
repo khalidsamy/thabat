@@ -68,14 +68,14 @@ const ProgressTab = ({ progress, refreshKey, itemVariants, oldDailyTarget, newDa
             value={`${oldDailyTarget} ${t('dashboard.pages')}`} 
             icon={<CalendarCheck className="h-6 w-6 text-sky-500" />}
             subtitle={t('dashboard.days_system', { days: reviewPace })}
-            className="border-sky-500/20 dark:border-sky-500/10"
+            className="border-sky-500/10"
           />
           <StatCard 
             title={t('dashboard.intensive_review_card')}
             value={`${newDailyTarget} ${t('dashboard.pages')}`} 
             icon={<Flame className="h-6 w-6 text-emerald-500" />}
             subtitle={t('dashboard.intensive_system')}
-            className="border-emerald-500/40 dark:border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/20"
+            className="border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/20"
           />
         </div>
       </motion.section>

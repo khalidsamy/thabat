@@ -5,18 +5,17 @@ import api from '../services/api';
 import { useToast } from '../context/ToastContext';
 
 // ── Mastery interval table (matches backend exactly) ──────────────────────
-const MASTERY_INTERVALS = { 0: 1, 1: 2, 2: 4, 3: 7, 4: 14, 5: 30 };
 const MASTERY_LABELS    = ['Confusing', 'Uncertain', 'Shaky', 'Usually Good', 'Confident', 'Mastered'];
 
 // ── All-done screen ───────────────────────────────────────────────────────
 const AllDoneScreen = ({ reviewed }) => (
-  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 flex flex-col items-center justify-center px-4 text-center">
+  <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center px-4 text-center">
     <div className="max-w-md mx-auto">
-      <div className="w-24 h-24 bg-teal-900/50 border-2 border-teal-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-teal-900/50">
+      <div className="w-24 h-24 bg-teal-900/50 border-2 border-teal-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-teal-950/50">
         <Sparkles className="h-12 w-12 text-teal-400" />
       </div>
       <h2 className="text-3xl font-extrabold text-white mb-2">أحسنت! 🌟</h2>
-      <p className="text-teal-300 text-lg font-bold mb-2">
+      <p className="text-teal-400 text-lg font-bold mb-2">
         All Mutashabihat reviewed for today!
       </p>
       <p className="text-slate-400 mb-2">
@@ -27,15 +26,15 @@ const AllDoneScreen = ({ reviewed }) => (
       </p>
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Link
-          to="/mutashabihat"
-          className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-700 border border-slate-600 text-white rounded-xl font-semibold hover:bg-slate-600 transition-colors"
+          to="/dashboard/mutashabihat"
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-800 border border-white/5 text-white rounded-xl font-semibold hover:bg-slate-700 transition-colors"
         >
           <RotateCcw className="h-4 w-4" />
           Back to المتشابهات
         </Link>
         <Link
           to="/dashboard"
-          className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-600 to-teal-500 text-white rounded-xl font-semibold hover:from-teal-500 hover:to-teal-400 transition-all shadow-lg"
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-teal-500 text-white rounded-xl font-semibold hover:bg-teal-600 transition-all shadow-lg shadow-teal-900/20"
         >
           <BookOpen className="h-4 w-4" />
           Dashboard
@@ -47,7 +46,7 @@ const AllDoneScreen = ({ reviewed }) => (
 
 // ── Nothing-due screen ────────────────────────────────────────────────────
 const NothingDueScreen = () => (
-  <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 flex flex-col items-center justify-center px-4 text-center">
+  <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center px-4 text-center">
     <div className="max-w-md mx-auto">
       <div className="w-24 h-24 bg-teal-900/40 border-2 border-teal-600 rounded-full flex items-center justify-center mx-auto mb-6">
         <GitMerge className="h-10 w-10 text-teal-400" />
@@ -56,14 +55,14 @@ const NothingDueScreen = () => (
       <p className="text-slate-400 mb-6">No Mutashabihat are due for review today. Come back tomorrow or log new groups.</p>
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Link
-          to="/mutashabihat"
-          className="px-6 py-3 bg-gradient-to-r from-teal-600 to-teal-500 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all"
+          to="/dashboard/mutashabihat"
+          className="px-6 py-3 bg-teal-500 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all shadow-teal-900/20"
         >
           Go to المتشابهات Log
         </Link>
         <Link
           to="/dashboard"
-          className="px-6 py-3 bg-slate-700 border border-slate-600 text-white rounded-xl font-semibold hover:bg-slate-600 transition-colors"
+          className="px-6 py-3 bg-slate-800 border border-white/5 text-white rounded-xl font-semibold hover:bg-slate-700 transition-colors"
         >
           Dashboard
         </Link>
@@ -95,7 +94,7 @@ const MutashabihatReview = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [showError]);
 
   useEffect(() => { fetchDue(); }, [fetchDue]);
 
@@ -108,11 +107,10 @@ const MutashabihatReview = () => {
       await api.put(`/mutashabihat/${current._id}/review`, { rating });
       setReviewed((prev) => prev + 1);
 
-      // Animate out, then advance
       setSlideOut(true);
       setTimeout(() => {
         setSlideOut(false);
-        setHintRevealed(false); // Reset hint reveal for next card
+        setHintRevealed(false);
         if (currentIndex + 1 >= queue.length) {
           setSessionComplete(true);
         } else {
@@ -126,10 +124,9 @@ const MutashabihatReview = () => {
     }
   };
 
-  // ── Loading ─────────────────────────────────────────────────────
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <Loader2 className="h-10 w-10 text-teal-400 animate-spin" />
       </div>
     );
@@ -142,21 +139,24 @@ const MutashabihatReview = () => {
   const level   = current.srs.masteryLevel;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 flex flex-col items-center justify-center px-4 py-10">
+    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center px-4 py-10 overflow-hidden">
+      
+      {/* Background Accent */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-teal-500/5 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Progress bar */}
-      <div className="w-full max-w-2xl mb-6">
+      <div className="w-full max-w-2xl mb-6 relative z-10">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-semibold text-white/70">
+          <span className="text-sm font-semibold text-white/50">
             Reviewing {currentIndex + 1} of {queue.length}
           </span>
           <span className="text-sm font-bold text-teal-400">
             Mastery: {MASTERY_LABELS[level]}
           </span>
         </div>
-        <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-teal-500 to-teal-400 rounded-full transition-all duration-500"
+            className="h-full bg-teal-500 rounded-full transition-all duration-500"
             style={{ width: `${(currentIndex / queue.length) * 100}%` }}
           />
         </div>
@@ -164,57 +164,57 @@ const MutashabihatReview = () => {
 
       {/* Review Card */}
       <div
-        className={`w-full max-w-2xl transition-all duration-350 ${
+        className={`w-full max-w-2xl relative z-10 transition-all duration-350 ${
           slideOut ? 'opacity-0 scale-95 -translate-y-3' : 'opacity-100 scale-100 translate-y-0'
         }`}
       >
-        <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl shadow-black/50 overflow-hidden">
+        <div className="bg-slate-900 rounded-[2.5rem] shadow-2xl shadow-black/80 overflow-hidden border border-white/5 backdrop-blur-md">
 
           {/* Card header */}
-          <div className="bg-gradient-to-r from-teal-700 to-teal-600 px-6 py-4 flex items-center justify-between">
+          <div className="bg-teal-700 px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <GitMerge className="h-5 w-5 text-teal-200" />
               <div>
-                <p className="text-teal-100 text-sm">Mutashabih Group</p>
-                <p className="text-white font-extrabold">
+                <p className="text-teal-100/70 text-sm font-black uppercase tracking-tighter">Mutashabih Group</p>
+                <p className="text-white font-extrabold text-lg">
                   {current.verses.length} Similar Verses
                 </p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-teal-200 text-xs">Reviews: {current.srs.totalReviews}</p>
-              <p className="text-teal-200 text-xs">Level {level}/5</p>
+              <p className="text-teal-200/50 text-[10px] font-black uppercase">Reviews: {current.srs.totalReviews}</p>
+              <p className="text-teal-200/50 text-[10px] font-black uppercase">Level {level}/5</p>
             </div>
           </div>
 
           {/* Verses display */}
-          <div className="px-6 pt-5 pb-4 border-b border-gray-100 dark:border-slate-700">
-            <p className="text-xs font-bold text-secondary-foreground uppercase tracking-widest mb-3">
+          <div className="px-6 pt-6 pb-4 border-b border-white/5">
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">
               Can you distinguish these?
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {current.verses.map((v, i) => (
                 <div
                   key={i}
-                  className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-700 dark:to-slate-700 rounded-2xl p-4 border border-teal-100 dark:border-teal-800"
+                  className="bg-slate-800/50 rounded-2xl p-4 border border-white/5 transition-all hover:border-teal-500/20"
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold text-teal-600 dark:text-teal-400">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold text-teal-400">
                       {v.surahName}
                     </span>
-                    <span className="text-xs text-secondary-foreground bg-white dark:bg-slate-600 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-black uppercase text-slate-400 bg-slate-900 px-2 py-0.5 rounded-full border border-white/5">
                       Ayah {v.ayahNumber}
                     </span>
                   </div>
                   {v.ayahText ? (
                     <p
-                      className="text-lg font-quran font-bold text-foreground leading-loose text-right"
+                      className="text-lg font-quran font-bold text-white leading-loose text-right"
                       dir="rtl"
                     >
                       {v.ayahText}
                     </p>
                   ) : (
-                    <p className="text-sm text-secondary-foreground italic text-center py-2">
+                    <p className="text-sm text-slate-500 italic text-center py-2">
                       Refer to your mushaf.
                     </p>
                   )}
@@ -224,11 +224,11 @@ const MutashabihatReview = () => {
           </div>
 
           {/* Hint section — hidden until revealed */}
-          <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700">
+          <div className="px-6 py-4 border-b border-white/5">
             <button
               type="button"
               onClick={() => setHintRevealed((prev) => !prev)}
-              className="flex items-center gap-2 text-sm font-bold text-amber-600 dark:text-amber-400 hover:text-amber-500 transition-colors"
+              className="flex items-center gap-2 text-xs font-black text-amber-400 uppercase tracking-widest hover:text-amber-300 transition-colors"
             >
               {hintRevealed ? (
                 <><EyeOff className="h-4 w-4" /> Hide Hint</>
@@ -238,14 +238,14 @@ const MutashabihatReview = () => {
             </button>
 
             {hintRevealed && (
-              <div className="mt-3 space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
+              <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
                 {/* Global mnemonic */}
                 {current.customMnemonic && (
-                  <div className="flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20 rounded-xl px-4 py-3 border border-amber-200 dark:border-amber-800">
-                    <Sparkles className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-3 bg-amber-950/20 rounded-xl px-4 py-3 border border-amber-800/30">
+                    <Sparkles className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-xs font-bold text-amber-700 dark:text-amber-400 mb-1">العلامة الذهنية</p>
-                      <p className="text-sm text-amber-900 dark:text-amber-300">{current.customMnemonic}</p>
+                      <p className="text-[10px] font-black text-amber-500 uppercase mb-1">العلامة الذهنية</p>
+                      <p className="text-sm text-amber-100/80">{current.customMnemonic}</p>
                     </div>
                   </div>
                 )}
@@ -257,66 +257,57 @@ const MutashabihatReview = () => {
                       v.distinctionNote ? (
                         <div
                           key={i}
-                          className="bg-slate-50 dark:bg-slate-700/50 rounded-lg px-3 py-2 border border-slate-200 dark:border-slate-600 text-sm"
+                          className="bg-slate-800/50 rounded-lg px-3 py-2 border border-white/5 text-sm"
                         >
-                          <span className="font-bold text-teal-600 dark:text-teal-400 me-1">
+                          <span className="font-bold text-teal-400 me-2 text-xs uppercase tracking-tighter">
                             {v.surahName}:{v.ayahNumber} →
                           </span>
-                          <span className="text-secondary-foreground italic">{v.distinctionNote}</span>
+                          <span className="text-slate-300 italic">{v.distinctionNote}</span>
                         </div>
                       ) : null
                     )}
                   </div>
-                )}
-
-                {!current.customMnemonic && !current.verses.some((v) => v.distinctionNote) && (
-                  <p className="text-sm text-secondary-foreground italic text-center py-2">
-                    No hints added for this group yet.
-                  </p>
                 )}
               </div>
             )}
           </div>
 
           {/* 3-way action buttons */}
-          <div className="px-6 py-5 grid grid-cols-3 gap-3">
-            {/* -1: Still confused */}
+          <div className="px-6 py-6 grid grid-cols-3 gap-3">
             <button
               onClick={() => handleReview(-1)}
               disabled={isSubmitting}
-              className="flex flex-col items-center justify-center gap-1.5 py-4 px-2 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 border-2 border-red-200 dark:border-red-800 rounded-2xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.97] disabled:opacity-50 group"
+              className="flex flex-col items-center justify-center gap-1.5 py-5 px-2 bg-rose-950/20 hover:bg-rose-950/30 border-2 border-rose-900 text-rose-400 font-bold rounded-2xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.97] disabled:opacity-50"
             >
               <span className="text-2xl">🔴</span>
-              <span className="text-xs font-bold text-red-600 dark:text-red-400 text-center leading-tight">
-                Still Confused
+              <span className="text-[10px] uppercase font-black text-rose-400 text-center leading-tight">
+                Confused
               </span>
-              <span className="text-[10px] text-red-500/70 font-bold" dir="rtl">لا أزال أخطئ</span>
+              <span className="text-[9px] text-rose-500/50 font-bold uppercase" dir="rtl">أخطأت</span>
             </button>
 
-            {/* 0: Unsure */}
             <button
               onClick={() => handleReview(0)}
               disabled={isSubmitting}
-              className="flex flex-col items-center justify-center gap-1.5 py-4 px-2 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/40 border-2 border-yellow-200 dark:border-yellow-700 rounded-2xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.97] disabled:opacity-50 group"
+              className="flex flex-col items-center justify-center gap-1.5 py-5 px-2 bg-amber-950/20 hover:bg-amber-950/30 border-2 border-amber-900 text-amber-400 font-bold rounded-2xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.97] disabled:opacity-50"
             >
               <span className="text-2xl">🟡</span>
-              <span className="text-xs font-bold text-yellow-700 dark:text-yellow-400 text-center leading-tight">
+              <span className="text-[10px] uppercase font-black text-amber-400 text-center leading-tight">
                 Unsure
               </span>
-              <span className="text-[10px] text-yellow-600/70 font-bold" dir="rtl">متردد</span>
+              <span className="text-[9px] text-amber-500/50 font-bold uppercase" dir="rtl">متردد</span>
             </button>
 
-            {/* +1: Distinguished */}
             <button
               onClick={() => handleReview(1)}
               disabled={isSubmitting}
-              className="flex flex-col items-center justify-center gap-1.5 py-4 px-2 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 border-2 border-emerald-200 dark:border-emerald-800 rounded-2xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.97] disabled:opacity-50 group"
+              className="flex flex-col items-center justify-center gap-1.5 py-5 px-2 bg-emerald-950/20 hover:bg-emerald-950/30 border-2 border-emerald-900 text-emerald-400 font-bold rounded-2xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.97] disabled:opacity-50"
             >
               <span className="text-2xl">🟢</span>
-              <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 text-center leading-tight">
-                Distinguished!
+              <span className="text-[10px] uppercase font-black text-emerald-400 text-center leading-tight">
+                Mastered
               </span>
-              <span className="text-[10px] text-emerald-600/70 font-bold" dir="rtl">عرفت الفرق</span>
+              <span className="text-[9px] text-emerald-500/50 font-bold uppercase" dir="rtl">أتقنت</span>
             </button>
           </div>
         </div>

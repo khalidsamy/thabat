@@ -1,31 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #10b981;
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #f1f5f9;
-  --color-secondary-foreground: #475569;
-  --color-background: #f8fafc;
-  --color-foreground: #09090b;
-  --color-card: #ffffff;
-  --color-card-foreground: #09090b;
+  --color-primary: #34d399;           /* Emerald-400 */
+  --color-primary-foreground: #022c22;
+  --color-secondary: #162032;         /* Deep Navy secondary */
+  --color-secondary-foreground: #cbd5e1;
+  --color-background: #0b1120;        /* Default Permanent Dark Background */
+  --color-foreground: #f8fafc;
+  --color-card: #162032;             /* Deep Navy Card Surface */
+  --color-card-foreground: #f8fafc;
   --color-destructive: #ef4444;
-  --color-border: #e2e8f0;
+  --color-border: #1e3050;
 }
 
 @layer base {
-  .dark {
-    --color-background: #0b1120;
-    --color-foreground: #f8fafc;
-    --color-primary: #34d399;
-    --color-primary-foreground: #022c22;
-    --color-secondary: #162032;
-    --color-secondary-foreground: #cbd5e1;
-    --color-card: #162032;
-    --color-card-foreground: #f8fafc;
-    --color-border: #1e3050;
-  }
-
   * {
     border-color: var(--color-border);
   }
@@ -40,7 +28,6 @@
     width: 100%;
   }
 
-  /* Prevent double scrollbars and layout shifts */
   #root {
     overflow-x: hidden;
     width: 100%;
@@ -48,6 +35,7 @@
   }
 }
 
+/* Premium Slim Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -66,23 +54,13 @@
   background: rgba(16, 185, 129, 0.4);
 }
 
-
 @utility glass-card {
-  @apply backdrop-blur-md border border-white/10 shadow-xl;
-  background: rgba(255, 255, 255, 0.7);
-}
-
-.dark .glass-card {
-  @apply border-white/5;
+  @apply backdrop-blur-md border border-white/5 shadow-xl;
   background: rgba(22, 32, 50, 0.75);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05);
 }
 
 @utility glow-border {
-  @apply border-primary/30 shadow-[0_0_15px_rgba(52,211,153,0.15)];
-}
-
-.dark .glow-border {
   @apply border-primary/20 shadow-[0_0_20px_rgba(52,211,153,0.1)];
 }
 
@@ -90,7 +68,6 @@
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-6 pb-28 sm:pb-12;
 }
 
-/* Mobile-First Scaling Fixes */
 @media (max-width: 375px) {
   .dashboard-container {
     @apply px-3 py-4 pb-24;
@@ -98,5 +75,5 @@
 }
 
 @utility glass-nav {
-  @apply backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border-t border-white/20 dark:border-white/5;
+  @apply backdrop-blur-xl bg-slate-900/70 border-t border-white/5;
 }
