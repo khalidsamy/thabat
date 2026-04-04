@@ -10,7 +10,6 @@ import { QURAN_VERSES } from '../utils/verses';
 import { getUserRank } from '../utils/rankManager';
 import confetti from 'canvas-confetti';
 import HeartMessage from '../components/HeartMessage';
-import BottomNav from '../components/BottomNav';
 import MindMapModal from '../components/MindMapModal';
 
 // Sub-pages (Adaptive)

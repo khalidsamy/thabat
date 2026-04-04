@@ -1,9 +1,9 @@
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from '../Sidebar';
-import BottomNav from '../BottomNav';
 import Navbar from '../Navbar';
 import FloatingFAB from '../FloatingFAB';
+import FloatingAssistantMenu from '../FloatingAssistantMenu';
 
 const ResponsiveLayout = () => {
   const location = useLocation();
@@ -34,7 +34,8 @@ const ResponsiveLayout = () => {
           )}
         </main>
 
-        <BottomNav />
+        {/* New Mobile Floating Assistant Menu */}
+        <FloatingAssistantMenu />
       </div>
     </div>
   );
