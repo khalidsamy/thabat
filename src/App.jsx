@@ -28,6 +28,7 @@ import MutashabihatReview from './pages/MutashabihatReview';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicOnlyRoute from './components/PublicOnlyRoute';
 import AnimatedPage from './components/AnimatedPage';
+import ResponsiveLayout from './components/layout/ResponsiveLayout';
 
 function App() {
   return (
@@ -35,46 +36,37 @@ function App() {
       <ToastProvider>
         <AuthProvider>
           <Router>
-            <div className="flex flex-col min-h-screen bg-background transition-colors duration-300">
-              <Navbar />
+            <div className="min-h-screen bg-background">
               <Toast />
-              
-              <main className="flex-grow">
-                <Routes>
+              <Routes>
+                {/* Public Routes with standalone layout */}
+                <Route 
+                  path="/register" 
+                  element={
+                    <PublicOnlyRoute>
+                      <AnimatedPage>
+                        <Register />
+                      </AnimatedPage>
+                    </PublicOnlyRoute>
+                  } 
+                />
+                
+                <Route 
+                  path="/login" 
+                  element={
+                    <PublicOnlyRoute>
+                      <AnimatedPage>
+                        <Login />
+                      </AnimatedPage>
+                    </PublicOnlyRoute>
+                  } 
+                />
+
+                {/* Dashboard & Protected Routes with ResponsiveLayout */}
+                <Route element={<ProtectedRoute><ResponsiveLayout /></ProtectedRoute>}>
                   <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              
-                  <Route 
-                    path="/register" 
-                    element={
-                      <PublicOnlyRoute>
-                        <AnimatedPage>
-                          <Register />
-                        </AnimatedPage>
-                      </PublicOnlyRoute>
-                    } 
-                  />
                   
-                  <Route 
-                    path="/login" 
-                    element={
-                      <PublicOnlyRoute>
-                        <AnimatedPage>
-                          <Login />
-                        </AnimatedPage>
-                      </PublicOnlyRoute>
-                    } 
-                  />
-                  
-                  <Route 
-                    path="/dashboard" 
-                    element={
-                      <ProtectedRoute>
-                        <AnimatedPage>
-                          <Dashboard />
-                        </AnimatedPage>
-                      </ProtectedRoute>
-                    }
-                  >
+                  <Route path="/dashboard" element={<Dashboard />}>
                     <Route index element={<Home />} />
                     <Route path="progress" element={<Progress />} />
                     <Route path="recite" element={<Recite />} />
@@ -82,69 +74,17 @@ function App() {
                     <Route path="review" element={<Review />} />
                   </Route>
                   
-                  <Route 
-                    path="/profile" 
-                    element={
-                      <ProtectedRoute>
-                        <AnimatedPage>
-                          <Profile />
-                        </AnimatedPage>
-                      </ProtectedRoute>
-                    } 
-                  />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/errors" element={<ErrorLog />} />
+                  <Route path="/review" element={<ReviewSession />} />
+                  <Route path="/mutashabihat" element={<MutashabihatLog />} />
+                  <Route path="/mutashabihat-review" element={<MutashabihatReview />} />
+                </Route>
 
-                  <Route 
-                    path="/errors" 
-                    element={
-                      <ProtectedRoute>
-                        <AnimatedPage>
-                          <ErrorLog />
-                        </AnimatedPage>
-                      </ProtectedRoute>
-                    } 
-                  />
-
-                  <Route 
-                    path="/review" 
-                    element={
-                      <ProtectedRoute>
-                        <AnimatedPage>
-                          <ReviewSession />
-                        </AnimatedPage>
-                      </ProtectedRoute>
-                    } 
-                  />
-
-                  <Route 
-                    path="/mutashabihat" 
-                    element={
-                      <ProtectedRoute>
-                        <AnimatedPage>
-                          <MutashabihatLog />
-                        </AnimatedPage>
-                      </ProtectedRoute>
-                    } 
-                  />
-
-                  <Route 
-                    path="/mutashabihat-review" 
-                    element={
-                      <ProtectedRoute>
-                        <AnimatedPage>
-                          <MutashabihatReview />
-                        </AnimatedPage>
-                      </ProtectedRoute>
-                    } 
-                  />
-
-                  {/* Catch-all route to prevent blank screens */}
-                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                </Routes>
-              </main>
-
-              <Footer />
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              </Routes>
             </div>
-        </Router>
+          </Router>
       </AuthProvider>
       </ToastProvider>
     </ThemeProvider>

@@ -178,68 +178,50 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background transition-colors duration-300">
-      {/* Universal Header */}
-      <header className="bg-card dark:bg-card/50 border-b border-gray-100 dark:border-white/5 shadow-sm sticky top-0 z-30 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
-                {t('auth.welcome_back', { name: currentUser?.name || '' })}
-              </h1>
-              <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-sm border border-white/10 flex items-center gap-2 ${getUserRank(progress?.totalMemorized || 0).bgColor} ${getUserRank(progress?.totalMemorized || 0).color}`}>
-                <span className="text-sm">{getUserRank(progress?.totalMemorized || 0).icon}</span>
-                {t(`ranks.${getUserRank(progress?.totalMemorized || 0).id}`)}
-              </div>
+    <div className="dashboard-main relative w-full h-full">
+        {/* Adaptive View: Grid on Desktop, Tabbed on Mobile */}
+        <div className="hidden lg:grid grid-cols-3 gap-8 mb-12">
+            <div className="col-span-2 space-y-8">
+                <Home /> {/* Assuming unified view components use shared context inside */}
+                <div className="grid grid-cols-2 gap-8">
+                    <Recite />
+                    <Progress />
+                </div>
             </div>
-          </motion.div>
-          
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-3">
-              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-full border border-emerald-500/10">
-                <Flame className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                <span className="text-sm font-bold text-emerald-700 dark:text-emerald-300">{progress?.streak || 0} {t('dashboard.days')}</span>
-              </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 rounded-full border border-blue-500/10">
-                <CalendarCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <span className="text-sm font-bold text-blue-700 dark:text-blue-300">{sharedProps.planLabels[reviewPace]}</span>
-              </div>
+            <div className="col-span-1 space-y-8">
+                <Review />
+                <Community />
             </div>
-            <button onClick={shareProgress} className="p-3 bg-emerald-500 text-white rounded-2xl shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all outline-none border border-white/10">
-              <Share2 className="h-5 w-5" />
-            </button>
-          </div>
         </div>
-      </header>
 
-      <main className="dashboard-container">
-        <AnimatePresence mode="wait">
-            <motion.div
-                key={location.pathname}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                variants={sharedProps.itemVariants}
-                transition={{ duration: 0.3 }}
-            >
-                <Outlet context={sharedProps} />
-            </motion.div>
-        </AnimatePresence>
+        {/* Tabbed View for Mobile/Tablet */}
+        <div className="lg:hidden">
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={location.pathname}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    variants={sharedProps.itemVariants}
+                    transition={{ duration: 0.3 }}
+                >
+                    <Outlet context={sharedProps} />
+                </motion.div>
+            </AnimatePresence>
+        </div>
 
-        {/* Floating Heart FAB */}
+        {/* Floating Heart FAB - Repositioned for Sidebar accessibility */}
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsHeartOpen(true)}
-          className="fixed bottom-28 sm:bottom-8 right-8 z-40 w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full shadow-2xl flex items-center justify-center group border-2 border-white/20"
+          className="fixed bottom-24 md:bottom-8 right-8 z-40 w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full shadow-2xl flex items-center justify-center group border-2 border-white/20"
         >
           <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.2, 0.5] }} transition={{ duration: 3, repeat: Infinity }} className="absolute inset-0 bg-amber-400 rounded-full" />
           <Heart className="relative h-7 w-7 text-white fill-white group-hover:scale-110" />
         </motion.button>
 
         <HeartMessage isOpen={isHeartOpen} onClose={() => setIsHeartOpen(false)} />
-        <BottomNav />
-      </main>
     </div>
   );
 };

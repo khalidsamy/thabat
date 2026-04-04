@@ -11,7 +11,7 @@ const VoiceRecitation = ({ onComplete }) => {
   });
 
   return (
-    <div className="bg-card dark:bg-card/50 border border-gray-100 dark:border-white/5 rounded-[2rem] p-6 sm:p-10 shadow-xl shadow-black/5 relative overflow-hidden group w-full max-w-2xl mx-auto transition-all">
+    <div className="bg-card dark:bg-card/50 border border-gray-100 dark:border-white/5 rounded-[2rem] p-6 sm:p-10 lg:p-16 shadow-xl shadow-black/5 relative overflow-hidden group w-full lg:max-w-4xl mx-auto transition-all">
       {/* Decorative pulse background */}
       <AnimatePresence>
         {isListening && (
@@ -39,7 +39,7 @@ const VoiceRecitation = ({ onComplete }) => {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={isListening ? stopListening : startListening}
-          className={`w-24 h-24 rounded-full flex items-center justify-center text-white shadow-2xl transition-all duration-500 ${
+          className={`w-24 h-24 sm:w-32 sm:h-32 rounded-full flex items-center justify-center text-white shadow-2xl transition-all duration-500 ${
             isListening 
               ? 'bg-rose-500 shadow-rose-500/40' 
               : 'bg-emerald-500 shadow-emerald-500/30'
@@ -47,10 +47,10 @@ const VoiceRecitation = ({ onComplete }) => {
         >
           {isListening ? (
             <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity }}>
-              <MicOff className="h-10 w-10" />
+              <MicOff className="h-10 w-10 sm:h-14 sm:w-14" />
             </motion.div>
           ) : (
-            <Mic className="h-10 w-10" />
+            <Mic className="h-10 w-10 sm:h-14 sm:w-14" />
           )}
         </motion.button>
 

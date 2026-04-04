@@ -39,6 +39,8 @@
     -webkit-font-smoothing: antialiased;
     font-feature-settings: 'rlig' 1, 'calt' 1;
     transition: background-color 0.3s ease, color 0.3s ease;
+    /* Fluid Typography - Scales between 14px and 16px */
+    font-size: clamp(0.875rem, 0.8rem + 0.375vw, 1rem); 
   }
 }
 
@@ -63,7 +65,7 @@
 
 /* App-like container */
 .dashboard-container {
-  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 sm:pb-8;
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8 pb-32 sm:pb-12;
 }
 
 @utility glass-nav {
