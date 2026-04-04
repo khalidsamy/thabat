@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { BookOpen, TrendingUp, Flame, CalendarCheck, Sparkles, CheckCircle2, Lightbulb, Calendar } from 'lucide-react';
+import { BookOpen, TrendingUp, Flame, CalendarCheck, Sparkles, CheckCircle2, Lightbulb } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
@@ -394,7 +394,7 @@ const Dashboard = () => {
               <div key={task.id} className="bg-card dark:bg-card/50 border border-gray-100 dark:border-white/5 rounded-2xl p-5 hover:border-amber-500/30 transition-colors group">
                 <div className="flex items-center gap-4 mb-3">
                   <div className="p-2.5 bg-amber-500/10 rounded-xl text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
-                    {task.id === 'new_hifz' ? <BookOpen className="h-5 w-5" /> : task.id === 'intensive_review' ? <Flame className="h-5 w-5" /> : <Calendar className="h-5 w-5" />}
+                    {task.id === 'new_hifz' ? <BookOpen className="h-5 w-5" /> : task.id === 'intensive_review' ? <Flame className="h-5 w-5" /> : <div className="h-5 w-5 bg-amber-500/20 rounded-full" />}
                   </div>
                   <div>
                     <h4 className="font-bold text-sm text-foreground">{t(`tasks.${task.id}`)}</h4>
