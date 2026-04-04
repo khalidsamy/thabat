@@ -105,7 +105,7 @@
     "distant_review": "Distant Review",
     "weekly_review": "Weekly Review"
   },
-  "heart": {
+    "heart": {
     "title": "Message to Your Heart",
     "another_message": "Another Message"
   },
@@ -114,8 +114,20 @@
     "progress": "Progress",
     "recite": "Recite",
     "review": "Review",
+    "community": "Community",
     "errors": "Error Log",
     "mutashabihat": "Mutashabihat",
     "review_sessions": "Review Sessions"
+  },
+  "community": {
+    "title": "Thabat Community",
+    "subtitle": "Spiritual reflections and kind words from your brothers and sisters on the path.",
+    "placeholder": "What's on your heart today? (Max 200 chars)",
+    "post": "Post Reflection",
+    "posting": "Posting...",
+    "pray": "Du'a (🤲)",
+    "prayed": "Prayed for!",
+    "no_reflections": "Be the first to share a reflection today!",
+    "goal_required": "Complete your daily goal to share a reflection with others."
   }
 }

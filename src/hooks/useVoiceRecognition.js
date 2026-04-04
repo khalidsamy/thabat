@@ -6,6 +6,7 @@ import { useState, useCallback, useRef } from 'react';
 export const useVoiceRecognition = (onResult) => {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const [masteryScore, setMasteryScore] = useState(null);
   const [error, setError] = useState(null);
   const recognitionRef = useRef(null);
 
@@ -66,5 +67,24 @@ export const useVoiceRecognition = (onResult) => {
     return n1 === n2;
   };
 
-  return { isListening, transcript, error, startListening, stopListening, compareArabic };
+  /**
+   * calculateMastery: Computes a similarity score (0-100) between transcript and target.
+   */
+  const calculateMastery = (transcript, target) => {
+    if (!transcript || !target) return 0;
+    
+    const s1 = transcript.trim().split(' ');
+    const s2 = target.trim().split(' ');
+    
+    let matches = 0;
+    s1.forEach(word => {
+      if (s2.includes(word)) matches++;
+    });
+
+    const score = Math.round((matches / Math.max(s1.length, s2.length)) * 100);
+    setMasteryScore(score);
+    return score;
+  };
+
+  return { isListening, transcript, masteryScore, error, startListening, stopListening, compareArabic, calculateMastery };
 };

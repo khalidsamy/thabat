@@ -1,17 +1,21 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Mic, Sparkles, CheckCircle2, Lightbulb } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import VoiceRecitation from '../VoiceRecitation';
-import Input from '../Input';
 import Button from '../Button';
+import MindMapModal from '../MindMapModal';
 
 const ReciteTab = ({ progress, pagesInput, setPagesInput, handleUpdateSubmit, isUpdating, handleSunnahToggle, isTogglingSunnah, handleVoiceComplete, itemVariants }) => {
   const { t } = useTranslation();
+  const [isMindMapOpen, setIsMindMapOpen] = useState(false);
 
   return (
     <div className="space-y-8 pb-32">
       <motion.section variants={itemVariants} className="flex flex-col gap-8">
+        <div className="flex justify-center">
+            <button 
+                onClick={() => setIsMindMapOpen(true)}
+                className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 border border-white/10"
+            >
+                <span>Visualize Current Surah 🧠</span>
+            </button>
+        </div>
         {/* Dedicated Voice Recitation Section */}
         <div className="w-full max-w-2xl mx-auto">
           <VoiceRecitation onComplete={handleVoiceComplete} />
@@ -112,6 +116,12 @@ const ReciteTab = ({ progress, pagesInput, setPagesInput, handleUpdateSubmit, is
           </div>
         </div>
       </motion.section>
+      
+      <MindMapModal 
+          isOpen={isMindMapOpen} 
+          onClose={() => setIsMindMapOpen(false)} 
+          pageNumber={progress?.currentPage}
+      />
     </div>
   );
 };

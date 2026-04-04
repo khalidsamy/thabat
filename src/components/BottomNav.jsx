@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, TrendingUp, Mic, BookOpen } from 'lucide-react';
+import { Home, TrendingUp, Mic, BookOpen, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
@@ -11,6 +11,7 @@ const BottomNav = () => {
     { path: '/dashboard', icon: Home, label: t('nav.home'), exact: true },
     { path: '/dashboard/progress', icon: TrendingUp, label: t('nav.progress') },
     { path: '/dashboard/recite', icon: Mic, label: t('nav.recite') },
+    { path: '/dashboard/community', icon: MessageCircle, label: t('nav.community') },
     { path: '/dashboard/review', icon: BookOpen, label: t('nav.review') },
   ];
 

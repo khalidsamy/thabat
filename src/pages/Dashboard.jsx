@@ -16,6 +16,7 @@ import HomeTab from '../components/tabs/HomeTab';
 import ProgressTab from '../components/tabs/ProgressTab';
 import ReciteTab from '../components/tabs/ReciteTab';
 import ReviewTab from '../components/tabs/ReviewTab';
+import CommunityTab from '../components/tabs/CommunityTab';
 
 const Dashboard = () => {
   const { t, i18n } = useTranslation();
@@ -214,6 +215,7 @@ const Dashboard = () => {
                         <Route path="/progress" element={<ProgressTab {...sharedProps} />} />
                         <Route path="/recite" element={<ReciteTab {...sharedProps} />} />
                         <Route path="/review" element={<ReviewTab {...sharedProps} />} />
+                        <Route path="/community" element={<CommunityTab {...sharedProps} />} />
                     </Routes>
                 </motion.div>
             </AnimatePresence>

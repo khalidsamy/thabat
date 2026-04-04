@@ -1,12 +1,10 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Sparkles, BookOpen, Flame, Calendar, History, ShieldAlert, GitCompare } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { getDailyTasks } from '../../utils/PlanManager';
+import MindMapModal from '../MindMapModal';
 
 const ReviewTab = ({ progress, itemVariants }) => {
   const { t } = useTranslation();
+  const [isMindMapOpen, setIsMindMapOpen] = useState(false);
 
   const reviewTools = [
     { title: t('nav.errors'), icon: ShieldAlert, path: '/errors', color: 'bg-rose-500/10 text-rose-600' },
@@ -16,6 +14,15 @@ const ReviewTab = ({ progress, itemVariants }) => {
 
   return (
     <div className="space-y-8 pb-32">
+      <motion.section variants={itemVariants} className="text-center">
+            <button 
+                onClick={() => setIsMindMapOpen(true)}
+                className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl font-bold mx-auto hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10"
+            >
+                <span>Visualize (🧠)</span>
+            </button>
+      </motion.section>
+
       {/* Alaa Hamed's Thabat Schedule */}
       <motion.section variants={itemVariants} className="mb-10">
         <div className="flex items-center justify-between mb-6">
@@ -71,6 +78,12 @@ const ReviewTab = ({ progress, itemVariants }) => {
             ))}
         </div>
       </motion.section>
+
+      <MindMapModal 
+          isOpen={isMindMapOpen} 
+          onClose={() => setIsMindMapOpen(false)} 
+          pageNumber={progress?.currentPage}
+      />
     </div>
   );
 };

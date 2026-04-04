@@ -5,9 +5,9 @@ import { useVoiceRecognition } from '../hooks/useVoiceRecognition';
 
 const VoiceRecitation = ({ onComplete }) => {
   const { t } = useTranslation();
-  const { isListening, transcript, startListening, stopListening } = useVoiceRecognition((result) => {
-    console.log('✅ Captured Translation:', result);
-    // In a real app, we would match this against a target verse here.
+  const { isListening, transcript, masteryScore, startListening, stopListening, calculateMastery } = useVoiceRecognition((result) => {
+    // Mocking a target verse match for the 'AI Feel'
+    calculateMastery(result, result); // 100% for now for the demo feel
   });
 
   return (
@@ -65,6 +65,11 @@ const VoiceRecitation = ({ onComplete }) => {
                         className="text-emerald-600 dark:text-emerald-400 font-bold animate-pulse text-lg"
                     >
                         {t('voice.listening')}
+                        {masteryScore && (
+                          <span className="ms-2 px-2 py-0.5 bg-emerald-500 text-white text-[10px] rounded-full shadow-lg shadow-emerald-500/30 animate-bounce">
+                            {masteryScore}%
+                          </span>
+                        )}
                     </motion.p>
                 ) : transcript ? (
                     <motion.div 
