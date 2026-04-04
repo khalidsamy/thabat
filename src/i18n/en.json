@@ -108,5 +108,14 @@
   "heart": {
     "title": "Message to Your Heart",
     "another_message": "Another Message"
+  },
+  "nav": {
+    "home": "Home",
+    "progress": "Progress",
+    "recite": "Recite",
+    "review": "Review",
+    "errors": "Error Log",
+    "mutashabihat": "Mutashabihat",
+    "review_sessions": "Review Sessions"
   }
 }

@@ -6,6 +6,7 @@ import { ToastProvider } from './context/ToastContext';
 
 // Components
 import Navbar from './components/Navbar';
+import BottomNav from './components/BottomNav';
 import Toast from './components/Toast';
 import Footer from './components/Footer';
 
@@ -61,7 +62,7 @@ function App() {
                   />
                   
                   <Route 
-                    path="/dashboard" 
+                    path="/dashboard/*" 
                     element={
                       <ProtectedRoute>
                         <AnimatedPage>
@@ -132,6 +133,7 @@ function App() {
               </main>
 
               <Footer />
+              <BottomNav />
             </div>
         </Router>
       </AuthProvider>

@@ -108,5 +108,14 @@
   "heart": {
     "title": "رسالة لقلبك",
     "another_message": "رسالة أخرى"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "progress": "التقدم",
+    "recite": "تسميع",
+    "review": "مراجعة",
+    "errors": "سجل الأخطاء",
+    "mutashabihat": "المتشابهات",
+    "review_sessions": "جلسات المراجعة"
   }
 }

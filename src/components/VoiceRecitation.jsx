@@ -11,7 +11,7 @@ const VoiceRecitation = ({ onComplete }) => {
   });
 
   return (
-    <div className="bg-card dark:bg-card/50 border border-gray-100 dark:border-white/5 rounded-3xl p-8 shadow-sm relative overflow-hidden group">
+    <div className="bg-card dark:bg-card/50 border border-gray-100 dark:border-white/5 rounded-[2rem] p-6 sm:p-10 shadow-xl shadow-black/5 relative overflow-hidden group w-full max-w-2xl mx-auto transition-all">
       {/* Decorative pulse background */}
       <AnimatePresence>
         {isListening && (
