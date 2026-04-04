@@ -18,12 +18,13 @@ export const getDailyTasks = (totalMemorized = 0, currentPage = 1) => {
   const isWeekend = new Date().getDay() === 6; // Saturday in JS is 6
 
   if (isWeekend) {
-    return {
-      type: 'WEEKLY_REVIEW',
+    return [{
+      id: 'weekly_review',
       title: 'مراجعة الأسبوع (Weekly Cumulative)',
       desc: 'Review everything you memorized this week to ensure it is rock-solid.',
       pages: THABAT_PLAN.DAILY_PORTION * 5,
-    };
+      icon: 'Calendar',
+    }];
   }
 
   return [
