@@ -21,7 +21,6 @@ const Navbar = () => {
     { path: '/dashboard/settings', icon: Settings, label: t('nav.settings'), color: 'text-slate-500' },
   ];
 
-  // If there's no user, we don't render the connected Navbar (can keep a public one later if desired)
   const toggleLanguage = () => {
     const nextLang = i18n.language === 'en' ? 'ar' : 'en';
     i18n.changeLanguage(nextLang);
@@ -45,7 +44,6 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Center Nav Links (desktop only) */}
           <div className="hidden lg:flex items-center gap-2 mx-8 bg-slate-50 dark:bg-white/5 p-1.5 rounded-3xl border border-slate-200 dark:border-white/5">
             {menuItems.slice(0, 3).map((item) => (
               <NavLink
@@ -69,7 +67,6 @@ const Navbar = () => {
 
           <div className="flex items-center gap-2 sm:gap-4">
             
-            {/* Language Switcher */}
             <button 
               onClick={toggleLanguage} 
               className="flex items-center gap-3 px-4 py-2.5 rounded-2xl text-xs font-black text-zinc-500 hover:bg-slate-50 dark:hover:bg-white/5 transition-all uppercase tracking-widest"
@@ -79,7 +76,6 @@ const Navbar = () => {
               <span className="hidden sm:inline">{i18n.language === 'en' ? 'Arabic' : 'English'}</span>
             </button>
 
-            {/* Dark Mode Toggle */}
             <button
               onClick={toggleTheme}
               className="p-3 rounded-2xl text-zinc-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-all shadow-inner"
@@ -90,7 +86,6 @@ const Navbar = () => {
                 : <Moon className="h-5 w-5 text-zinc-950" />}
             </button>
             
-            {/* User Profile Badge */}
             <Link 
               to="/dashboard/profile"
               className="hidden md:flex items-center gap-3 pl-2 pr-4 py-1.5 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/5 hover:border-emerald-500/30 transition-all group"
@@ -103,7 +98,6 @@ const Navbar = () => {
               <span className="text-sm font-black text-zinc-950 dark:text-foreground group-hover:text-emerald-600 transition-colors uppercase tracking-tight">{user?.name}</span>
             </Link>
 
-            {/* Logout Mechanism */}
             <button 
               onClick={logout}
               className="hidden lg:flex items-center justify-center p-3 text-zinc-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-2xl transition-all"
@@ -112,7 +106,6 @@ const Navbar = () => {
               <LogOut className="h-5 w-5 rtl:rotate-180" />
             </button>
 
-            {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="lg:hidden p-3 rounded-2xl bg-zinc-950 text-white shadow-xl shadow-zinc-950/20 active:scale-95 transition-all"

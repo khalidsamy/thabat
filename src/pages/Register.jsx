@@ -7,7 +7,7 @@ import { useToast } from '../context/ToastContext';
 import Input from '../components/Input';
 import Button from '../components/Button';
 
-// ── Islamic geometric SVG background (same shared pattern) ───────────────
+// Islamic geometric pattern
 const IslamicPattern = () => (
   <svg className="absolute inset-0 w-full h-full opacity-[0.04] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -57,16 +57,14 @@ const Register = () => {
   return (
     <div className="relative min-h-screen flex items-center justify-center px-4 py-10 overflow-hidden bg-background">
 
-      {/* Islamic geometric pattern overlay - subtle for light mode */}
       <IslamicPattern />
 
-      {/* Soft gradient Orbs for that premium feel */}
+      {/* Visual background accents */}
       <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-emerald-500/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-amber-500/5 blur-[120px] pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-md">
 
-        {/* Logo Section */}
         <div className="flex flex-col items-center mb-10">
           <div className="w-20 h-20 bg-emerald-500 rounded-[2.5rem] flex items-center justify-center shadow-[0_20px_50px_rgba(16,185,129,0.3)] mb-6 animate-bounce-slow">
             <span className="text-white font-black text-4xl">ث</span>
@@ -75,7 +73,6 @@ const Register = () => {
           <div className="h-1 w-12 bg-emerald-500 rounded-full"></div>
         </div>
 
-        {/* Quranic Verse */}
         <div className="text-center mb-8 p-6 bg-emerald-50/50 rounded-3xl border border-emerald-100/50">
           <p className="text-xl font-black text-zinc-950 leading-loose" dir="rtl">
             {QURAN_VERSE.arabic}
@@ -85,7 +82,6 @@ const Register = () => {
           </p>
         </div>
 
-        {/* Register Card */}
         <div className="bg-white dark:bg-card/80 border border-slate-200 dark:border-white/5 rounded-[3rem] shadow-[0_30px_60px_rgba(0,0,0,0.08)] px-10 py-12 transition-all duration-500 hover:shadow-[0_40px_80px_rgba(0,0,0,0.12)]">
           <style>{`
             .elite-input input {
@@ -145,7 +141,6 @@ const Register = () => {
             </div>
           </form>
 
-          {/* Footer */}
           <div className="mt-10 text-center">
             <p className="text-sm font-bold text-zinc-400 uppercase tracking-tight">
               {t('auth.already_have_account')}{' '}
@@ -157,7 +152,6 @@ const Register = () => {
           </div>
         </div>
 
-        {/* Bottom ornament */}
         <p className="text-center text-zinc-300 font-bold text-[10px] mt-10 tracking-[0.4em] uppercase">
           ثَبِّتْنَا عَلَى حِفْظِ كِتَابِكَ
         </p>

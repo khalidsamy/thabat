@@ -21,7 +21,6 @@ const Home = (props) => {
   return (
     <div className="pb-32">
       <DashboardLayout>
-        {/* ROW 1: 8/4 Split (Proportional Alignment) */}
         <DailyMotivationCard dailyVerse={dailyVerse} itemVariants={itemVariants} />
         <TargetSurahCard 
           surahName={progress?.currentSurahName || user?.currentTargetSurah} 
@@ -29,7 +28,6 @@ const Home = (props) => {
           itemVariants={itemVariants} 
         />
 
-        {/* ROW 2: 4/4/4 Split (Metric Alignment) */}
         <HifzStreaks 
           streak={progress?.streak} 
           isCompletedToday={progress?.doneToday >= progress?.dailyTarget} 

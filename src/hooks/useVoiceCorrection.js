@@ -1,8 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 
 /**
- * useVoiceCorrection: Advanced hook for real-time Quranic recitation feedback.
- * Normalizes Arabic text (Tashkeel stripping) and provides live word-level diffing.
+ * Real-time Quranic recitation feedback hook.
+ * Handles normalization and word-level diffing between speech and target text.
  */
 export const useVoiceCorrection = (targetVerses = [], onComplete) => {
   const [isListening, setIsListening] = useState(false);
@@ -43,26 +43,17 @@ export const useVoiceCorrection = (targetVerses = [], onComplete) => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Normalize: Strip ALL Tashkeel, harakat, tajweed signs and standardize letters
+  // Normalize Arabic text to ensure consistent STT vs Script comparisons
   const normalize = useCallback((str) => {
     if (!str) return "";
     return str
-      // Strip all Tashkeel (harakat), tajweed marks, and small signs
       .replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E8\u06EA-\u06ED]/g, "")
-      // Standardize Alef variations
-      .replace(/[أإآٱ]/g, "ا")
-      // Standardize Yaa/Hamza variations
-      .replace(/[ىئ]/g, "ي")
-      // Standardize Waw-Hamza
-      .replace(/ؤ/g, "و")
-      // Standardize Teh Marbuta (often heard as Heh in speech or confused by STT)
+      // Standardize Alef, Yaa, Hamza, and Teh Marbuta variations
       .replace(/ة/g, "ه")
-      // Clean whitespace and trim
       .replace(/\s+/g, " ")
       .trim();
   }, []);
 
-  // Initialize matches when target verses change
   useEffect(() => {
     if (targetVerses.length > 0) {
       const allWords = targetVerses.flatMap(v => v.text.split(/\s+/)).filter(w => w.length > 0);
@@ -72,7 +63,6 @@ export const useVoiceCorrection = (targetVerses = [], onComplete) => {
       setMasteryScore(0);
       setCurrentIndex(0);
     }
-    // Safety cleanup on target change
     return () => stopListening();
   }, [targetVerses, normalize]);
 
@@ -102,16 +92,15 @@ export const useVoiceCorrection = (targetVerses = [], onComplete) => {
                     // Mark current as 'wrong' (skipped/mistake) and next as 'correct'
                     updated[localIndex].status = 'wrong';
                     updated[nextIdx].status = 'correct';
-                    if (onError) onError(updated[localIndex].text); // Trigger Chime
+                    if (onError) onError(updated[localIndex].text); // Alert trigger
                     localIndex = nextIdx + 1;
                 } else {
                     // 3. This is a clear mistake on the current word
                     updated[localIndex].status = 'wrong';
-                    if (onError) onError(updated[localIndex].text); // Trigger Chime
+                    if (onError) onError(updated[localIndex].text); // Alert trigger
                     localIndex++;
                 }
             } else {
-                // Mistake on the last word
                 updated[localIndex].status = 'wrong';
                 if (onError) onError(updated[localIndex].text);
                 localIndex++;
@@ -121,7 +110,6 @@ export const useVoiceCorrection = (targetVerses = [], onComplete) => {
       
       setCurrentIndex(localIndex);
 
-      // Calculate score based on correct matches
       const totalWords = updated.length;
       const correctCount = updated.filter(m => m.status === 'correct').length;
       const score = totalWords > 0 ? Math.round((correctCount / totalWords) * 100) : 0;
