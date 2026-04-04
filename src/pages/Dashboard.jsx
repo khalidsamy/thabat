@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { BookOpen, TrendingUp, Flame, CalendarCheck, Sparkles, CheckCircle2, Lightbulb } from 'lucide-react';
+import { BookOpen, TrendingUp, Flame, CalendarCheck, Sparkles, CheckCircle2, Lightbulb, Calendar } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
