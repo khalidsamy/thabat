@@ -2,6 +2,10 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -37,11 +41,19 @@ export default defineConfig({
       }
     })
   ],
+  resolve: {
+    alias: {
+      'react-is': path.resolve(__dirname, 'node_modules', 'react-is'),
+    },
+  },
+  optimizeDeps: {
+    include: ['recharts', 'react-is'],
+  },
   build: {
     chunkSizeWarningLimit: 2000, 
     rollupOptions: {
       output: {
-        manualChunks: undefined, 
+        manualChunks: undefined,
       },
     },
   },
