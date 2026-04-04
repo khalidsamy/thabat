@@ -23,7 +23,7 @@ const ReviewPacerCard = ({ data = [], itemVariants }) => {
           </span>
         </div>
 
-        <div className="flex-1 w-full mt-6 -mb-4 -mx-4">
+        <div className="relative flex-1 w-full min-h-0 overflow-hidden mt-6 -mb-4 -mx-4">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData}>
               <defs>

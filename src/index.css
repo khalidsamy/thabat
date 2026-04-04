@@ -5,12 +5,12 @@
   --color-primary-foreground: #ffffff;
   --color-secondary: #f1f5f9;
   --color-secondary-foreground: #475569;
-  --color-background: #f8fafc; /* Sophisticated Zinc-50 for non-generic feel */
-  --color-foreground: #09090b; /* Zinc-950 for elite readability */
-  --color-card: rgba(255, 255, 255, 0.8);
+  --color-background: #f8fafc; /* Sophisticated Zinc-50 Field */
+  --color-foreground: #09090b; /* Zinc-950 Text Body */
+  --color-card: rgba(255, 255, 255, 0.85); /* High-end Glass Transition */
   --color-card-foreground: #09090b;
   --color-destructive: #ef4444;
-  --color-border: #e4e4e7; /* Sharp Zinc-200 for visible hierarchies */
+  --color-border: #e4e4e7; /* Sharp Zinc-200 Boundaries */
 }
 
 @layer base {
@@ -25,9 +25,7 @@
     --color-card-foreground: #f8fafc;
     --color-border: #1e3050;
   }
-}
 
-@layer base {
   * {
     border-color: var(--color-border);
   }

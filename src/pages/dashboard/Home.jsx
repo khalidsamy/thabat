@@ -46,7 +46,8 @@ const Home = (props) => {
         />
 
         <ReviewPacerCard 
-            itemVariants={itemVariants} 
+            itemVariants={itemVariants}
+            className="h-full"
         />
       </DashboardLayout>
     </div>
