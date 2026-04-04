@@ -75,6 +75,31 @@ const Recite = (props) => {
     }
   };
 
+  // Audio Utility: Professional Error Chime (Web Audio API)
+  const playErrorChime = () => {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // High-frequency soft chime
+      oscillator.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.1);
+
+      gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.01); // Very subtle
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.2);
+    } catch (e) {
+      console.error('Audio chime failed', e);
+    }
+  };
+
   const handleLog = async () => {
     stopListening();
     try {
@@ -92,6 +117,24 @@ const Recite = (props) => {
         pages: pagesToLog
       });
 
+      // 3. Automatic Error Logging (The 'Error Book' Integration)
+      const wrongWords = matches.filter(m => m.status === 'wrong');
+      if (wrongWords.length > 0) {
+        // Log unique errors only to avoid duplicates
+        const uniqueWrongTexts = [...new Set(wrongWords.map(m => m.text))];
+        
+        for (const wordText of uniqueWrongTexts) {
+            await api.post('/errors', {
+                surah: surahName,
+                verse: ayahFrom, // Simplification: log to the starting verse of range
+                wrongText: wordText,
+                correctText: wordText, // We use the same for mapping in the error book
+                type: 'pronunciation',
+                note: `Automatically logged during AI Recitation session (${masteryScore}% accuracy)`
+            }).catch(err => console.error("Failed to log error:", err));
+        }
+      }
+
       showSuccess(t('dashboard.progress_logged') || 'Recitation mastery logged successfully!');
       setShowSummary(true);
       
@@ -105,63 +148,63 @@ const Recite = (props) => {
   };
 
   return (
-    <div className="pb-40 animate-fade-in">
-      <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
+    <div className="pb-40 animate-fade-in bg-[#FBFBFA] dark:bg-transparent min-h-screen">
+      <div className="max-w-[1600px] mx-auto px-4 lg:px-12 pt-8">
         
         <AnimatePresence mode="wait">
           {!showSummary ? (
             <motion.div 
               key="tutor-main"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
               className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12"
             >
-              {/* LEFT SIDEBAR: CONFIGURATION (4 COLS) */}
+              {/* STEP 1: TARGET RANGE SELECTION (4 COLS) */}
               <div className="lg:col-span-4 space-y-8">
-                <div className="bg-card dark:bg-card/40 border border-gray-100 dark:border-white/5 rounded-[2.5rem] p-8 shadow-xl shadow-black/5 animate-slide-in">
+                <div className="bg-white/70 dark:bg-card/40 backdrop-blur-xl border border-white dark:border-white/5 rounded-[2.5rem] p-8 shadow-2xl shadow-emerald-900/5 animate-slide-in">
                   <div className="flex items-center gap-3 mb-8">
                     <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-600 dark:text-emerald-400">
                       <Search className="h-6 w-6" />
                     </div>
-                    <h3 className="text-xl font-bold tracking-tight text-foreground">
-                      Selection Range
+                    <h3 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-foreground">
+                      Target Range
                     </h3>
                   </div>
 
                   <div className="space-y-6">
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-400 dark:text-emerald-500/40 uppercase tracking-[0.3em] px-1">Choose Surah</label>
+                       <label className="text-[10px] font-black text-emerald-600/40 dark:text-emerald-500/40 uppercase tracking-[0.3em] px-1">Surah Selection</label>
                        <select 
                           value={selectedSurah}
                           onChange={(e) => setSelectedSurah(parseInt(e.target.value))}
-                          className="w-full h-14 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl px-4 font-bold text-foreground focus:ring-2 focus:ring-emerald-500 transition-all outline-none"
+                          className="w-full h-14 bg-emerald-50/30 dark:bg-slate-900 border border-emerald-100 dark:border-white/5 rounded-2xl px-4 font-bold text-zinc-900 dark:text-foreground focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all outline-none"
                        >
                           {surahs.map(s => (
-                            <option key={s.number} value={s.number}>{s.number}. {s.englishName} ({s.name})</option>
+                            <option key={s.number} value={s.number}>{s.number}. {s.englishName}</option>
                           ))}
                        </select>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-slate-400 dark:text-emerald-500/40 uppercase tracking-[0.3em] px-1">From Ayah</label>
+                          <label className="text-[10px] font-black text-emerald-600/40 dark:text-emerald-500/40 uppercase tracking-[0.3em] px-1">From Ayah</label>
                           <input 
                             type="number"
                             min="1"
                             value={ayahFrom}
                             onChange={(e) => setAyahFrom(parseInt(e.target.value))}
-                            className="w-full h-14 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl px-4 font-bold text-foreground focus:ring-2 focus:ring-emerald-500 outline-none"
+                            className="w-full h-14 bg-emerald-50/30 dark:bg-slate-900 border border-emerald-100 dark:border-white/5 rounded-2xl px-4 font-bold text-zinc-900 dark:text-foreground focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none"
                           />
                        </div>
                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-slate-400 dark:text-emerald-500/40 uppercase tracking-[0.3em] px-1">To Ayah</label>
+                          <label className="text-[10px] font-black text-emerald-600/40 dark:text-emerald-500/40 uppercase tracking-[0.3em] px-1">To Ayah</label>
                           <input 
                             type="number"
                             min="1"
                             value={ayahTo}
                             onChange={(e) => setAyahTo(parseInt(e.target.value))}
-                            className="w-full h-14 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-2xl px-4 font-bold text-foreground focus:ring-2 focus:ring-emerald-500 outline-none"
+                            className="w-full h-14 bg-emerald-50/30 dark:bg-slate-900 border border-emerald-100 dark:border-white/5 rounded-2xl px-4 font-bold text-zinc-900 dark:text-foreground focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none"
                           />
                        </div>
                     </div>
@@ -169,13 +212,13 @@ const Recite = (props) => {
                     <button 
                       onClick={loadTargetVerses}
                       disabled={isLoadingVerses}
-                      className="w-full bg-emerald-500 hover:bg-emerald-600 text-white h-16 rounded-2xl font-black shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50"
+                      className="w-full bg-emerald-500 hover:bg-emerald-600 text-white h-16 rounded-3xl font-black shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50"
                     >
                       {isLoadingVerses ? (
                          <div className="h-6 w-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       ) : (
                         <>
-                          <span>Load Verses</span>
+                          <span>Pre-load Range</span>
                           <ChevronRight className="h-5 w-5" />
                         </>
                       )}
@@ -183,20 +226,19 @@ const Recite = (props) => {
                   </div>
                 </div>
 
-                {/* Score Dashboard (Optional Stats) */}
-                <div className="bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-[2.5rem] p-8 shadow-2xl shadow-indigo-900/40 border border-white/10 text-white overflow-hidden relative group">
+                {/* Live Accuracy Metric */}
+                <div className="bg-gradient-to-br from-emerald-600 to-emerald-800 dark:from-emerald-900 dark:to-emerald-950 rounded-[2.5rem] p-8 shadow-2xl shadow-emerald-900/10 border border-white/10 text-white overflow-hidden relative group">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-1000"></div>
                     <div className="relative">
-                        <span className="text-[10px] font-black text-indigo-100/40 uppercase tracking-[0.4em] mb-1 block">Live Mastery</span>
+                        <span className="text-[10px] font-black text-emerald-100/40 uppercase tracking-[0.4em] mb-1 block">Recitation Mastery</span>
                         <div className="flex items-end gap-3 mb-6">
                             <span className="text-5xl font-black tracking-tighter">{masteryScore}%</span>
-                            <span className="text-xs font-bold text-indigo-100/60 mb-2">accuracy</span>
                         </div>
                         <div className="h-3 w-full bg-black/20 rounded-full overflow-hidden border border-white/5">
                             <motion.div 
                                 initial={{ width: 0 }}
                                 animate={{ width: `${masteryScore}%` }}
-                                className="h-full bg-emerald-400 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.5)]"
+                                className="h-full bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)]"
                                 transition={{ duration: 0.5 }}
                             />
                         </div>
@@ -204,131 +246,163 @@ const Recite = (props) => {
                 </div>
               </div>
 
-              {/* RIGHT CONTENT: TUTOR ENGINE (8 COLS) */}
+              {/* STEP 2 & 3: CONTINUOUS AI RECITER (8 COLS) */}
               <div className="lg:col-span-8 space-y-8">
-                <div className="bg-card dark:bg-card/40 border border-gray-100 dark:border-white/5 rounded-[3rem] p-10 lg:p-14 shadow-xl shadow-black/5 flex flex-col items-center justify-between min-h-[700px] relative overflow-hidden">
+                <div className="bg-white/80 dark:bg-card/40 backdrop-blur-xl border border-white dark:border-white/5 rounded-[3rem] p-10 lg:p-14 shadow-2xl shadow-zinc-900/5 flex flex-col items-center justify-between min-h-[750px] relative overflow-hidden">
                     
-                    {/* Header Action */}
+                    {/* Header: Range Display */}
                     <div className="relative w-full flex items-center justify-between mb-8">
                         <div className="flex items-center gap-3">
                             <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-600 dark:text-emerald-400">
                                 <Volume2 className="h-5 w-5" />
                             </div>
-                            <h4 className="text-lg font-black text-foreground">AI Recitation Tutor</h4>
+                            <h4 className="text-lg font-black text-zinc-900 dark:text-foreground">
+                              {surahs.find(s => s.number === selectedSurah)?.englishName} {ayahFrom}:{ayahTo}
+                            </h4>
                         </div>
-                        <div className="flex items-center gap-4">
-                            <div className={`px-4 py-2 rounded-full border border-gray-100 dark:border-white/10 flex items-center gap-2 transition-colors duration-500 ${isListening ? 'bg-rose-500/10 text-rose-500' : 'bg-emerald-500/10 text-emerald-500'}`}>
-                                <div className={`w-2 h-2 rounded-full ${isListening ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`} />
-                                <span className="text-[10px] font-black uppercase tracking-widest">{isListening ? 'Listening' : 'Ready'}</span>
-                            </div>
+                        <div className={`px-4 py-2 rounded-full flex items-center gap-2 transition-all duration-500 ${isListening ? 'bg-rose-500/10 text-rose-600 border border-rose-200' : 'bg-zinc-100 text-zinc-400 border border-zinc-200'}`}>
+                            <div className={`w-2 h-2 rounded-full ${isListening ? 'bg-rose-500 animate-pulse' : 'bg-zinc-300'}`} />
+                            <span className="text-[10px] font-black uppercase tracking-widest">{isListening ? 'LIVE: Session Active' : 'Waiting for Voice'}</span>
                         </div>
                     </div>
 
-                    {/* MAIN MICROPHONE AREA */}
-                    <div className="relative group/btn my-10">
-                        {/* THE PURE CENTERED PULSE */}
-                        <AnimatePresence>
-                            {isListening && (
-                                <motion.div 
-                                    initial={{ scale: 0.8, opacity: 0 }}
-                                    animate={{ scale: [1, 2, 1], opacity: [0.1, 0, 0.1] }}
-                                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                                    className="absolute inset-0 bg-rose-500 rounded-full blur-[60px]"
-                                />
-                            )}
-                        </AnimatePresence>
-
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={isListening ? stopListening : startListening}
-                            className={`w-40 h-40 lg:w-56 lg:h-56 rounded-full flex items-center justify-center text-white shadow-2xl transition-all duration-500 relative z-10 ${
-                                isListening 
-                                    ? 'bg-rose-500 shadow-rose-500/40 ring-[12px] ring-rose-500/10' 
-                                    : 'bg-emerald-500 shadow-emerald-500/30 ring-[12px] ring-emerald-500/10 hover:shadow-emerald-500/50'
-                            }`}
-                        >
-                            {isListening ? (
-                                <motion.div animate={{ rotate: [0, -10, 10, 0] }} transition={{ repeat: Infinity, duration: 1 }}>
-                                    <MicOff className="h-16 w-16 lg:h-24 lg:w-24" />
-                                </motion.div>
-                            ) : (
-                                <Mic className="h-16 w-16 lg:h-24 lg:w-24" />
-                            )}
-                        </motion.button>
-                    </div>
-
-                    {/* LIVE CORRECTION BOX (THE STAR FEATURE) */}
-                    <div className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-[2.5rem] p-8 lg:p-10 min-h-[220px] flex flex-wrap items-center justify-center gap-x-4 gap-y-3 shadow-inner text-center" dir="rtl">
+                    {/* LIVE TRANSCRIPT: Above the Mic */}
+                    <div className="w-full bg-[#f8fafb] dark:bg-slate-900 border-2 border-emerald-500 shadow-[0_0_40px_rgba(16,185,129,0.05)] rounded-[2.5rem] p-8 lg:p-12 min-h-[280px] flex flex-wrap items-center justify-center gap-x-6 gap-y-4 shadow-inner text-center relative z-20" dir="rtl">
                         {targetVerses.length > 0 ? (
                            matches.map((word, i) => (
                              <motion.span 
                                 key={i}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: i * 0.01 }}
-                                className={`text-2xl lg:text-3xl font-extrabold transition-all duration-500 ${
-                                  word.status === 'correct' ? 'text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] scale-110' :
-                                  word.status === 'wrong' ? 'text-rose-500' :
-                                  'text-slate-300 dark:text-slate-700'
+                                initial={{ opacity: 0.3, scale: 0.95 }}
+                                animate={{ 
+                                    opacity: word.status === 'pending' ? 0.3 : 1, 
+                                    scale: word.status === 'pending' ? 0.95 : 1,
+                                    y: word.status === 'pending' ? 0 : -2
+                                }}
+                                className={`text-3xl lg:text-5xl font-black transition-all duration-500 tracking-tight ${
+                                  word.status === 'correct' ? 'text-emerald-500 drop-shadow-[0_0_12px_rgba(16,185,129,0.3)]' :
+                                  word.status === 'wrong' ? 'text-rose-600 drop-shadow-[0_0_12px_rgba(225,29,72,0.3)]' :
+                                  'text-zinc-300 dark:text-zinc-800'
                                 }`}
                              >
                                {word.text}
                              </motion.span>
                            ))
                         ) : (
-                          <p className="text-slate-400 font-bold italic opacity-40 text-xl" dir="ltr">Load a range to begin correction</p>
+                          <div className="flex flex-col items-center gap-4 py-10">
+                              <Sparkles className="h-10 w-10 text-emerald-500/20" />
+                              <p className="text-zinc-300 font-black italic text-2xl uppercase tracking-widest" dir="ltr">Range Not Loaded</p>
+                          </div>
                         )}
                     </div>
 
-                    {/* Action Footer */}
-                    <div className="w-full flex justify-center pt-10">
-                        {targetVerses.length > 0 && (
-                            <button
+                    {/* DYNAMIC PULSING MICROPHONE */}
+                    <div className="relative flex flex-col items-center gap-6 mt-12 mb-8">
+                        <AnimatePresence>
+                            {isListening && (
+                                <motion.div 
+                                    initial={{ scale: 0.8, opacity: 0 }}
+                                    animate={{ 
+                                        scale: [1, 2.5, 3.5], 
+                                        opacity: [0.15, 0.05, 0] 
+                                    }}
+                                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
+                                    className="absolute inset-0 bg-emerald-500 rounded-full blur-[80px]"
+                                />
+                            )}
+                        </AnimatePresence>
+
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={isListening ? stopListening : () => startListening(playErrorChime)}
+                            className={`w-44 h-44 lg:w-60 lg:h-60 rounded-full flex items-center justify-center text-white shadow-2xl transition-all duration-700 relative z-30 ${
+                                isListening 
+                                    ? 'bg-rose-600 shadow-rose-600/40 ring-[20px] ring-rose-500/5' 
+                                    : 'bg-emerald-500 shadow-emerald-500/30 ring-[20px] ring-emerald-500/5 hover:shadow-emerald-500/50'
+                            }`}
+                        >
+                            {isListening ? (
+                                <div className="flex flex-col items-center">
+                                    <MicOff className="h-16 w-16 lg:h-24 lg:w-24 mb-2" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Stop Session</span>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center">
+                                    <Mic className="h-16 w-16 lg:h-24 lg:w-24 mb-2" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Start Reciting</span>
+                                </div>
+                            )}
+                        </motion.button>
+                        
+                        <p className="text-zinc-400 font-bold text-xs uppercase tracking-[0.2em]">{isListening ? 'Stream Active' : 'Tap to Start AI'}</p>
+                    </div>
+
+                    {/* STICKY ACTION: LOGGING (Visible only when meaningful progress made) */}
+                    <div className="w-full flex justify-center py-6">
+                        {targetVerses.length > 0 && masteryScore > 0 && !isListening && (
+                            <motion.button
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
                                 onClick={handleLog}
-                                disabled={masteryScore < 20}
-                                className="px-10 py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-3xl font-black text-sm uppercase tracking-[0.2em] shadow-xl shadow-black/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-3 disabled:opacity-30 disabled:grayscale"
+                                className="px-12 py-6 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-[2rem] font-black text-sm uppercase tracking-[0.3em] shadow-2xl shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-4"
                             >
-                                <Sparkles className="h-5 w-5 text-amber-500" />
-                                <span>Confirm & Log Mastery</span>
-                            </button>
+                                <Sparkles className="h-6 w-6 text-emerald-400" />
+                                <span>Analyze & End Session</span>
+                            </motion.button>
                         )}
                     </div>
                 </div>
               </div>
             </motion.div>
           ) : (
+            /* STEP 4: INTEGRATED MASTERY SUMMARY */
             <motion.div 
                key="tutor-summary"
-               initial={{ opacity: 0, scale: 0.9 }}
+               initial={{ opacity: 0, scale: 0.95 }}
                animate={{ opacity: 1, scale: 1 }}
-               className="max-w-xl mx-auto bg-card rounded-[3rem] p-12 text-center shadow-2xl border border-gray-100 dark:border-white/5"
+               className="max-w-2xl mx-auto bg-white/70 dark:bg-card/40 backdrop-blur-3xl rounded-[4rem] p-12 lg:p-16 text-center shadow-2xl border border-white dark:border-white/5 relative overflow-hidden"
             >
-              <div className="w-24 h-24 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
-                <Trophy className="h-12 w-12 text-amber-500" />
-              </div>
-              <h2 className="text-4xl font-black text-foreground mb-4">Masha'Allah!</h2>
-              <p className="text-lg text-slate-500 font-medium mb-12">You have successfully mastered this recitation section with amazing accuracy.</p>
+              {/* Glassmorphism Accents */}
+              <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/5 rounded-full -mr-40 -mt-40 blur-3xl"></div>
               
-              <div className="bg-slate-50 dark:bg-slate-900 rounded-3xl p-8 mb-10">
-                  <div className="grid grid-cols-2 gap-8">
-                     <div>
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Final Score</span>
-                        <span className="text-4xl font-black text-emerald-500">{masteryScore}%</span>
-                     </div>
-                     <div>
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Verses</span>
-                        <span className="text-4xl font-black text-foreground">{targetVerses.length}</span>
-                     </div>
+              <div className="w-28 h-28 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner relative">
+                <Trophy className="h-14 w-14 text-emerald-500" />
+                <motion.div 
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute inset-0 rounded-full border-2 border-emerald-500/20"
+                />
+              </div>
+
+              <h2 className="text-5xl font-black text-zinc-900 dark:text-foreground tracking-tighter mb-4">Allahuma Barik!</h2>
+              <p className="text-xl text-zinc-500 font-medium mb-12">Recitation complete. Your effort has been logged to your progress history.</p>
+              
+              <div className="grid grid-cols-2 gap-8 mb-12">
+                  <div className="bg-emerald-50/50 dark:bg-slate-900/50 p-8 rounded-[2.5rem] border border-emerald-100/50 dark:border-white/5">
+                      <span className="text-[10px] font-black text-emerald-600/40 uppercase tracking-widest block mb-1 px-1">Mastery Score</span>
+                      <span className="text-5xl font-black text-emerald-600">{masteryScore}%</span>
+                  </div>
+                  <div className="bg-rose-50/50 dark:bg-slate-900/50 p-8 rounded-[2.5rem] border border-rose-100/50 dark:border-white/5">
+                      <span className="text-[10px] font-black text-rose-600/40 uppercase tracking-widest block mb-1 px-1">Mistakes Found</span>
+                      <span className="text-5xl font-black text-rose-600">{matches.filter(m => m.status === 'wrong').length}</span>
                   </div>
               </div>
 
-              <button 
-                onClick={() => setShowSummary(false)}
-                className="w-full py-5 bg-emerald-500 text-white rounded-2xl font-black shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all active:scale-95"
-              >
-                Back to Tutor
-              </button>
+              <div className="space-y-4">
+                  <button 
+                    onClick={() => setShowSummary(false)}
+                    className="w-full h-20 bg-zinc-900 text-white rounded-3xl font-black text-lg shadow-2xl shadow-emerald-500/30 hover:bg-zinc-800 transition-all active:scale-95 flex items-center justify-center gap-3"
+                  >
+                    <span>Log to Streak</span>
+                    <ChevronRight className="h-6 w-6" />
+                  </button>
+                  <button 
+                    onClick={() => window.location.href = '/dashboard/errors'}
+                    className="w-full text-zinc-400 font-bold py-4 hover:text-rose-500 transition-all text-sm uppercase tracking-widest"
+                  >
+                    View in Error Book
+                  </button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

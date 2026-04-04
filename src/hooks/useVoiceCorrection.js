@@ -41,6 +41,8 @@ export const useVoiceCorrection = (targetVerses = [], onComplete) => {
       return 1 - distance / Math.max(a.length, b.length);
   };
 
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   // Normalize: Strip ALL Tashkeel, harakat, tajweed signs and standardize letters
   const normalize = useCallback((str) => {
     if (!str) return "";
@@ -68,39 +70,56 @@ export const useVoiceCorrection = (targetVerses = [], onComplete) => {
       setTranscript('');
       setInterimTranscript('');
       setMasteryScore(0);
+      setCurrentIndex(0);
     }
     // Safety cleanup on target change
     return () => stopListening();
   }, [targetVerses, normalize]);
 
-  const updateMatches = useCallback((finalSpeech) => {
+  const updateMatches = useCallback((finalSpeech, onError) => {
     const speechWords = normalize(finalSpeech).split(/\s+/).filter(w => w.length > 0);
     
     setMatches(prev => {
       const updated = [...prev];
       const threshold = 0.8; // 80% Similarity Threshold
+      let localIndex = currentIndex;
       
       speechWords.forEach(sWord => {
-        // Find best fuzzy match among pending words
-        let bestMatchIdx = -1;
-        let highestSim = 0;
+        if (localIndex >= updated.length) return;
 
-        for (let i = 0; i < updated.length; i++) {
-          if (updated[i].status === 'pending') {
-            const sim = getSimilarity(updated[i].normalized, sWord);
-            if (sim > highestSim) {
-              highestSim = sim;
-              bestMatchIdx = i;
+        // 1. Try to match the CURRENT word
+        const currentSim = getSimilarity(updated[localIndex].normalized, sWord);
+        
+        if (currentSim >= threshold) {
+            updated[localIndex].status = 'correct';
+            localIndex++;
+        } else {
+            // 2. Try to match the NEXT word (handle single-word skip)
+            const nextIdx = localIndex + 1;
+            if (nextIdx < updated.length) {
+                const nextSim = getSimilarity(updated[nextIdx].normalized, sWord);
+                if (nextSim >= threshold) {
+                    // Mark current as 'wrong' (skipped/mistake) and next as 'correct'
+                    updated[localIndex].status = 'wrong';
+                    updated[nextIdx].status = 'correct';
+                    if (onError) onError(updated[localIndex].text); // Trigger Chime
+                    localIndex = nextIdx + 1;
+                } else {
+                    // 3. This is a clear mistake on the current word
+                    updated[localIndex].status = 'wrong';
+                    if (onError) onError(updated[localIndex].text); // Trigger Chime
+                    localIndex++;
+                }
+            } else {
+                // Mistake on the last word
+                updated[localIndex].status = 'wrong';
+                if (onError) onError(updated[localIndex].text);
+                localIndex++;
             }
-            // Stop if we hit a 100% match
-            if (sim > 0.99) break;
-          }
-        }
-
-        if (bestMatchIdx !== -1 && highestSim >= threshold) {
-          updated[bestMatchIdx].status = 'correct';
         }
       });
+      
+      setCurrentIndex(localIndex);
 
       // Calculate score based on correct matches
       const totalWords = updated.length;
@@ -110,9 +129,9 @@ export const useVoiceCorrection = (targetVerses = [], onComplete) => {
 
       return updated;
     });
-  }, [normalize]);
+  }, [normalize, currentIndex]);
 
-  const startListening = useCallback(() => {
+  const startListening = useCallback((onWordError) => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     
     if (!SpeechRecognition) {
@@ -135,8 +154,9 @@ export const useVoiceCorrection = (targetVerses = [], onComplete) => {
 
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
-          finalText += event.results[i][0].transcript + ' ';
-          updateMatches(event.results[i][0].transcript);
+          const speech = event.results[i][0].transcript;
+          finalText += speech + ' ';
+          updateMatches(speech, onWordError);
         } else {
           interimText += event.results[i][0].transcript;
         }
