@@ -11,7 +11,12 @@ import RecoveryCard from '../../components/RecoveryCard';
 const Home = (props) => {
   const { t } = useTranslation();
   const context = useOutletContext() || {};
-  const { progress, user, dailyVerse, itemVariants } = { ...context, ...props };
+  const { progress, user, dailyVerse, itemVariants } = { 
+    progress: {}, 
+    user: {}, 
+    ...context, 
+    ...props 
+  };
 
   return (
     <div className="space-y-8 pb-32">

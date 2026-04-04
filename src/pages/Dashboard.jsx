@@ -55,30 +55,45 @@ const Dashboard = () => {
     }
   }, [t]);
 
+  // Combined Initial Data Fetch (Performance Optimization)
   const loadInitialData = useCallback(async () => {
     setIsLoading(true);
     try {
+      // 🚀 Parallel execution to minimize TTI (Time to Interactive)
       const [progressRes, userRes] = await Promise.all([
         api.get('/progress'),
         api.get('/user/profile')
       ]);
       
       if (progressRes.data.success) setProgress(progressRes.data.progress);
-      if (userRes.data.success) setUser(userRes.data.data || userRes.data.user);
       
+      // Definitively set the user state from the fresh profile data
+      const userData = userRes.data.data || userRes.data.user;
+      if (userRes.data.success && userData) {
+        setUser(userData);
+      }
+      
+      // Random Daily Verse
       const randomIndex = Math.floor(Math.random() * QURAN_VERSES.length);
       setDailyVerse(QURAN_VERSES[randomIndex]);
       
+      // Browser background notifications check
       if ("Notification" in window && Notification.permission === "default") {
         await Notification.requestPermission();
       }
     } catch (err) {
       console.error('Initial load failed:', err);
-      setError(t('dashboard.fetch_error'));
+      // Fallback: If auth exists, don't crash, just show an error toast
+      if (authUser) {
+          setUser(authUser);
+          showError(t('dashboard.fetch_error') || 'Sync failed. Using cached profile.');
+      } else {
+          setError(t('dashboard.fetch_error'));
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, [t, authUser, showError]);
 
   useEffect(() => {
     loadInitialData();
@@ -134,28 +149,46 @@ const Dashboard = () => {
   };
 
   const shareProgress = async () => {
+    // Definitive rank check
     const rank = getUserRank(progress?.totalMemorized || 0);
     const text = i18n.language === 'ar' 
-      ? `الحمد لله! حققت لقب "${t(`ranks.${rank.id}`)}" في تطبيق ثبات (Thabat). استمراريتي: ${progress?.streak} أيام. 📖✨`
-      : `Alhamdullilah! I achieved the rank "${t(`ranks.${rank.id}`)}" in Thabat. My streak: ${progress?.streak} days. 📖✨`;
+      ? `الحمد لله! حققت لقب "${t(`ranks.${rank.id}`)}" في تطبيق ثبات (Thabat). استمراريتي: ${progress?.streak || 0} أيام. 📖✨`
+      : `Alhamdullilah! I achieved the rank "${t(`ranks.${rank.id}`)}" in Thabat. My streak: ${progress?.streak || 0} days. 📖✨`;
     
     if (navigator.share) {
       try { await navigator.share({ title: t('dashboard.share'), text, url: window.location.origin }); }
       catch (err) { console.error('Share failed:', err); }
     } else {
-      navigator.clipboard.writeText(text);
-      showSuccess(t('dashboard.success_update', { count: 0 }));
+      try {
+        await navigator.clipboard.writeText(text);
+        showSuccess(t('dashboard.copy_success') || 'Link copied to clipboard!');
+      } catch (err) {
+        showError('Could not copy link.');
+      }
     }
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center">
-        <Loader2 className="h-10 w-10 text-emerald-500 animate-spin mb-4" />
-        <p className="text-secondary-foreground font-medium animate-pulse">{t('dashboard.loading')}</p>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
+        <div className="relative mb-8">
+            <motion.div 
+               animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0] }} 
+               transition={{ duration: 4, repeat: Infinity }}
+               className="w-20 h-20 bg-emerald-500/10 rounded-full blur-2xl absolute -inset-4" 
+            />
+            <Loader2 className="h-12 w-12 text-emerald-500 animate-spin relative" />
+        </div>
+        <p className="text-foreground font-black text-xl tracking-tight animate-pulse uppercase">
+            {t('dashboard.syncing') || 'Stabilizing Thabat...'}
+        </p>
+        <p className="text-secondary-foreground text-sm font-medium mt-2 opacity-50">
+            {t('dashboard.loading_subtitle') || 'Synchronizing your spiritual journey'}
+        </p>
       </div>
     );
   }
+
 
   const reviewPace = user?.reviewPace || 10;
   const totalMemorized = progress?.totalMemorized || 0;

@@ -14,12 +14,23 @@ import api from '../../services/api';
 const Recite = (props) => {
   const { t } = useTranslation();
   const context = useOutletContext() || {};
-  const { progress, user, pagesInput, setPagesInput, handleUpdateSubmit, isUpdating, handleSunnahToggle, isTogglingSunnah, handleVoiceComplete, itemVariants } = { ...context, ...props };
-  const { updateUser } = useContext(AuthContext);
+  const { progress, user, pagesInput, setPagesInput, handleUpdateSubmit, isUpdating, handleSunnahToggle, isTogglingSunnah, handleVoiceComplete, itemVariants } = { 
+    progress: {}, 
+    user: {}, 
+    ...context, 
+    ...props 
+  };
   const { showSuccess, showError } = useToast();
   const [targetInput, setTargetInput] = useState(user?.currentTargetSurah || '');
   const [isChangingTarget, setIsChangingTarget] = useState(false);
   const [isMindMapOpen, setIsMindMapOpen] = useState(false);
+
+  // Sync target input if user profile loads late
+  React.useEffect(() => {
+    if (user?.currentTargetSurah && !isChangingTarget) {
+      setTargetInput(user.currentTargetSurah);
+    }
+  }, [user?.currentTargetSurah, isChangingTarget]);
 
   const onTargetSubmit = async (e) => {
     e.preventDefault();

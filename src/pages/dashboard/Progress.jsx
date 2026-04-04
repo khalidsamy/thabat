@@ -11,7 +11,12 @@ import HifzProgress from '../../components/HifzProgress';
 const Progress = (props) => {
   const { t } = useTranslation();
   const context = useOutletContext() || {};
-  const { progress, user, refreshKey, itemVariants, oldDailyTarget, newDailyTarget, reviewPace, planLabels } = { ...context, ...props };
+  const { progress, user, refreshKey, itemVariants, oldDailyTarget, newDailyTarget, reviewPace, planLabels } = { 
+    progress: {}, 
+    user: {}, 
+    ...context, 
+    ...props 
+  };
 
   return (
     <div className="space-y-8 pb-32">
