@@ -79,7 +79,7 @@ const Home = (props) => {
             streak={progress?.streak} 
             isCompletedToday={progress?.doneToday >= progress?.dailyTarget} 
             wasActiveYesterday={progress?.streak > 0}
-            currentSurah={user?.currentTargetSurah || 'Al-Baqarah'}
+            currentSurah={progress?.currentSurahName || user?.currentTargetSurah}
             completion={progress?.masteryPercent || 0}
             history={progress?.history || []}
           />

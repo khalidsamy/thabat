@@ -29,7 +29,8 @@
     "refresh_msg": "يرجى تحديث الصفحة أو تسجيل الدخول مرة أخرى.",
     "current_journey": "مسيرتك الحالية",
     "current_page": "الصفحة الحالية",
-    "out_of": "من أصل ٦٠٤",
+    "total_mushaf_pages": "إجمالي صفحات المصحف",
+    "out_of": "من أصل {{total}}",
     "total_memorized": "إجمالي المحفوظ",
     "pages_committed": "صفحة تم حفظها",
     "active_streak": "الاستمرارية النشطة",
@@ -62,7 +63,8 @@
     "sunnah_done": "تم التثبيت في النوافل",
     "sunnah_log": "سجّل الإتمام الآن",
     "golden_rule": "قاعدة ذهبية:",
-    "golden_rule_msg": "لا تُسمّع ما حفظته اليوم لشيخك! اختبر نفسك كل ٨ ساعات، وسمّعه غداً لضمان ثباته في الذاكرة طويلة المدى."
+    "golden_rule_msg": "لا تُسمّع ما حفظته اليوم لشيخك! اختبر نفسك كل ٨ ساعات، وسمّعه غداً لضمان ثباته في الذاكرة طويلة المدى.",
+    "start_journey": "ابدأ رحلة الحفظ!"
   },
   "chart": {
     "title": "سجل الحفظ",
@@ -71,7 +73,9 @@
   "achievements": {
     "title": "الأوسمة والجوائز",
     "unlocked": "مفتوح",
-    "progress": "التقدم"
+    "progress": "التقدم",
+    "next_milestone": "المركز القادم",
+    "keep_going": "استمر لمزيد من التقدم!"
   },
   "ranks": {
     "murabit": "المرابط",
@@ -97,7 +101,8 @@
     "title": "سمّع لي (Voice Recitation)",
     "listening": "جاري الاستماع...",
     "click_to_start": "اضغط على الزر وابدأ بالتسميع",
-    "confirm_and_log": "تثبيت الحفظ (Confirm & Log)"
+    "confirm_and_log": "تثبيت الحفظ (Confirm & Log)",
+    "perfect_match": "ما شاء الله! قراءة متقنة بنسبة ١٠٠٪. تم تسجيل التقدم."
   },
   "tasks": {
     "new_hifz": "الحفظ الجديد",
@@ -115,11 +120,11 @@
     "recite": "تسميع",
     "review": "مراجعة",
     "community": "المجتمع",
-    "errors": "سجل الأخطاء",
-    "mutashabihat": "المتشابهات",
-    "review_sessions": "جلسات المراجعة",
     "profile": "ملفي الشخصي",
-    "settings": "الإعدادات"
+    "settings": "الإعدادات",
+    "review_sessions": "جلسات المراجعة",
+    "errors": "كراسة الأخطاء",
+    "mutashabihat": "المتشابهات"
   },
   "community": {
     "title": "مجتمع ثبات",

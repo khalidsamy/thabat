@@ -91,7 +91,14 @@
 
 /* App-like container */
 .dashboard-container {
-  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8 pb-32 sm:pb-12;
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-6 pb-28 sm:pb-12;
+}
+
+/* Mobile-First Scaling Fixes */
+@media (max-width: 375px) {
+  .dashboard-container {
+    @apply px-3 py-4 pb-24;
+  }
 }
 
 @utility glass-nav {

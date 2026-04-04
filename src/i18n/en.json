@@ -29,7 +29,8 @@
     "refresh_msg": "Please refresh the page or try logging in again.",
     "current_journey": "Current Journey",
     "current_page": "Current Page",
-    "out_of": "Out of 604",
+    "total_mushaf_pages": "Total Mushaf Pages",
+    "out_of": "out of {{total}}",
     "total_memorized": "Total Memorized",
     "pages_committed": "Pages committed",
     "active_streak": "Active Streak",
@@ -62,7 +63,8 @@
     "sunnah_done": "Logged in Sunnah",
     "sunnah_log": "Log Completion Now",
     "golden_rule": "Golden Rule:",
-    "golden_rule_msg": "Don't recite what you learned today to your teacher yet! Test yourself every 8 hours, and recite tomorrow for long-term mastery."
+    "golden_rule_msg": "Don't recite what you learned today to your teacher yet! Test yourself every 8 hours, and recite tomorrow for long-term mastery.",
+    "start_journey": "Start your journey!"
   },
   "chart": {
     "title": "Memorization History",
@@ -71,7 +73,9 @@
   "achievements": {
     "title": "Achievements & Badges",
     "unlocked": "Unlocked",
-    "progress": "Progress"
+    "progress": "Progress",
+    "next_milestone": "Next Milestone",
+    "keep_going": "Keep going to unlock!"
   },
   "ranks": {
     "murabit": "Murabit",
@@ -97,7 +101,8 @@
     "title": "Recite to Me (Voice Recitation)",
     "listening": "Listening...",
     "click_to_start": "Click the button and start reciting",
-    "confirm_and_log": "Confirm & Log"
+    "confirm_and_log": "Confirm & Log",
+    "perfect_match": "SubhanAllah! 100% perfect match. Progress recorded."
   },
   "tasks": {
     "new_hifz": "New Hifz",
@@ -115,11 +120,11 @@
     "recite": "Recite",
     "review": "Review",
     "community": "Community",
-    "errors": "Error Log",
-    "mutashabihat": "Mutashabihat",
-    "review_sessions": "Review Sessions",
     "profile": "My Profile",
-    "settings": "Settings"
+    "settings": "Settings",
+    "review_sessions": "Review Sessions",
+    "errors": "Error Log",
+    "mutashabihat": "Mutashabihat"
   },
   "community": {
     "title": "Thabat Community",

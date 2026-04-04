@@ -24,7 +24,7 @@ const Progress = (props) => {
           <div className="h-px flex-1 bg-gradient-to-r from-emerald-500/20 to-transparent ms-4"></div>
         </div>
         <div className="grid grid-cols-1 gap-6">
-          <HifzProgress current={progress?.totalMemorized || 0} total={604} label={t('dashboard.overall_mastery')} />
+          <HifzProgress current={progress?.totalMemorized || 0} total={progress?.totalMushafPages || 604} label={t('dashboard.overall_mastery')} />
         </div>
       </motion.section>
 
@@ -51,7 +51,7 @@ const Progress = (props) => {
             title={t('dashboard.current_page')}
             value={progress?.currentPage || 1} 
             icon={<BookOpen className="h-6 w-6" />}
-            subtitle={t('dashboard.out_of')}
+            subtitle={t('dashboard.out_of', { total: progress?.totalMushafPages || 604 })}
           />
           <StatCard 
             title={t('dashboard.total_memorized')}

@@ -25,6 +25,7 @@ const Community = (props) => {
       }
     } catch (err) {
       console.error('Failed to fetch reflections:', err);
+      showError(t('dashboard.fetch_error'));
     } finally {
       setIsLoading(false);
     }
@@ -54,11 +55,14 @@ const Community = (props) => {
   };
 
   const handleAddDua = async (id) => {
+    const reflection = reflections.find(r => r._id === id);
+    if (reflection?.duas?.includes('me')) return; // Already prayed
+
     // Optimistic UI Update
     setReflections(prev => prev.map(r => 
       r._id === id ? { 
         ...r, 
-        duaCount: r.duas?.includes('me') ? r.duaCount : r.duaCount + 1, 
+        duaCount: r.duaCount + 1, 
         duas: [...(r.duas || []), 'me'] 
       } : r
     ));
@@ -69,9 +73,15 @@ const Community = (props) => {
         showSuccess(t('community.prayed'));
       }
     } catch (err) {
-      // Rollback on error
+      // Immediate Rollback
+      setReflections(prev => prev.map(r => 
+        r._id === id ? { 
+          ...r, 
+          duaCount: r.duaCount - 1, 
+          duas: (r.duas || []).filter(u => u !== 'me') 
+        } : r
+      ));
       showError(err.response?.data?.message || err.message);
-      await fetchReflections();
     }
   };
 

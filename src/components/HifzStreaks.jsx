@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { getStreakMood, getMoodVariants, MOODS } from '../utils/streakMoods';
 
-const HifzStreaks = ({ streak = 0, isCompletedToday = false, wasActiveYesterday = true, currentSurah = "Al-Baqarah", completion = 0, history = [] }) => {
+const HifzStreaks = ({ streak = 0, isCompletedToday = false, wasActiveYesterday = true, currentSurah = "", completion = 0, history = [] }) => {
   const { t, i18n } = useTranslation();
   const mood = getStreakMood(streak, isCompletedToday, wasActiveYesterday);
   const moodVariant = getMoodVariants(mood.id);
@@ -99,8 +99,8 @@ const HifzStreaks = ({ streak = 0, isCompletedToday = false, wasActiveYesterday 
               <Star className="h-4 w-4 text-amber-500" />
             </div>
             <div>
-              <p className="text-sm font-bold text-foreground">{currentSurah}</p>
-              <p className="text-[10px] text-slate-400">Current Hifz Target</p>
+              <p className="text-sm font-bold text-foreground">{currentSurah || t('dashboard.start_journey')}</p>
+              <p className="text-[10px] text-slate-400 capitalize">{t('dashboard.current_journey')}</p>
             </div>
           </div>
           <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">{completion}%</span>
@@ -120,8 +120,8 @@ const HifzStreaks = ({ streak = 0, isCompletedToday = false, wasActiveYesterday 
           <Trophy className="h-5 w-5 text-amber-500" />
         </div>
         <div className="flex-1">
-          <p className="text-xs font-bold text-foreground">Next Milestone: Golden Warrior</p>
-          <p className="text-[10px] text-slate-400">Reach a 10-day streak to unlock.</p>
+          <p className="text-xs font-bold text-foreground">{t('achievements.next_milestone')}: {streak < 7 ? t('ranks.murabit') : t('ranks.mujahid')}</p>
+          <p className="text-[10px] text-slate-400">{t('achievements.keep_going')}</p>
         </div>
       </div>
     </div>

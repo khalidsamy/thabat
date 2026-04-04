@@ -18,6 +18,8 @@ const Recite = (props) => {
   const { updateUser } = useContext(AuthContext);
   const { showSuccess, showError } = useToast();
   const [targetInput, setTargetInput] = useState(user?.currentTargetSurah || '');
+  const [isChangingTarget, setIsChangingTarget] = useState(false);
+  const [isMindMapOpen, setIsMindMapOpen] = useState(false);
 
   const onTargetSubmit = async (e) => {
     e.preventDefault();

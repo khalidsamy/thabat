@@ -171,9 +171,13 @@ const Dashboard = () => {
     handleSunnahToggle, 
     isTogglingSunnah, 
     handleVoiceComplete: (score, surah) => {
+        // Record 1 page of progress for a successful recitation session
+        setPagesInput('1');
         handleUpdateSubmit();
-        // Background sync for mastery
+        
+        // Background sync for mastery analytics
         api.post('/progress/mastery', { score, surah }).catch(console.error);
+        if (score > 90) showSuccess(t('voice.perfect_match') || 'Perfect recitation! Recorded.');
     },
     refreshData: loadInitialData,
     itemVariants: { 
