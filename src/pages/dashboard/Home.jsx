@@ -15,8 +15,16 @@ const Home = (props) => {
 
   return (
     <div className="space-y-8 pb-32">
-      {/* Recovery Mode (Broken Streak) */}
-      {progress?.streak === 0 && (
+      {progress?.streak === 0 && progress?.totalMemorized === 0 && (
+        <motion.div variants={itemVariants}>
+          <div className="bg-emerald-500/10 border-2 border-emerald-500/20 rounded-[2rem] p-8 text-center mb-8">
+            <h3 className="text-2xl font-bold text-emerald-600 mb-2">{t('streaks.newbie')}</h3>
+            <p className="text-secondary-foreground opacity-70">Start your journey today and build your first streak!</p>
+          </div>
+        </motion.div>
+      )}
+
+      {progress?.streak === 0 && progress?.totalMemorized > 0 && (
         <motion.div variants={itemVariants}>
           <RecoveryCard onStartSmall={() => {
             const el = document.getElementById('pages');
@@ -71,7 +79,7 @@ const Home = (props) => {
             streak={progress?.streak} 
             isCompletedToday={progress?.doneToday >= progress?.dailyTarget} 
             wasActiveYesterday={progress?.streak > 0}
-            currentSurah={progress?.currentTargetSurah || 'Al-Baqarah'}
+            currentSurah={user?.currentTargetSurah || 'Al-Baqarah'}
             completion={progress?.masteryPercent || 0}
             history={progress?.history || []}
           />

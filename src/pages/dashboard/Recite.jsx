@@ -17,8 +17,6 @@ const Recite = (props) => {
   const { progress, user, pagesInput, setPagesInput, handleUpdateSubmit, isUpdating, handleSunnahToggle, isTogglingSunnah, handleVoiceComplete, itemVariants } = { ...context, ...props };
   const { updateUser } = useContext(AuthContext);
   const { showSuccess, showError } = useToast();
-  const [isMindMapOpen, setIsMindMapOpen] = useState(false);
-  const [isChangingTarget, setIsChangingTarget] = useState(false);
   const [targetInput, setTargetInput] = useState(user?.currentTargetSurah || '');
 
   const onTargetSubmit = async (e) => {
@@ -26,9 +24,9 @@ const Recite = (props) => {
     try {
       const res = await api.patch('/user/profile', { currentTargetSurah: targetInput });
       if (res.data.success) {
-        updateUser({ currentTargetSurah: targetInput });
         setIsChangingTarget(false);
         showSuccess(t('dashboard.target_updated') || 'Target Surah updated!');
+        if (props.refreshData) props.refreshData();
       }
     } catch (err) {
       showError(err.message);

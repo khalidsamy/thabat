@@ -60,7 +60,7 @@ const Dashboard = () => {
         ]);
         
         if (progressRes.data.success) setProgress(progressRes.data.progress);
-        if (userRes.data.success) setCurrentUser(userRes.data.user);
+        if (userRes.data.success) setCurrentUser(userRes.data.data || userRes.data.user);
         
         const randomIndex = Math.floor(Math.random() * QURAN_VERSES.length);
         setDailyVerse(QURAN_VERSES[randomIndex]);
@@ -170,7 +170,12 @@ const Dashboard = () => {
     isUpdating,
     handleSunnahToggle, 
     isTogglingSunnah, 
-    handleVoiceComplete: () => handleUpdateSubmit(),
+    handleVoiceComplete: (score, surah) => {
+        handleUpdateSubmit();
+        // Background sync for mastery
+        api.post('/progress/mastery', { score, surah }).catch(console.error);
+    },
+    refreshData: loadInitialData,
     itemVariants: { 
         hidden: { opacity: 0, y: 20 }, 
         visible: { opacity: 1, y: 0 },

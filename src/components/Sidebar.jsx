@@ -1,11 +1,19 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Home, TrendingUp, Mic, MessageCircle, BookOpen, User, Settings, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { AuthContext } from '../context/AuthContext';
 
 const Sidebar = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const navItems = [
     { path: '/dashboard', icon: Home, label: t('nav.home'), exact: true },
@@ -84,7 +92,7 @@ const Sidebar = () => {
         ))}
         
         <button 
-          onClick={() => {/* Logout logic */}}
+          onClick={handleLogout}
           className={`w-full flex items-center gap-4 p-3 rounded-2xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 transition-all duration-300 ${
             i18n.language === 'ar' ? 'flex-row-reverse text-right' : 'flex-row text-left'
           }`}

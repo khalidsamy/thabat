@@ -54,16 +54,24 @@ const Community = (props) => {
   };
 
   const handleAddDua = async (id) => {
+    // Optimistic UI Update
+    setReflections(prev => prev.map(r => 
+      r._id === id ? { 
+        ...r, 
+        duaCount: r.duas?.includes('me') ? r.duaCount : r.duaCount + 1, 
+        duas: [...(r.duas || []), 'me'] 
+      } : r
+    ));
+
     try {
       const response = await api.post(`/community/dua/${id}`);
       if (response.data.success) {
         showSuccess(t('community.prayed'));
-        setReflections(prev => prev.map(r => 
-          r._id === id ? { ...r, duaCount: r.duaCount + 1, duas: [...(r.duas || []), 'me'] } : r
-        ));
       }
     } catch (err) {
+      // Rollback on error
       showError(err.response?.data?.message || err.message);
+      await fetchReflections();
     }
   };
 
@@ -144,7 +152,16 @@ const Community = (props) => {
                           {reflection.userName.charAt(0).toUpperCase()}
                        </div>
                        <span className="text-sm font-black text-foreground opacity-80">{reflection.userName}</span>
-                       <span className="text-[10px] text-slate-400">• {new Date(reflection.createdAt).toLocaleDateString()}</span>
+                        <span className="text-[10px] text-slate-400">• {new Date(reflection.createdAt).toLocaleDateString()}</span>
+                        {new Date() - new Date(reflection.createdAt) < 3600000 && (
+                          <span className="flex items-center gap-1.5 ms-2">
+                             <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                             </span>
+                             <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter">Live</span>
+                          </span>
+                        )}
                     </div>
                     <p className="text-foreground leading-relaxed font-medium">
                       {reflection.content}

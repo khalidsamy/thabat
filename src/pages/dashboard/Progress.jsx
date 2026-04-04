@@ -24,7 +24,7 @@ const Progress = (props) => {
           <div className="h-px flex-1 bg-gradient-to-r from-emerald-500/20 to-transparent ms-4"></div>
         </div>
         <div className="grid grid-cols-1 gap-6">
-          <HifzProgress current={progress?.totalMemorized} total={604} label={t('dashboard.overall_mastery')} />
+          <HifzProgress current={progress?.totalMemorized || 0} total={604} label={t('dashboard.overall_mastery')} />
         </div>
       </motion.section>
 
