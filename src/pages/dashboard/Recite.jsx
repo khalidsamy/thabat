@@ -78,18 +78,29 @@ const Recite = (props) => {
   const handleLog = async () => {
     stopListening();
     try {
-      const res = await api.post('/progress', { 
-        pages: Math.ceil(targetVerses.length / 2), // Approximate
-        surah: surahs.find(s => s.number === selectedSurah)?.name || '',
-        score: masteryScore
+      const surahName = surahs.find(s => s.number === selectedSurah)?.englishName || '';
+      
+      // 1. Log the mastery score to user history
+      await api.post('/progress/mastery', { 
+        score: masteryScore,
+        surah: surahName
       });
-      if (res.data.success) {
-          showSuccess(t('dashboard.progress_logged') || 'Recitation logged successfully!');
-          setShowSummary(true);
-          if (handleVoiceComplete) handleVoiceComplete(transcript);
+
+      // 2. Update the actual progress pages in the tracker
+      const pagesToLog = Math.ceil(targetVerses.length / 2) || 1;
+      await api.post('/progress/update', { 
+        pages: pagesToLog
+      });
+
+      showSuccess(t('dashboard.progress_logged') || 'Recitation mastery logged successfully!');
+      setShowSummary(true);
+      
+      // Update global context/state
+      if (handleVoiceComplete) {
+        handleVoiceComplete(masteryScore, surahName);
       }
     } catch (err) {
-      showError(err.message);
+      showError(err.message || 'Failed to log progress');
     }
   };
 
