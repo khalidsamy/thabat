@@ -1,25 +1,26 @@
+import React from 'react';
+import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 
 const StatCard = ({ title, value, icon, subtitle, className = "", variant = "grid" }) => {
   const isList = variant === "list";
 
   return (
-    <motion.div 
-      whileHover={{ 
-        scale: 1.02, 
+    <motion.div
+      whileHover={{
+        scale: 1.02,
         backgroundColor: "rgba(30, 48, 80, 0.5)",
         transition: { duration: 0.2 }
       }}
       className={`relative group overflow-hidden transition-all duration-300 inner-glow premium-shadow ${
-        isList 
-          ? 'bg-slate-900/60 rounded-[1.5rem] p-4 flex items-center gap-4 border border-white/5' 
+        isList
+          ? 'bg-slate-900/60 rounded-[1.5rem] p-4 flex items-center gap-4 border border-white/5'
           : 'bg-card/40 rounded-3xl p-6 flex flex-col justify-between border border-white/5'
       } ${className}`}
     >
-      {/* Leading Icon for List / Status Icon for Grid */}
       <div className={`flex items-center justify-center shrink-0 transition-all duration-300 ${
-        isList 
-          ? 'w-12 h-12 bg-emerald-500/10 rounded-2xl text-emerald-400 group-hover:bg-emerald-500/20' 
+        isList
+          ? 'w-12 h-12 bg-emerald-500/10 rounded-2xl text-emerald-400 group-hover:bg-emerald-500/20'
           : 'p-3 bg-emerald-500/10 rounded-xl text-emerald-400 border border-emerald-500/20 mb-4 group-hover:shadow-[0_0_20px_rgba(52,211,153,0.2)]'
       }`}>
         {icon && React.cloneElement(icon, { className: isList ? "h-5 w-5" : "h-6 w-6 stroke-[2.5]" })}

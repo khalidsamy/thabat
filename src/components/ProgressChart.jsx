@@ -10,41 +10,34 @@ const ProgressChart = ({ refreshTrigger }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchChartData = async () => {
+    const fetch = async () => {
       try {
         setIsLoading(true);
         setError(null);
-        
-        const response = await api.get('/progress/chart');
-        
-        if (response.data.success) {
-          const chartData = response.data.chart || [];
-          const formattedData = chartData.map(item => {
-            const dateObj = new Date(item.date);
-            return {
+        const res = await api.get('/progress/chart');
+        if (res.data.success) {
+          setData(
+            (res.data.chart || []).map(item => ({
               ...item,
-              displayDate: dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-            };
-          });
-          setData(formattedData);
+              displayDate: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            }))
+          );
         }
-      } catch (err) {
-        console.error('Failed to fetch chart data:', err);
-        setError('Unable to securely load chart data.');
+      } catch {
+        setError('Unable to load chart data.');
       } finally {
         setIsLoading(false);
       }
     };
-
-    fetchChartData();
+    fetch();
   }, [refreshTrigger]);
 
   if (isLoading) {
     return (
-      <div className="bg-card/40 rounded-3xl border border-white/5 p-8 shadow-xl shadow-black/40 h-full flex flex-col items-center justify-center min-h-[400px]">
-        <svg className="animate-spin h-10 w-10 text-emerald-500 opacity-50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      <div className="bg-card/40 rounded-3xl border border-white/5 p-8 shadow-xl shadow-black/40 flex items-center justify-center" style={{ height: 400 }}>
+        <svg className="animate-spin h-10 w-10 text-emerald-500 opacity-50" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
         </svg>
       </div>
     );
@@ -52,67 +45,59 @@ const ProgressChart = ({ refreshTrigger }) => {
 
   if (error) {
     return (
-      <div className="bg-card/40 rounded-3xl border border-white/5 p-8 shadow-xl shadow-black/40 h-full flex flex-col items-center justify-center min-h-[400px]">
+      <div className="bg-card/40 rounded-3xl border border-white/5 p-8 shadow-xl shadow-black/40 flex items-center justify-center" style={{ height: 400 }}>
         <p className="text-sm font-bold text-rose-500">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-card/40 rounded-3xl border border-white/5 p-8 lg:p-10 shadow-xl shadow-black/40 h-full flex flex-col min-h-[450px] transition-all duration-300">
-      <h3 className="text-xl font-black tracking-tight text-foreground mb-8 uppercase tracking-widest">{t('chart.title')}</h3>
-      
-      <div className="flex-1 w-full relative">
+    <div className="bg-card/40 rounded-3xl border border-white/5 p-8 lg:p-10 shadow-xl shadow-black/40">
+      <h3 className="text-xl font-black text-foreground mb-8 uppercase tracking-widest">
+        {t('chart.title')}
+      </h3>
+
+      {/* Fixed pixel height — ResponsiveContainer cannot measure a percentage
+          height from a flex parent that has no explicit size set. */}
+      <div style={{ width: '100%', height: 360 }}>
         {data.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart
-              data={data}
-              margin={{ top: 5, right: 0, left: -20, bottom: 0 }}
-            >
+            <AreaChart data={data} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorPages" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  <stop offset="5%"  stopColor="#10b981" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
-              <XAxis 
-                dataKey="displayDate" 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 12, fill: '#94a3b8' }}
-                dy={10}
+              <XAxis
+                dataKey="displayDate"
+                axisLine={false} tickLine={false}
+                tick={{ fontSize: 12, fill: '#94a3b8' }} dy={10}
               />
-              <YAxis 
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 12, fill: '#94a3b8' }}
-                allowDecimals={false}
+              <YAxis
+                axisLine={false} tickLine={false}
+                tick={{ fontSize: 12, fill: '#94a3b8' }} allowDecimals={false}
               />
-              <Tooltip 
-                contentStyle={{ borderRadius: '8px', border: '1px solid #1e293b', backgroundColor: '#0f172a', color: '#f8fafc', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+              <Tooltip
+                contentStyle={{
+                  borderRadius: '8px', border: '1px solid #1e293b',
+                  backgroundColor: '#0f172a', color: '#f8fafc',
+                  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+                }}
                 cursor={{ stroke: '#334155', strokeWidth: 1, strokeDasharray: '3 3' }}
               />
-              <Area 
-                type="monotone" 
-                dataKey="pages" 
-                name={t('dashboard.pages')}
-                stroke="#10b981" 
-                strokeWidth={3}
-                fillOpacity={1} 
-                fill="url(#colorPages)" 
+              <Area
+                type="monotone" dataKey="pages" name={t('dashboard.pages')}
+                stroke="#10b981" strokeWidth={3}
+                fillOpacity={1} fill="url(#colorPages)"
                 activeDot={{ r: 6, strokeWidth: 0, fill: '#10b981' }}
               />
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
-            <div className="w-16 h-16 bg-emerald-950/20 rounded-full flex items-center justify-center mb-4">
-              <AreaChart className="h-8 w-8 text-emerald-500 opacity-20" />
-            </div>
-            <p className="text-sm font-medium text-slate-500 max-w-[200px]">
-              {t('chart.no_data')}
-            </p>
+          <div className="w-full h-full flex flex-col items-center justify-center text-center p-8">
+            <p className="text-sm font-medium text-slate-500">{t('chart.no_data')}</p>
           </div>
         )}
       </div>

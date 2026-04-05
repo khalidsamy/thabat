@@ -41,28 +41,57 @@ const Dashboard = () => {
   }, []);
 
   const loadInitialData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const [progressRes, userRes] = await Promise.all([
-        api.get('/progress'),
-        api.get('/user/profile'),
-      ]);
-      if (progressRes.data.success) setProgress(progressRes.data.progress);
-      const userData = userRes.data.data || userRes.data.user;
-      if (userRes.data.success && userData) setUser(userData);
-      setDailyVerse(QURAN_VERSES[Math.floor(Math.random() * QURAN_VERSES.length)]);
-      if ('Notification' in window && Notification.permission === 'default') {
-        Notification.requestPermission();
+  setIsLoading(true);
+  try {
+    const [progressResult, userResult] = await Promise.allSettled([
+      api.get('/progress'),
+      api.get('/user/profile'),
+    ]);
+ 
+    // Progress — fall back to an empty defaults object so the UI never crashes
+    if (progressResult.status === 'fulfilled' && progressResult.value.data.success) {
+      setProgress(progressResult.value.data.progress);
+    } else {
+      setProgress({
+        currentPage: 1,
+        totalMemorized: 0,
+        dailyTarget: 1,
+        streak: 0,
+        longestStreak: 0,
+        doneToday: 0,
+        sunnahCompletedToday: false,
+        masteryPercent: 0,
+        history: [],
+      });
+      if (progressResult.status === 'rejected') {
+        console.error('Progress fetch failed:', progressResult.reason?.message);
       }
-    } catch {
-      if (authUser) {
-        setUser(authUser);
-        showError(t('dashboard.fetch_error'));
-      }
-    } finally {
-      setIsLoading(false);
     }
-  }, [t, authUser, showError]);
+ 
+    // User profile — fall back to the cached AuthContext value
+    if (userResult.status === 'fulfilled' && userResult.value.data.success) {
+      const userData = userResult.value.data.data || userResult.value.data.user;
+      if (userData) setUser(userData);
+    } else {
+      if (authUser) setUser(authUser);
+      if (userResult.status === 'rejected') {
+        console.error('Profile fetch failed:', userResult.reason?.message);
+      }
+    }
+ 
+    setDailyVerse(QURAN_VERSES[Math.floor(Math.random() * QURAN_VERSES.length)]);
+ 
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  } catch (err) {
+    // This catch only fires for synchronous errors (e.g. QURAN_VERSES undefined)
+    console.error('loadInitialData unexpected error:', err);
+    if (authUser) setUser(authUser);
+  } finally {
+    setIsLoading(false);
+  }
+}, [t, authUser, showError]);
 
   useEffect(() => { loadInitialData(); }, [loadInitialData]);
 
