@@ -8,6 +8,27 @@ import { useVoiceCorrection } from '../../hooks/useVoiceCorrection';
 import { useToast } from '../../context/ToastContext';
 import api from '../../services/api';
 
+const Waveform = () => (
+  <div className="flex items-center justify-center gap-1.5 h-12">
+    {[...Array(6)].map((_, i) => (
+      <motion.div
+        key={i}
+        animate={{ 
+          height: [10, 40, 15, 30, 10],
+          backgroundColor: ["#10b981", "#34d399", "#059669", "#10b981"]
+        }}
+        transition={{ 
+          duration: 1, 
+          repeat: Infinity, 
+          delay: i * 0.1,
+          ease: "easeInOut" 
+        }}
+        className="w-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+      />
+    ))}
+  </div>
+);
+
 const Recite = (props) => {
   const { t } = useTranslation();
   const context = useOutletContext() || {};
@@ -37,6 +58,13 @@ const Recite = (props) => {
     stopListening, 
     resetCorrection 
   } = useVoiceCorrection(targetVerses);
+
+  const [surahSearch, setSurahSearch] = useState('');
+  
+  const filteredSurahs = surahs.filter(s => 
+    s.englishName.toLowerCase().includes(surahSearch.toLowerCase()) || 
+    s.number.toString().includes(surahSearch)
+  );
 
   useEffect(() => {
     const fetchSurahs = async () => {
@@ -176,16 +204,32 @@ const Recite = (props) => {
                   </div>
 
                   <div className="space-y-6">
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black text-emerald-500/40 uppercase tracking-[0.3em] px-1">Surah Selection</label>
+                    <div className="space-y-2 group">
+                       <label className="text-[10px] font-black text-emerald-500/40 uppercase tracking-[0.3em] px-1 group-focus-within:text-emerald-400 transition-colors">Surah Selection</label>
+                       
+                       {/* SEARCH INPUT */}
+                       <div className="relative mb-2">
+                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                          <input 
+                            type="text"
+                            placeholder="Search surah name or number..."
+                            value={surahSearch}
+                            onChange={(e) => setSurahSearch(e.target.value)}
+                            className="w-full h-12 bg-slate-900/50 border border-white/5 rounded-xl pl-12 pr-4 text-sm font-bold text-foreground focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all"
+                          />
+                       </div>
+
                        <select 
                           value={selectedSurah}
                           onChange={(e) => setSelectedSurah(parseInt(e.target.value))}
                           className="w-full h-14 bg-slate-900 border border-white/5 rounded-2xl px-4 font-bold text-foreground focus:ring-2 focus:ring-emerald-500 transition-all outline-none"
                        >
-                          {surahs.map(s => (
+                          {filteredSurahs.map(s => (
                             <option key={s.number} value={s.number}>{s.number}. {s.englishName}</option>
                           ))}
+                          {filteredSurahs.length === 0 && (
+                            <option disabled>No surahs found</option>
+                          )}
                        </select>
                     </div>
 
@@ -254,8 +298,8 @@ const Recite = (props) => {
                 <div className="bg-card/40 border border-white/5 rounded-[2.5rem] p-10 lg:p-14 shadow-xl shadow-zinc-900/5 flex flex-col items-center justify-between min-h-[750px] relative overflow-hidden group/tutor">
                     
                     <div className="relative w-full flex flex-col items-center mb-8">
-                        <h4 className="text-2xl font-black text-foreground mb-4">Al Quran Tutor</h4>
-                        <div className="flex items-center gap-4">
+                        <h4 className="text-2xl font-black text-foreground mb-4 font-outfit uppercase tracking-widest opacity-80">AI Holy Quran Tutor</h4>
+                        <div className="flex items-center gap-4 mb-6">
                             <div className="px-6 py-2.5 bg-slate-900 border border-white/10 rounded-2xl flex items-center gap-3">
                                 <Volume2 className="h-5 w-5 text-emerald-600" />
                                 <span className="text-sm font-black text-emerald-400 uppercase tracking-widest">
@@ -266,6 +310,20 @@ const Recite = (props) => {
                                 <span className="text-sm font-black text-emerald-600 uppercase tracking-widest">Verses {ayahFrom}-{ayahTo}</span>
                             </div>
                         </div>
+
+                        {/* LIVE WAVELINE INDICATOR */}
+                        <AnimatePresence>
+                            {isListening && (
+                                <motion.div 
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="mb-4"
+                                >
+                                    <Waveform />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
 
                     <div className="w-full bg-slate-900/50 border-2 border-white/5 shadow-inner rounded-3xl p-8 lg:p-12 min-h-[320px] flex flex-wrap items-center justify-center gap-x-6 gap-y-4 text-center relative z-20" dir="rtl">
@@ -275,15 +333,20 @@ const Recite = (props) => {
                                 key={i}
                                 initial={{ opacity: 0.3, scale: 0.95 }}
                                 animate={{ 
-                                    opacity: word.status === 'pending' ? 0.3 : 1, 
-                                    scale: word.status === 'pending' ? 0.95 : 1,
+                                    opacity: word.status === 'pending' ? (i === matches.findIndex(m => m.status === 'pending') ? 0.6 : 0.2) : 1, 
+                                    scale: word.status === 'pending' ? (i === matches.findIndex(m => m.status === 'pending') ? [1, 1.1, 1] : 0.95) : 1,
                                     y: word.status === 'pending' ? 0 : -2
                                 }}
+                                transition={word.status === 'pending' && i === matches.findIndex(m => m.status === 'pending') ? {
+                                    duration: 2,
+                                    repeat: Infinity,
+                                    ease: "easeInOut"
+                                } : { duration: 0.5 }}
                                 className={`text-4xl lg:text-5xl font-quran font-black transition-all duration-500 tracking-tight leading-relaxed ${
                                   word.status === 'correct' ? 'text-emerald-500 drop-shadow-[0_0_12px_rgba(16,185,129,0.3)]' :
                                   word.status === 'wrong' ? 'text-rose-600 drop-shadow-[0_0_12px_rgba(225,29,72,0.3)]' :
-                                  'text-zinc-800'
-                                }`}
+                                  'text-zinc-600'
+                                } ${word.status === 'pending' && i === matches.findIndex(m => m.status === 'pending') ? 'text-emerald-400/60' : ''}`}
                              >
                                {word.text}
                              </motion.span>
