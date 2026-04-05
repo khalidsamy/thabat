@@ -6,22 +6,16 @@ import {
   BookOpen, BookMarked, UserCircle, Plus, X, GitMerge,
 } from 'lucide-react';
 
-// All routes reachable from mobile — kept in sync with Sidebar.jsx
 const NAV_ITEMS = [
-  { path: '/dashboard',                icon: Home,          label: 'الرئيسية',  exact: true },
-  { path: '/dashboard/progress',       icon: TrendingUp,    label: 'التقدم' },
+  { path: '/dashboard',                icon: Home,          label: 'الرئيسية',     exact: true },
   { path: '/dashboard/recite',         icon: Mic,           label: 'تسميع' },
   { path: '/dashboard/review-session', icon: BookOpen,      label: 'المراجعة' },
   { path: '/dashboard/errors',         icon: BookMarked,    label: 'الأخطاء' },
   { path: '/dashboard/mutashabihat',   icon: GitMerge,      label: 'المتشابهات' },
+  { path: '/dashboard/progress',       icon: TrendingUp,    label: 'التقدم' },
   { path: '/dashboard/community',      icon: MessageCircle, label: 'المجتمع' },
   { path: '/dashboard/profile',        icon: UserCircle,    label: 'الملف الشخصي' },
 ];
-
-const itemVariants = {
-  closed: { scale: 0.7, opacity: 0, y: 8 },
-  open:   { scale: 1,   opacity: 1, y: 0  },
-};
 
 const FloatingAssistantMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,40 +23,47 @@ const FloatingAssistantMenu = () => {
 
   return (
     <>
-      {/* Backdrop — tapping outside closes the menu */}
+      {/* Full-screen backdrop */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            key="backdrop"
+            key="fab-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[65] bg-black/50 backdrop-blur-sm md:hidden"
+            transition={{ duration: 0.18 }}
+            className="fixed inset-0 z-[65] md:hidden"
+            style={{ backdropFilter: 'blur(12px)', background: 'rgba(11, 17, 32, 0.75)' }}
             onClick={close}
           />
         )}
       </AnimatePresence>
 
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[70] flex flex-col items-center gap-4 md:hidden">
-        {/* Expanded navigation overlay */}
+      <div className="fixed bottom-7 left-1/2 -translate-x-1/2 z-[70] flex flex-col items-center gap-4 md:hidden">
+        {/* Navigation overlay */}
         <AnimatePresence>
           {isOpen && (
             <motion.nav
-              key="menu"
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              key="fab-menu"
+              initial={{ opacity: 0, y: 16, scale: 0.92 }}
               animate={{ opacity: 1, y: 0,  scale: 1 }}
-              exit={{   opacity: 0, y: 20, scale: 0.95 }}
-              transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-              className="glass-assistive p-3 rounded-[2rem] flex flex-col gap-1 w-56"
+              exit={{   opacity: 0, y: 16, scale: 0.92 }}
+              transition={{ type: 'spring', stiffness: 340, damping: 30 }}
+              className="flex flex-col gap-1 p-3 rounded-[1.75rem] w-52 overflow-hidden"
+              style={{
+                background: 'rgba(15, 22, 40, 0.82)',
+                backdropFilter: 'blur(24px)',
+                WebkitBackdropFilter: 'blur(24px)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                boxShadow: '0 16px 48px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)',
+              }}
             >
               {NAV_ITEMS.map((item, i) => (
                 <motion.div
                   key={item.path}
-                  variants={itemVariants}
-                  initial="closed"
-                  animate="open"
-                  transition={{ delay: i * 0.04 }}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.035, type: 'spring', stiffness: 300 }}
                 >
                   <NavLink
                     to={item.path}
@@ -71,8 +72,8 @@ const FloatingAssistantMenu = () => {
                     className={({ isActive }) =>
                       `flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${
                         isActive
-                          ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20'
-                          : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                          ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/25'
+                          : 'text-zinc-400 hover:text-white hover:bg-white/6'
                       }`
                     }
                   >
@@ -85,27 +86,33 @@ const FloatingAssistantMenu = () => {
           )}
         </AnimatePresence>
 
-        {/* FAB trigger */}
+        {/* FAB button */}
         <motion.button
-          whileHover={{ scale: 1.08 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setIsOpen((v) => !v)}
-          aria-label={isOpen ? 'Close menu' : 'Open menu'}
-          className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl border-2 border-white/15 transition-colors duration-300 relative overflow-hidden ${
-            isOpen
-              ? 'bg-rose-500 shadow-rose-500/40'
-              : 'bg-emerald-500 shadow-emerald-500/40'
-          }`}
+          whileHover={{ scale: 1.07 }}
+          whileTap={{ scale: 0.88 }}
+          onClick={() => setIsOpen(v => !v)}
+          aria-label={isOpen ? 'Close navigation' : 'Open navigation'}
+          className="w-14 h-14 rounded-full flex items-center justify-center border border-white/15 relative overflow-hidden"
+          style={{
+            background: isOpen
+              ? 'linear-gradient(135deg, #f43f5e, #e11d48)'
+              : 'linear-gradient(135deg, #10b981, #059669)',
+            boxShadow: isOpen
+              ? '0 8px 30px rgba(244,63,94,0.45)'
+              : '0 8px 30px rgba(16,185,129,0.45)',
+          }}
         >
-          <motion.div
-            animate={{ scale: [1, 1.5, 1], opacity: [0.25, 0.08, 0.25] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            className={`absolute inset-0 rounded-full ${isOpen ? 'bg-rose-300' : 'bg-emerald-300'}`}
+          {/* Ambient glow ring */}
+          <motion.span
+            animate={{ scale: [1, 1.6, 1], opacity: [0.2, 0.06, 0.2] }}
+            transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute inset-0 rounded-full"
+            style={{ background: isOpen ? '#f43f5e' : '#34d399' }}
           />
           <AnimatePresence mode="wait">
             {isOpen
-              ? <motion.div key="x"    initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}><X    className="h-8 w-8 text-white relative z-10" /></motion.div>
-              : <motion.div key="plus" initial={{ rotate:  90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate:-90, opacity: 0 }} transition={{ duration: 0.15 }}><Plus className="h-8 w-8 text-white relative z-10" /></motion.div>
+              ? <motion.div key="x" initial={{ rotate: -80, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 80, opacity: 0 }} transition={{ duration: 0.14 }}><X    className="h-7 w-7 text-white relative z-10" /></motion.div>
+              : <motion.div key="p" initial={{ rotate:  80, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate:-80, opacity: 0 }} transition={{ duration: 0.14 }}><Plus className="h-7 w-7 text-white relative z-10" /></motion.div>
             }
           </AnimatePresence>
         </motion.button>

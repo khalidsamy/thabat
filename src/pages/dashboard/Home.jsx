@@ -8,14 +8,12 @@ import HifzStreaks from '../../components/HifzStreaks';
 
 const Home = (props) => {
   const context = useOutletContext() || {};
-  const { progress, user, dailyVerse, itemVariants, onVisualize } = {
-    progress: {}, user: {}, ...context, ...props,
-  };
+  const { progress, user, dailyVerse, itemVariants, onVisualize } = { progress: {}, user: {}, ...context, ...props };
 
   return (
     <div className="pb-40">
       <DashboardLayout>
-        {/* Row 1: 8/4 — motivation takes the wide slot, target surah in the sidebar */}
+        {/* Row 1 — 8/4: wide motivation card + compact target tracker */}
         <DashboardLayout.Item cols={8}>
           <DailyMotivationCard dailyVerse={dailyVerse} itemVariants={itemVariants} />
         </DashboardLayout.Item>
@@ -27,7 +25,7 @@ const Home = (props) => {
           />
         </DashboardLayout.Item>
 
-        {/* Row 2: 4/4/4 — three equal metric cards */}
+        {/* Row 2 — 4/4/4: three equal metric cards */}
         <DashboardLayout.Item cols={4}>
           <MemorizedGaugeCard percentage={progress?.masteryPercent || 0} itemVariants={itemVariants} />
         </DashboardLayout.Item>

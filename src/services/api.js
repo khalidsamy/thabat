@@ -1,62 +1,44 @@
 import axios from 'axios';
 
-// Create a unified Axios instance pointing to our environment API URL
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api',
   withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  timeout: 12000,
+  headers: { 'Content-Type': 'application/json' },
 });
 
-// Intercept ANY outgoing request from this instance
-api.interceptors.request.use(
-  (config) => {
-    // 1. Check local storage for the JWT token
-    const token = localStorage.getItem('thabat_token');
-    
-    // 2. If token exists, inject it into the Authorization header natively
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    
-    // Detailed Network Tracer - Outgoing
-    console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, config.data ? config.data : '');
-    
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// Retry a failed request once after a short delay — handles cold Railway starts.
+const retryRequest = (config) =>
+  new Promise(resolve => setTimeout(() => resolve(axios(config)), 2000));
 
-// Intercept ANY incoming response to centrally catch 401 Unauthorized errors
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('thabat_token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // Detailed Network Tracer - Incoming Errors
-    console.error(`[API Error] ${error.response?.status || 'NETWORK_ERROR'}`, error.message, error.response?.data);
+  (res) => res,
+  async (error) => {
+    // Single automatic retry on network timeout or 502/503 (Railway cold start)
+    const status = error.response?.status;
+    const isRetryable = !error.response || status === 502 || status === 503 || status === 504;
+    if (isRetryable && !error.config._retried) {
+      error.config._retried = true;
+      try { return await retryRequest(error.config); } catch (_) {}
+    }
 
-    if (error.response && error.response.status === 401) {
-      // Clear local storage to wipe the bad token
+    if (status === 401) {
       localStorage.removeItem('thabat_token');
-      
-      // Force reload the window to safely bounce them back to the login page via routing
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
-      }
+      if (window.location.pathname !== '/login') window.location.href = '/login';
     }
-    
-    // Centralized Error Normalization
-    // Overriding the default axios error.message to automatically map backend JSON error messages.
-    // This allows components to simply consume `showError(err.message)` globally.
-    if (error.response?.data?.message) {
-      error.message = error.response.data.message;
-    } else if (error.message === 'Network Error') {
-      error.message = 'Unable to connect to the server. Please check your connection.';
-    } else {
-      error.message = 'Something went wrong. Please try again later.';
-    }
+
+    // Normalize error message so components can just call showError(err.message)
+    error.message =
+      error.response?.data?.message ||
+      (error.code === 'ECONNABORTED' ? 'Request timed out — server may be waking up, try again.' :
+      !error.response           ? 'Unable to connect to the server. Please check your connection.' :
+                                  'Something went wrong. Please try again later.');
 
     return Promise.reject(error);
   }
