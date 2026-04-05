@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useOutletContext } from 'react-router-dom';
 import { Mic, MicOff, Search, RotateCcw, Trophy, AlertCircle, Link2, ChevronRight } from 'lucide-react';
 import axios from 'axios';
-import { useSmartRecitation } from '../hooks/useSmartRecitation';
+import { useSmartRecitation } from "../../hooks/useSmartRecitation";
 import { useToast } from '../../context/ToastContext';
 import api from '../../services/api';
 
