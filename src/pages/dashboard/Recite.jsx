@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOutletContext } from 'react-router-dom';
 import { Mic, MicOff, Sparkles, CheckCircle2, ChevronRight, Volume2, Search, Trophy } from 'lucide-react';
