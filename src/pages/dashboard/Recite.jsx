@@ -1,472 +1,414 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOutletContext } from 'react-router-dom';
-import { Mic, MicOff, Sparkles, CheckCircle2, ChevronRight, Volume2, Search, Trophy } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { Mic, MicOff, Search, RotateCcw, Trophy, AlertCircle, Link2, ChevronRight } from 'lucide-react';
 import axios from 'axios';
-import { useVoiceCorrection } from '../../hooks/useVoiceCorrection';
+import { useSmartRecitation } from '../hooks/useSmartRecitation';
 import { useToast } from '../../context/ToastContext';
 import api from '../../services/api';
 
+// Subtle audio cue on error — keeps the experience non-jarring
+const playErrorChime = () => {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(660, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(330, ctx.currentTime + 0.15);
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.25);
+  } catch (_) {}
+};
+
 const Waveform = () => (
-  <div className="flex items-center justify-center gap-1.5 h-12">
-    {[...Array(6)].map((_, i) => (
+  <div className="flex items-center justify-center gap-1 h-8">
+    {[...Array(5)].map((_, i) => (
       <motion.div
         key={i}
-        animate={{ 
-          height: [10, 40, 15, 30, 10],
-          backgroundColor: ["#10b981", "#34d399", "#059669", "#10b981"]
-        }}
-        transition={{ 
-          duration: 1, 
-          repeat: Infinity, 
-          delay: i * 0.1,
-          ease: "easeInOut" 
-        }}
-        className="w-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+        animate={{ height: [6, 28, 10, 22, 6] }}
+        transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.12, ease: 'easeInOut' }}
+        className="w-1 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]"
       />
     ))}
   </div>
 );
 
-const Recite = (props) => {
-  const { t } = useTranslation();
-  const context = useOutletContext() || {};
-  const { progress, user, handleVoiceComplete, itemVariants } = { 
-    progress: {}, 
-    user: {}, 
-    ...context, 
-    ...props 
+// Word block rendered inside the verse display area
+const WordChip = ({ word, isNext }) => {
+  const colorMap = {
+    correct: 'text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.4)]',
+    error:   'text-rose-400 drop-shadow-[0_0_10px_rgba(251,113,133,0.4)]',
+    pending: isNext ? 'text-zinc-300' : 'text-zinc-600',
   };
+
+  return (
+    <motion.span
+      layout
+      animate={isNext ? { opacity: [0.5, 1, 0.5] } : {}}
+      transition={isNext ? { duration: 2, repeat: Infinity, ease: 'easeInOut' } : {}}
+      className={`font-quran text-3xl leading-loose tracking-wide transition-colors duration-300 ${colorMap[word.status]}`}
+    >
+      {word.text}
+    </motion.span>
+  );
+};
+
+const Recite = (props) => {
+  const context = useOutletContext() || {};
+  const { handleVoiceComplete } = { ...context, ...props };
   const { showSuccess, showError } = useToast();
 
   const [surahs, setSurahs] = useState([]);
+  const [surahSearch, setSurahSearch] = useState('');
   const [selectedSurah, setSelectedSurah] = useState(1);
   const [ayahFrom, setAyahFrom] = useState(1);
-  const [ayahTo, setAyahTo] = useState(7);
+  const [ayahTo, setAyahTo] = useState(5);
   const [targetVerses, setTargetVerses] = useState([]);
+  const [previousVerse, setPreviousVerse] = useState(null);
   const [isLoadingVerses, setIsLoadingVerses] = useState(false);
-  const [showSummary, setShowSummary] = useState(false);
+  const [sessionDone, setSessionDone] = useState(false);
 
-  const { 
-    isListening, 
-    transcript, 
-    matches, 
-    masteryScore, 
-    error, 
-    startListening, 
-    stopListening, 
-    resetCorrection 
-  } = useVoiceCorrection(targetVerses);
-
-  const [surahSearch, setSurahSearch] = useState('');
-  
-  const filteredSurahs = surahs.filter(s => 
-    s.englishName.toLowerCase().includes(surahSearch.toLowerCase()) || 
-    s.number.toString().includes(surahSearch)
-  );
-
-  useEffect(() => {
-    const fetchSurahs = async () => {
-      try {
-        const res = await axios.get('https://api.alquran.cloud/v1/surah');
-        setSurahs(res.data.data);
-      } catch (err) {
-        showError('Failed to fetch Surah list');
-      }
-    };
-    fetchSurahs();
+  const handleError = useCallback((word) => {
+    playErrorChime();
+    showError(`خطأ: "${word}" — اضغط استئناف للمتابعة`);
   }, [showError]);
 
-  const loadTargetVerses = async () => {
+  const {
+    phase, words, masteryScore, errorWord, linkWord,
+    recognitionError, isActive,
+    startSession, stopSession, resumeFromError, resetSession,
+  } = useSmartRecitation({ targetVerses, previousVerseText: previousVerse?.text, onError: handleError });
+
+  useEffect(() => {
+    axios.get('https://api.alquran.cloud/v1/surah')
+      .then((r) => setSurahs(r.data.data))
+      .catch(() => showError('Failed to load surah list'));
+  }, [showError]);
+
+  const filteredSurahs = useMemo(
+    () => surahs.filter((s) =>
+      s.englishName.toLowerCase().includes(surahSearch.toLowerCase()) ||
+      s.number.toString().includes(surahSearch)
+    ),
+    [surahs, surahSearch]
+  );
+
+  const loadVerses = async () => {
     setIsLoadingVerses(true);
     try {
-      const verses = [];
+      const fetched = [];
       for (let i = ayahFrom; i <= ayahTo; i++) {
-        const res = await axios.get(`https://api.alquran.cloud/v1/ayah/${selectedSurah}:${i}/quran-uthmani`);
-        verses.push({
-          numberInSurah: i,
-          text: res.data.data.text,
-          surah: res.data.data.surah.name
-        });
+        const r = await axios.get(`https://api.alquran.cloud/v1/ayah/${selectedSurah}:${i}/quran-uthmani`);
+        fetched.push({ numberInSurah: i, text: r.data.data.text, surah: r.data.data.surah });
       }
-      setTargetVerses(verses);
-      resetCorrection();
-    } catch (err) {
-      showError('Failed to fetch specific verses');
+
+      // Fetch the verse before the range for الربط (verse linking)
+      if (ayahFrom > 1) {
+        const prevR = await axios.get(`https://api.alquran.cloud/v1/ayah/${selectedSurah}:${ayahFrom - 1}/quran-uthmani`);
+        setPreviousVerse({ text: prevR.data.data.text, numberInSurah: ayahFrom - 1 });
+      } else {
+        setPreviousVerse(null);
+      }
+
+      setTargetVerses(fetched);
+      resetSession();
+      setSessionDone(false);
+    } catch {
+      showError('Failed to fetch verses from API');
     } finally {
       setIsLoadingVerses(false);
     }
   };
 
-  const playErrorChime = useCallback(() => {
+  const handleEndSession = async () => {
+    stopSession();
+    const surahData = surahs.find((s) => s.number === selectedSurah);
+    const surahName = surahData?.name || surahData?.englishName || '';
+
     try {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
+      await api.post('/progress/mastery', { score: masteryScore, surah: surahName });
+      await api.post('/progress/update', { pages: Math.max(1, Math.ceil(targetVerses.length / 2)) });
 
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.1);
+      // Log each error word to the Error Book with the correct schema format
+      const errorWords = words.filter((w) => w.status === 'error');
+      const uniqueErrors = [...new Set(errorWords.map((w) => w.text))];
 
-      gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.01);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-
-      oscillator.start();
-      oscillator.stop(audioCtx.currentTime + 0.2);
-    } catch (e) {
-      console.error('Audio chime failed', e);
-    }
-  }, []);
-
-  const handleRecitationError = useCallback((word) => {
-    // 1. Physical Haptic Feedback (Compatibility Check)
-    if ("vibrate" in navigator) {
-      navigator.vibrate([200, 100, 200]);
-    }
-
-    // 2. Audible subtle cue
-    playErrorChime();
-
-    // 3. Professional Visual Alert (Arabic)
-    showError("خطأ في التلاوة، يرجى إعادة الآية");
-  }, [showError, playErrorChime]);
-
-  const handleLog = async () => {
-    stopListening();
-    try {
-      const surahName = surahs.find(s => s.number === selectedSurah)?.englishName || '';
-      
-      await api.post('/progress/mastery', { 
-        score: masteryScore,
-        surah: surahName
-      });
-
-      const pagesToLog = Math.ceil(targetVerses.length / 2) || 1;
-      await api.post('/progress/update', { 
-        pages: pagesToLog
-      });
-
-      const wrongWords = matches.filter(m => m.status === 'wrong');
-      if (wrongWords.length > 0) {
-        const uniqueWrongTexts = [...new Set(wrongWords.map(m => m.text))];
-        
-        for (const wordText of uniqueWrongTexts) {
-            await api.post('/errors', {
-                surah: surahName,
-                verse: ayahFrom,
-                wrongText: wordText,
-                correctText: wordText,
-                type: 'pronunciation',
-                note: `Automatically logged during AI Recitation session (${masteryScore}% accuracy)`
-            }).catch(err => console.error("Failed to log error:", err));
-        }
+      for (const word of uniqueErrors) {
+        await api.post('/errors', {
+          location: {
+            surahNumber: selectedSurah,
+            surahName,
+            ayahNumber: ayahFrom,
+          },
+          errorType: 'wrong_word',
+          note: `كلمة "${word}" — مسجلة تلقائياً (دقة: ${masteryScore}%)`,
+          ayahText: targetVerses[0]?.text,
+        }).catch(() => {});
       }
 
-      showSuccess(t('dashboard.progress_logged') || 'Recitation mastery logged successfully!');
-      setShowSummary(true);
-      
-      if (handleVoiceComplete) {
-        handleVoiceComplete(masteryScore, surahName);
-      }
-    } catch (err) {
-      showError(err.message || 'Failed to log progress');
+      showSuccess('تم تسجيل جلسة التلاوة بنجاح');
+      setSessionDone(true);
+      handleVoiceComplete?.(masteryScore, surahName);
+    } catch {
+      showError('Failed to save session');
     }
   };
 
+  const nextWordIndex = words.findIndex((w) => w.status === 'pending');
+
+  if (sessionDone) {
+    const errorCount = words.filter((w) => w.status === 'error').length;
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 pb-32">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="max-w-lg w-full bg-card/50 border border-white/5 rounded-3xl p-12 text-center shadow-2xl"
+        >
+          <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Trophy className="h-10 w-10 text-emerald-400" />
+          </div>
+          <h2 className="text-4xl font-black text-foreground mb-2">اللهم بارك!</h2>
+          <p className="text-zinc-500 mb-8">تم تسجيل الجلسة في سجل التقدم</p>
+
+          <div className="grid grid-cols-2 gap-4 mb-8">
+            <div className="bg-slate-900/60 rounded-2xl p-6 border border-white/5">
+              <p className="text-xs font-black text-emerald-500/40 uppercase tracking-widest mb-1">الإتقان</p>
+              <p className="text-4xl font-black text-emerald-400">{masteryScore}%</p>
+            </div>
+            <div className="bg-slate-900/60 rounded-2xl p-6 border border-white/5">
+              <p className="text-xs font-black text-rose-500/40 uppercase tracking-widest mb-1">أخطاء</p>
+              <p className="text-4xl font-black text-rose-400">{errorCount}</p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => { setSessionDone(false); resetSession(); }}
+            className="w-full h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl font-black flex items-center justify-center gap-2 transition-all active:scale-95"
+          >
+            <RotateCcw className="h-5 w-5" /> جلسة جديدة
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
-    <div className="pb-40 animate-fade-in bg-background min-h-screen">
-      <div className="max-w-[1600px] mx-auto px-4 lg:px-12 pt-8">
-        
-        <AnimatePresence mode="wait">
-          {!showSummary ? (
-            <motion.div 
-              key="tutor-main"
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10"
-            >
-              {/* STEP 1: TARGET RANGE SELECTION */}
-              <div className="lg:col-span-4 space-y-8">
-                <div className="bg-card/40 border border-white/5 rounded-3xl p-8 shadow-xl shadow-black/5 animate-slide-in">
-                  <div className="flex items-center gap-3 mb-8">
-                    <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-400">
-                      <Search className="h-6 w-6" />
-                    </div>
-                    <h3 className="text-xl font-black tracking-tight text-foreground">
-                      Target Range
-                    </h3>
-                  </div>
+    <div className="pb-40">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
 
-                  <div className="space-y-6">
-                    <div className="space-y-2 group">
-                       <label className="text-[10px] font-black text-emerald-500/40 uppercase tracking-[0.3em] px-1 group-focus-within:text-emerald-400 transition-colors">Surah Selection</label>
-                       
-                       {/* SEARCH INPUT */}
-                       <div className="relative mb-2">
-                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
-                          <input 
-                            type="text"
-                            placeholder="Search surah name or number..."
-                            value={surahSearch}
-                            onChange={(e) => setSurahSearch(e.target.value)}
-                            className="w-full h-12 bg-slate-900/50 border border-white/5 rounded-xl pl-12 pr-4 text-sm font-bold text-foreground focus:ring-2 focus:ring-emerald-500/50 outline-none transition-all"
-                          />
-                       </div>
+        {/* ── Selector Panel ─────────────────────────────────────────────── */}
+        <div className="lg:col-span-4 space-y-5">
+          <div className="bg-card/40 border border-white/5 rounded-3xl p-6 shadow-xl">
+            <h3 className="text-base font-black text-foreground uppercase tracking-widest mb-5 flex items-center gap-2">
+              <Search className="h-4 w-4 text-emerald-400" /> النطاق المستهدف
+            </h3>
 
-                       <select 
-                          value={selectedSurah}
-                          onChange={(e) => setSelectedSurah(parseInt(e.target.value))}
-                          className="w-full h-14 bg-slate-900 border border-white/5 rounded-2xl px-4 font-bold text-foreground focus:ring-2 focus:ring-emerald-500 transition-all outline-none"
-                       >
-                          {filteredSurahs.map(s => (
-                            <option key={s.number} value={s.number}>{s.number}. {s.englishName}</option>
-                          ))}
-                          {filteredSurahs.length === 0 && (
-                            <option disabled>No surahs found</option>
-                          )}
-                       </select>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                       <div className="space-y-2">
-                          <label className="text-[10px] font-black text-emerald-500/40 uppercase tracking-[0.3em] px-1">From Ayah</label>
-                          <input 
-                            type="number"
-                            min="1"
-                            value={ayahFrom}
-                            onChange={(e) => setAyahFrom(parseInt(e.target.value))}
-                            className="w-full h-14 bg-slate-900 border border-white/5 rounded-2xl px-4 font-bold text-foreground focus:ring-2 focus:ring-emerald-500 outline-none"
-                          />
-                       </div>
-                       <div className="space-y-2">
-                          <label className="text-[10px] font-black text-emerald-500/40 uppercase tracking-[0.3em] px-1">To Ayah</label>
-                          <input 
-                            type="number"
-                            min="1"
-                            value={ayahTo}
-                            onChange={(e) => setAyahTo(parseInt(e.target.value))}
-                            className="w-full h-14 bg-slate-900 border border-white/5 rounded-2xl px-4 font-bold text-foreground focus:ring-2 focus:ring-emerald-500 outline-none"
-                          />
-                       </div>
-                    </div>
-
-                    <button 
-                      onClick={loadTargetVerses}
-                      disabled={isLoadingVerses}
-                      className="w-full bg-emerald-500 hover:bg-emerald-600 text-white h-16 rounded-3xl font-black shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-3 active:scale-95 transition-all disabled:opacity-50"
-                    >
-                      {isLoadingVerses ? (
-                         <div className="h-6 w-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      ) : (
-                        <>
-                          <span>Pre-load Range</span>
-                          <ChevronRight className="h-5 w-5" />
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Live Accuracy Metric */}
-                <div className="bg-gradient-to-br from-emerald-900 to-emerald-950 rounded-3xl p-8 shadow-2xl shadow-emerald-900/10 border border-white/10 text-white overflow-hidden relative group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-1000"></div>
-                    <div className="relative">
-                        <span className="text-[10px] font-black text-emerald-100/40 uppercase tracking-[0.4em] mb-1 block">Recitation Mastery</span>
-                        <div className="flex items-end gap-3 mb-6">
-                            <span className="text-5xl font-black tracking-tighter">{masteryScore}%</span>
-                        </div>
-                        <div className="h-3 w-full bg-black/20 rounded-full overflow-hidden border border-white/5">
-                            <motion.div 
-                                initial={{ width: 0 }}
-                                animate={{ width: `${masteryScore}%` }}
-                                className="h-full bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)]"
-                                transition={{ duration: 0.5 }}
-                            />
-                        </div>
-                    </div>
-                </div>
-              </div>
-
-              {/* STEP 2 & 3: CONTINUOUS AI RECITER */}
-              <div className="lg:col-span-8 space-y-8">
-                <div className="bg-card/40 border border-white/5 rounded-[2.5rem] p-10 lg:p-14 shadow-xl shadow-zinc-900/5 flex flex-col items-center justify-between min-h-[750px] relative overflow-hidden group/tutor">
-                    
-                    <div className="relative w-full flex flex-col items-center mb-8">
-                        <h4 className="text-2xl font-black text-foreground mb-4 font-outfit uppercase tracking-widest opacity-80">AI Holy Quran Tutor</h4>
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="px-6 py-2.5 bg-slate-900 border border-white/10 rounded-2xl flex items-center gap-3">
-                                <Volume2 className="h-5 w-5 text-emerald-600" />
-                                <span className="text-sm font-black text-emerald-400 uppercase tracking-widest">
-                                  {surahs.find(s => s.number === selectedSurah)?.englishName || "Surah Selection"}
-                                </span>
-                            </div>
-                            <div className="px-6 py-2.5 bg-emerald-500/20 border border-emerald-500/20 rounded-2xl">
-                                <span className="text-sm font-black text-emerald-600 uppercase tracking-widest">Verses {ayahFrom}-{ayahTo}</span>
-                            </div>
-                        </div>
-
-                        {/* LIVE WAVELINE INDICATOR */}
-                        <AnimatePresence>
-                            {isListening && (
-                                <motion.div 
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    className="mb-4"
-                                >
-                                    <Waveform />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                    <div className="w-full bg-slate-900/50 border-2 border-white/5 shadow-inner rounded-3xl p-8 lg:p-12 min-h-[320px] flex flex-wrap items-center justify-center gap-x-6 gap-y-4 text-center relative z-20" dir="rtl">
-                        {targetVerses.length > 0 ? (
-                           matches.map((word, i) => (
-                             <motion.span 
-                                key={i}
-                                initial={{ opacity: 0.3, scale: 0.95 }}
-                                animate={{ 
-                                    opacity: word.status === 'pending' ? (i === matches.findIndex(m => m.status === 'pending') ? 0.6 : 0.2) : 1, 
-                                    scale: word.status === 'pending' ? (i === matches.findIndex(m => m.status === 'pending') ? [1, 1.1, 1] : 0.95) : 1,
-                                    y: word.status === 'pending' ? 0 : -2
-                                }}
-                                transition={word.status === 'pending' && i === matches.findIndex(m => m.status === 'pending') ? {
-                                    duration: 2,
-                                    repeat: Infinity,
-                                    ease: "easeInOut"
-                                } : { duration: 0.5 }}
-                                className={`text-4xl lg:text-5xl font-quran font-black transition-all duration-500 tracking-tight leading-relaxed ${
-                                  word.status === 'correct' ? 'text-emerald-500 drop-shadow-[0_0_12px_rgba(16,185,129,0.3)]' :
-                                  word.status === 'wrong' ? 'text-rose-600 drop-shadow-[0_0_12px_rgba(225,29,72,0.3)]' :
-                                  'text-zinc-600'
-                                } ${word.status === 'pending' && i === matches.findIndex(m => m.status === 'pending') ? 'text-emerald-400/60' : ''}`}
-                             >
-                               {word.text}
-                             </motion.span>
-                           ))
-                        ) : (
-                          <div className="flex flex-col items-center gap-4 py-10 opacity-40">
-                              <Sparkles className="h-10 w-10 text-emerald-500" />
-                              <p className="text-foreground font-black italic text-2xl uppercase tracking-widest" dir="ltr">Range Not Loaded</p>
-                          </div>
-                        )}
-                    </div>
-
-                    <div className="relative flex flex-col items-center gap-6 mt-12 mb-8">
-                        <AnimatePresence>
-                            {isListening && (
-                                <motion.div 
-                                    initial={{ scale: 0.8, opacity: 0 }}
-                                    animate={{ 
-                                        scale: [1, 2.5, 3.5], 
-                                        opacity: [0.1, 0.05, 0] 
-                                    }}
-                                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
-                                    className="absolute inset-0 bg-emerald-500 rounded-full blur-[80px]"
-                                />
-                            )}
-                        </AnimatePresence>
-
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={isListening ? stopListening : () => startListening(handleRecitationError)}
-                            className={`w-44 h-44 lg:w-52 lg:h-52 rounded-full flex items-center justify-center text-white shadow-2xl transition-all duration-700 relative z-30 ring-[15px] ${
-                                isListening 
-                                    ? 'bg-rose-600 shadow-rose-600/40 ring-rose-500/5' 
-                                    : 'bg-emerald-500 shadow-emerald-500/30 ring-emerald-500/5 hover:shadow-emerald-500/50'
-                            }`}
-                        >
-                            {isListening ? (
-                                <div className="flex flex-col items-center">
-                                    <MicOff className="h-16 w-16 lg:h-20 lg:w-20 mb-2" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">Stop Session</span>
-                                </div>
-                            ) : (
-                                <div className="flex flex-col items-center">
-                                    <Mic className="h-16 w-16 lg:h-20 lg:w-20 mb-2" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">Start Reciting</span>
-                                </div>
-                            )}
-                        </motion.button>
-                        
-                        <p className="text-zinc-400 font-bold text-xs uppercase tracking-[0.2em]">{isListening ? 'Stream Active' : 'Tap to Start AI'}</p>
-                    </div>
-
-                    <div className="w-full flex justify-center py-6">
-                        {targetVerses.length > 0 && masteryScore > 0 && !isListening && (
-                            <motion.button
-                                initial={{ y: 20, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                onClick={handleLog}
-                                className="px-12 py-6 bg-white text-zinc-950 rounded-3xl font-black text-sm uppercase tracking-[0.3em] shadow-2xl shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-4"
-                            >
-                                <Sparkles className="h-6 w-6 text-emerald-400" />
-                                <span>Analyze & End Session</span>
-                            </motion.button>
-                        )}
-                    </div>
-                </div>
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div 
-               key="tutor-summary"
-               initial={{ opacity: 0, scale: 0.95 }}
-               animate={{ opacity: 1, scale: 1 }}
-               className="max-w-2xl mx-auto bg-card/40 rounded-[3rem] p-12 lg:p-16 text-center shadow-2xl border border-white/5 relative overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/5 rounded-full -mr-40 -mt-40 blur-3xl"></div>
-              
-              <div className="w-28 h-28 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner relative">
-                <Trophy className="h-14 w-14 text-emerald-500" />
-                <motion.div 
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="absolute inset-0 rounded-full border-2 border-emerald-500/20"
+            <div className="space-y-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <input
+                  type="text"
+                  placeholder="ابحث عن السورة..."
+                  value={surahSearch}
+                  onChange={(e) => setSurahSearch(e.target.value)}
+                  className="w-full h-11 bg-slate-900/60 border border-white/5 rounded-xl pl-10 pr-3 text-sm text-foreground focus:ring-2 focus:ring-emerald-500/40 outline-none"
+                  dir="rtl"
                 />
               </div>
 
-              <h2 className="text-5xl font-black text-foreground tracking-tighter mb-4">Allahuma Barik!</h2>
-              <p className="text-xl text-zinc-500 font-medium mb-12">Recitation complete. Your effort has been logged to your progress history.</p>
-              
-              <div className="grid grid-cols-2 gap-8 mb-12">
-                  <div className="bg-slate-900/50 p-8 rounded-3xl border border-white/5 shadow-inner">
-                      <span className="text-[10px] font-black text-emerald-600/40 uppercase tracking-widest block mb-1 px-1">Mastery Score</span>
-                      <span className="text-5xl font-black text-emerald-600">{masteryScore}%</span>
+              <select
+                value={selectedSurah}
+                onChange={(e) => setSelectedSurah(parseInt(e.target.value))}
+                className="w-full h-12 bg-slate-900/60 border border-white/5 rounded-xl px-3 font-bold text-foreground focus:ring-2 focus:ring-emerald-500/40 outline-none"
+              >
+                {filteredSurahs.map((s) => (
+                  <option key={s.number} value={s.number}>{s.number}. {s.englishName}</option>
+                ))}
+              </select>
+
+              <div className="grid grid-cols-2 gap-3">
+                {[['من آية', ayahFrom, setAyahFrom], ['إلى آية', ayahTo, setAyahTo]].map(([label, val, setter]) => (
+                  <div key={label}>
+                    <label className="text-[10px] font-black text-emerald-500/50 uppercase tracking-widest px-1 block mb-1">{label}</label>
+                    <input
+                      type="number" min="1" value={val}
+                      onChange={(e) => setter(parseInt(e.target.value) || 1)}
+                      className="w-full h-11 bg-slate-900/60 border border-white/5 rounded-xl px-3 font-bold text-foreground focus:ring-2 focus:ring-emerald-500/40 outline-none text-center"
+                    />
                   </div>
-                  <div className="bg-slate-900/50 p-8 rounded-3xl border border-white/5 shadow-inner">
-                      <span className="text-[10px] font-black text-rose-600/40 uppercase tracking-widest block mb-1 px-1">Mistakes Found</span>
-                      <span className="text-5xl font-black text-rose-600">{matches.filter(m => m.status === 'wrong').length}</span>
-                  </div>
+                ))}
               </div>
 
-              <div className="space-y-4">
-                  <button 
-                    onClick={() => setShowSummary(false)}
-                    className="w-full h-20 bg-white text-zinc-950 rounded-3xl font-black text-lg shadow-2xl shadow-emerald-500/30 hover:bg-slate-100 transition-all active:scale-95 flex items-center justify-center gap-3"
-                  >
-                    <span>Log to Streak</span>
-                    <ChevronRight className="h-6 w-6" />
-                  </button>
-                  <button 
-                    onClick={() => window.location.href = '/dashboard/errors'}
-                    className="w-full text-zinc-400 font-bold py-4 hover:text-rose-500 transition-all text-sm uppercase tracking-widest"
-                  >
-                    View in Error Book
-                  </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <button
+                onClick={loadVerses}
+                disabled={isLoadingVerses}
+                className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white rounded-2xl font-black flex items-center justify-center gap-2 transition-all active:scale-95"
+              >
+                {isLoadingVerses
+                  ? <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  : <><span>تحميل الآيات</span><ChevronRight className="h-4 w-4" /></>}
+              </button>
+            </div>
+          </div>
 
+          {/* Mastery score */}
+          <div className="bg-slate-900/80 border border-white/5 rounded-3xl p-6">
+            <p className="text-[10px] font-black text-emerald-500/40 uppercase tracking-widest mb-1">دقة التلاوة</p>
+            <p className="text-5xl font-black text-emerald-400 mb-3">{masteryScore}%</p>
+            <div className="h-2 bg-black/30 rounded-full overflow-hidden">
+              <motion.div
+                animate={{ width: `${masteryScore}%` }}
+                transition={{ duration: 0.4 }}
+                className="h-full bg-emerald-500 rounded-full"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* ── Recitation Engine ──────────────────────────────────────────── */}
+        <div className="lg:col-span-8">
+          <div className="bg-card/40 border border-white/5 rounded-3xl p-6 lg:p-10 min-h-[600px] flex flex-col gap-6">
+
+            {/* Verse linking banner — الربط */}
+            <AnimatePresence>
+              {phase === 'linking' && linkWord && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="flex items-center gap-3 bg-amber-950/40 border border-amber-500/30 rounded-2xl px-5 py-4"
+                >
+                  <Link2 className="h-5 w-5 text-amber-400 shrink-0" />
+                  <div>
+                    <p className="text-xs font-black text-amber-400/60 uppercase tracking-widest">الربط — ابدأ بقول</p>
+                    <p className="text-2xl font-quran text-amber-200 mt-0.5">{linkWord}</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Error pause banner */}
+            <AnimatePresence>
+              {phase === 'paused_error' && errorWord && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center justify-between gap-4 bg-rose-950/40 border border-rose-500/30 rounded-2xl px-5 py-4"
+                >
+                  <div className="flex items-center gap-3">
+                    <AlertCircle className="h-5 w-5 text-rose-400 shrink-0" />
+                    <div>
+                      <p className="text-xs font-black text-rose-400/60 uppercase tracking-widest">توقف عند</p>
+                      <p className="text-xl font-quran text-rose-200 mt-0.5">{errorWord.text}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={resumeFromError}
+                    className="shrink-0 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-black rounded-xl transition-all active:scale-95"
+                  >
+                    استئناف
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Verse word display */}
+            <div
+              className="flex-1 min-h-[280px] bg-slate-900/40 border border-white/5 rounded-2xl p-6 lg:p-8 flex flex-wrap content-center justify-center gap-x-4 gap-y-2"
+              dir="rtl"
+            >
+              {targetVerses.length > 0 ? (
+                words.map((word, i) => (
+                  <WordChip key={i} word={word} isNext={i === nextWordIndex && isActive} />
+                ))
+              ) : (
+                <p className="text-zinc-600 font-bold text-sm" dir="ltr">
+                  Load a verse range to begin
+                </p>
+              )}
+            </div>
+
+            {/* Waveform */}
+            <AnimatePresence>
+              {isActive && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex justify-center"
+                >
+                  <Waveform />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {recognitionError && (
+              <p className="text-xs text-rose-400 text-center font-bold">{recognitionError}</p>
+            )}
+
+            {/* Mic button */}
+            <div className="flex flex-col items-center gap-4">
+              {phase === 'paused_error' ? null : (
+                <motion.button
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.93 }}
+                  onClick={isActive ? stopSession : startSession}
+                  disabled={targetVerses.length === 0}
+                  className={`w-32 h-32 rounded-full flex flex-col items-center justify-center text-white shadow-2xl transition-all duration-500 relative ring-[12px] disabled:opacity-40 ${
+                    isActive
+                      ? 'bg-rose-500 shadow-rose-500/30 ring-rose-500/10'
+                      : 'bg-emerald-500 shadow-emerald-500/30 ring-emerald-500/10'
+                  }`}
+                >
+                  <AnimatePresence mode="wait">
+                    {isActive ? (
+                      <motion.div key="stop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center">
+                        <MicOff className="h-10 w-10 mb-1" />
+                        <span className="text-[9px] font-black uppercase tracking-widest">إيقاف</span>
+                      </motion.div>
+                    ) : (
+                      <motion.div key="start" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center">
+                        <Mic className="h-10 w-10 mb-1" />
+                        <span className="text-[9px] font-black uppercase tracking-widest">ابدأ</span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.button>
+              )}
+
+              <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest">
+                {phase === 'idle'     && 'اضغط للبدء'}
+                {phase === 'linking'  && 'الربط — قل الكلمة الأخيرة'}
+                {phase === 'reciting' && 'استمر بالتلاوة'}
+                {phase === 'paused_error' && 'صحّح ثم اضغط استئناف'}
+                {phase === 'complete' && 'اكتملت التلاوة!'}
+              </p>
+            </div>
+
+            {/* End session — shown only when there's a meaningful score */}
+            <AnimatePresence>
+              {masteryScore > 0 && !isActive && phase !== 'paused_error' && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex justify-center">
+                  <button
+                    onClick={handleEndSession}
+                    className="px-8 py-4 bg-white text-zinc-950 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl hover:bg-slate-100 active:scale-95 transition-all flex items-center gap-3"
+                  >
+                    <Trophy className="h-5 w-5 text-emerald-500" />
+                    إنهاء وتسجيل الجلسة
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
     </div>
   );
