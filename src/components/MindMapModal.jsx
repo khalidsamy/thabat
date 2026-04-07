@@ -1,148 +1,251 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, BookOpen, Layers, Type, Globe } from 'lucide-react';
+import { X, Sparkles, Target, Info, ChevronRight, Layout } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { fetchSurahMetadata, isAbortedRequest } from '../services/quranApi';
+import { getSurahTheme } from '../utils/surahThemes';
+
+const Node = ({ x, y, label, subLabel, isCenter, delay = 0, isArabic }) => (
+  <motion.g
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ delay, duration: 0.5, type: 'spring' }}
+  >
+    {/* Glow Effect */}
+    <circle cx={x} cy={y} r={isCenter ? 55 : 35} fill={isCenter ? 'url(#centerGlow)' : 'url(#nodeGlow)'} className="opacity-40" />
+    
+    {/* Node Body */}
+    <rect
+      x={x - (isCenter ? 80 : 60)}
+      y={y - (isCenter ? 35 : 25)}
+      width={isCenter ? 160 : 120}
+      height={isCenter ? 70 : 50}
+      rx={isCenter ? 20 : 14}
+      className={`${isCenter ? 'fill-emerald-500 shadow-xl' : 'fill-[#18181b] border border-white/10'} shadow-2xl transition-all hover:brightness-110`}
+      style={{ filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.3))' }}
+    />
+
+    {/* Text */}
+    <text
+      x={x}
+      y={y - (subLabel ? 5 : 0)}
+      textAnchor="middle"
+      alignmentBaseline="middle"
+      className={`${isCenter ? 'fill-white font-black' : 'fill-emerald-400 font-bold'} text-[12px] sm:text-[14px]`}
+      dir={isArabic ? 'rtl' : 'ltr'}
+    >
+      {label}
+    </text>
+    {subLabel && (
+      <text
+        x={x}
+        y={y + 15}
+        textAnchor="middle"
+        alignmentBaseline="middle"
+        className={`${isCenter ? 'fill-emerald-100/70' : 'fill-white/40'} text-[9px] font-bold uppercase tracking-widest`}
+      >
+        {subLabel}
+      </text>
+    )}
+  </motion.g>
+);
+
+const Connection = ({ x1, y1, x2, y2, delay = 0 }) => {
+  const midX = (x1 + x2) / 2;
+  const pathData = `M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`;
+  
+  return (
+    <motion.path
+      d={pathData}
+      fill="none"
+      stroke="url(#lineGradient)"
+      strokeWidth="2"
+      strokeDasharray="1000"
+      initial={{ strokeDashoffset: 1000 }}
+      animate={{ strokeDashoffset: 0 }}
+      transition={{ delay, duration: 1.2, ease: "easeInOut" }}
+      className="opacity-30"
+    />
+  );
+};
 
 const MindMapModal = ({ isOpen, onClose, pageNumber = 1 }) => {
   const { i18n } = useTranslation();
-  const [surahData, setSurahData] = useState(null);
+  const [surahMetadata, setSurahMetadata] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const isArabic = i18n.language === 'ar';
 
   const getSurahFromPage = (page) => {
     if (page <= 1) return 1;
     if (page <= 50) return 2;
     if (page <= 76) return 3;
-    return 114;
+    return 1; // Default
   };
 
+  const surahThemes = useMemo(() => {
+    const num = getSurahFromPage(pageNumber);
+    return getSurahTheme(num);
+  }, [pageNumber]);
+
   useEffect(() => {
-    if (!isOpen) {
-      setSurahData(null);
-      return undefined;
-    }
-
+    if (!isOpen) return undefined;
     const controller = new AbortController();
-
-    const loadSurahMetadata = async () => {
+    const loadMetadata = async () => {
       setIsLoading(true);
       try {
-        const surahNum = getSurahFromPage(pageNumber);
-        const metadata = await fetchSurahMetadata(surahNum, { signal: controller.signal });
-        setSurahData(metadata);
-      } catch (error) {
-        if (!isAbortedRequest(error)) {
-          console.error('Failed to fetch mind map data:', error);
-          setSurahData(null);
-        }
+        const num = getSurahFromPage(pageNumber);
+        const metadata = await fetchSurahMetadata(num, { signal: controller.signal });
+        setSurahMetadata(metadata);
+      } catch (err) {
+        if (!isAbortedRequest(err)) console.error(err);
       } finally {
         setIsLoading(false);
       }
     };
-
-    void loadSurahMetadata();
-
-    return () => {
-      controller.abort();
-    };
+    void loadMetadata();
+    return () => controller.abort();
   }, [isOpen, pageNumber]);
 
   if (!isOpen) return null;
 
+  const canvasWidth = 800;
+  const canvasHeight = 600;
+  const centerX = canvasWidth / 2;
+  const centerY = canvasHeight / 2;
+
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="absolute inset-0 backdrop-blur-sm"
-          style={{ background: 'var(--theme-backdrop)' }}
+           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+           onClick={onClose}
+           className="absolute inset-0 bg-[#09090b]/95 backdrop-blur-2xl"
         />
-        
+
         <motion.div
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          className="glass-card-strong relative w-full max-w-2xl overflow-hidden rounded-[2.5rem]"
+          className="relative w-full max-w-5xl aspect-[4/3] max-h-[90vh] glass-card rounded-[3rem] overflow-hidden flex flex-col border border-white/5"
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-emerald-600 to-teal-700 p-8 text-white relative">
-            <button onClick={onClose} className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors">
-              <X className="h-5 w-5" />
-            </button>
+          <div className="flex items-center justify-between p-6 sm:p-8 border-b border-white/5 bg-white/[0.02]">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-white/20 rounded-3xl flex items-center justify-center backdrop-blur-md border border-white/30">
-                <Sparkles className="h-8 w-8 text-white" />
+              <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center border border-emerald-500/20">
+                <Layout className="h-6 w-6 text-emerald-400" />
               </div>
               <div>
-                <h2 className="text-3xl font-black tracking-tight mb-1">
-                  {i18n.language === 'ar' ? 'خارطة التثبيت (Mind Map)' : 'Stabilization Map'}
+                <h2 className="text-xl sm:text-2xl font-black text-foreground">
+                  {isArabic ? `خارطة ${surahMetadata?.name || ''}` : `${surahMetadata?.englishName || ''} Mind Map`}
                 </h2>
-                <p className="text-emerald-100/80 font-medium text-sm">
-                  {i18n.language === 'ar' ? 'تصور هيكلي للسورة الحالية' : 'Structural visualization of the current Surah'}
-                </p>
+                <div className="flex items-center gap-2 mt-1">
+                    <Target className="h-3 w-3 text-amber-500" />
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500/80">
+                        {isArabic ? 'هيكل السورة ومقاصدها' : 'Structure & Objectives'}
+                    </p>
+                </div>
               </div>
             </div>
+            <button onClick={onClose} className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl transition-all">
+                <X className="h-5 w-5" />
+            </button>
           </div>
 
-          {/* Content */}
-          <div className="p-6 sm:p-8">
+          {/* Canvas Area */}
+          <div className="flex-1 relative bg-[radial-gradient(circle_at_center,_#111827_0%,_#09090b_100%)] overflow-hidden">
             {isLoading ? (
-              <div className="flex flex-col items-center justify-center py-20 text-[color:var(--theme-text-muted)]">
-                <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} className="h-10 w-10 border-4 border-emerald-500 border-t-transparent rounded-full mb-4" />
-                <p className="animate-pulse">{i18n.language === 'ar' ? 'جاري بناء الخارطة...' : 'Building Map...'}</p>
-              </div>
-            ) : surahData ? (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="surface-inset p-6 rounded-3xl group hover:border-emerald-500/20 transition-all">
-                    <div className="flex items-center gap-3 mb-4">
-                      <BookOpen className="h-5 w-5 text-emerald-400" />
-                      <h4 className="font-bold text-foreground">{i18n.language === 'ar' ? 'اسم السورة' : 'Surah Name'}</h4>
-                    </div>
-                    <p className="text-2xl font-black text-emerald-400" dir="rtl">
-                      {surahData.name} ({surahData.englishName})
-                    </p>
-                  </div>
-
-                  <div className="surface-inset p-6 rounded-3xl group hover:border-emerald-500/20 transition-all">
-                    <div className="flex items-center gap-3 mb-4">
-                      <Layers className="h-5 w-5 text-emerald-400" />
-                      <h4 className="font-bold text-foreground">{i18n.language === 'ar' ? 'عدد الآيات' : 'Total Verses'}</h4>
-                    </div>
-                    <p className="text-2xl font-black text-emerald-400">
-                      {surahData.numberOfAyahs} {i18n.language === 'ar' ? 'آية' : 'Ayahs'}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="bg-emerald-500/5 border-2 border-emerald-500/20 p-8 rounded-3xl relative overflow-hidden group">
-                   <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-                      <Globe className="h-20 w-20 text-emerald-500" />
-                   </div>
-                   <div className="relative">
-                      <div className="flex items-center gap-3 mb-4">
-                        <Type className="h-5 w-5 text-emerald-500" />
-                        <h4 className="font-bold text-foreground">{i18n.language === 'ar' ? 'النزول والنمط' : 'Revelation & Type'}</h4>
-                      </div>
-                      <p className="text-lg font-bold text-emerald-300">
-                        {i18n.language === 'ar' 
-                          ? `${surahData.revelationType === 'Meccan' ? 'مكية' : 'مدنية'} - نزلت بترتيب ${surahData.number}` 
-                          : `${surahData.revelationType} - Revelation order: ${surahData.number}`}
-                      </p>
-                      <p className="mt-4 text-sm text-[color:var(--theme-text-muted)] leading-relaxed">
-                        {i18n.language === 'ar'
-                          ? 'هذه الخارطة تساعدك على تثبيت المحفوظ من خلال فهم السياق التاريخي والهيكلي للسورة.'
-                          : 'This map helps stabilize your memorization by understanding the historical and structural context.'}
-                      </p>
-                   </div>
-                </div>
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} className="h-8 w-8 border-2 border-emerald-500 border-t-transparent rounded-full" />
+                <p className="text-xs font-black uppercase tracking-widest text-emerald-500/60 animate-pulse">Calculating Hierarchy...</p>
               </div>
             ) : (
-                <p className="py-20 text-center text-[color:var(--theme-text-muted)] opacity-70">Data unavailable.</p>
+              <div className="w-full h-full overflow-auto custom-scrollbar">
+                <svg
+                  viewBox={`0 0 ${canvasWidth} ${canvasHeight}`}
+                  className="min-w-[800px] h-full mx-auto"
+                >
+                  <defs>
+                    <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#10b981" stopOpacity="0" />
+                      <stop offset="50%" stopColor="#10b981" stopOpacity="0.5" />
+                      <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+                    </linearGradient>
+                    <radialGradient id="centerGlow">
+                      <stop offset="0%" stopColor="#10b981" stopOpacity="0.2" />
+                      <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+                    </radialGradient>
+                    <radialGradient id="nodeGlow">
+                        <stop offset="0%" stopColor="#34d399" stopOpacity="0.1" />
+                        <stop offset="100%" stopColor="#34d399" stopOpacity="0" />
+                    </radialGradient>
+                  </defs>
+
+                  {/* Connections */}
+                  {surahThemes?.sections.map((section, idx) => {
+                    const angle = (idx / surahThemes.sections.length) * Math.PI * 2;
+                    const radius = 240;
+                    const x = centerX + Math.cos(angle) * (radius * 1.2);
+                    const y = centerY + Math.sin(angle) * radius;
+                    return <Connection key={idx} x1={centerX} y1={centerY} x2={x} y2={y} delay={0.3 + idx * 0.1} />;
+                  })}
+
+                  {/* Theme Nodes */}
+                  {surahThemes?.sections.map((section, idx) => {
+                    const angle = (idx / surahThemes.sections.length) * Math.PI * 2;
+                    const radius = 240;
+                    const x = centerX + Math.cos(angle) * (radius * 1.2);
+                    const y = centerY + Math.sin(angle) * radius;
+                    return (
+                      <Node
+                        key={idx}
+                        x={x}
+                        y={y}
+                        label={isArabic ? section.ar : section.en}
+                        subLabel={`Verse ${section.range}`}
+                        delay={0.6 + idx * 0.1}
+                        isArabic={isArabic}
+                      />
+                    );
+                  })}
+
+                  {/* Central Node */}
+                  <Node
+                    x={centerX}
+                    y={centerY}
+                    label={isArabic ? surahMetadata?.name : surahMetadata?.englishName}
+                    subLabel={isArabic ? 'المقصد الرئيسي' : 'MAIN OBJECTIVE'}
+                    isCenter
+                    delay={0.2}
+                    isArabic={isArabic}
+                  />
+                </svg>
+              </div>
             )}
+
+            {/* Objective Overlay */}
+            <AnimatePresence>
+                {!isLoading && surahThemes && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-lg px-4"
+                    >
+                        <div className="bg-[#18181b]/80 backdrop-blur-xl border border-white/10 p-5 rounded-3xl shadow-2xl flex items-start gap-4">
+                            <div className="w-10 h-10 shrink-0 bg-amber-500/10 rounded-xl flex items-center justify-center border border-amber-500/20">
+                                <Info className="h-5 w-5 text-amber-400" />
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500/70 mb-1">
+                                    {isArabic ? 'المقصد العام' : 'General Objective'}
+                                </p>
+                                <p className="text-sm font-bold text-foreground leading-relaxed">
+                                    {isArabic ? surahThemes.objectiveAr : surahThemes.objectiveEn}
+                                </p>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
           </div>
         </motion.div>
       </div>
@@ -151,3 +254,4 @@ const MindMapModal = ({ isOpen, onClose, pageNumber = 1 }) => {
 };
 
 export default MindMapModal;
+
