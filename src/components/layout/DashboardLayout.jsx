@@ -11,14 +11,14 @@ const SPAN = {
 
 const DashboardLayout = ({ children }) => (
   <div className="w-full max-w-[1600px] mx-auto">
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-7">
+    <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-12 lg:gap-7">
       {children}
     </div>
   </div>
 );
 
 DashboardLayout.Item = ({ cols = 12, className = '', children }) => (
-  <div className={`${SPAN[cols] ?? 'lg:col-span-12'} ${className}`}>
+  <div className={`min-w-0 ${SPAN[cols] ?? 'lg:col-span-12'} ${className}`}>
     {children}
   </div>
 );

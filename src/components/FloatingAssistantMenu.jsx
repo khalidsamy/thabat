@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Home, TrendingUp, Mic, MessageCircle,
   BookOpen, BookMarked, UserCircle, Plus, X, GitMerge,
@@ -18,8 +19,10 @@ const NAV_ITEMS = [
 ];
 
 const FloatingAssistantMenu = () => {
+  const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const close = useCallback(() => setIsOpen(false), []);
+  const isRtl = i18n.language === 'ar';
 
   return (
     <>
@@ -33,13 +36,13 @@ const FloatingAssistantMenu = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
             className="fixed inset-0 z-[65] md:hidden"
-            style={{ backdropFilter: 'blur(12px)', background: 'rgba(11, 17, 32, 0.75)' }}
+            style={{ backdropFilter: 'blur(12px)', background: 'var(--theme-backdrop)' }}
             onClick={close}
           />
         )}
       </AnimatePresence>
 
-      <div className="fixed bottom-7 left-1/2 -translate-x-1/2 z-[70] flex flex-col items-center gap-4 md:hidden">
+      <div className={`fixed bottom-[calc(env(safe-area-inset-bottom)+1rem)] z-[70] flex flex-col items-end gap-3 md:hidden ${isRtl ? 'left-4 sm:left-6' : 'right-4 sm:right-6'}`}>
         {/* Navigation overlay */}
         <AnimatePresence>
           {isOpen && (
@@ -49,13 +52,10 @@ const FloatingAssistantMenu = () => {
               animate={{ opacity: 1, y: 0,  scale: 1 }}
               exit={{   opacity: 0, y: 16, scale: 0.92 }}
               transition={{ type: 'spring', stiffness: 340, damping: 30 }}
-              className="flex flex-col gap-1 p-3 rounded-[1.75rem] w-52 overflow-hidden"
+              className="glass-assistive flex w-[min(18rem,calc(100vw-2rem))] flex-col gap-1 overflow-hidden rounded-[1.75rem] p-3"
               style={{
-                background: 'rgba(15, 22, 40, 0.82)',
                 backdropFilter: 'blur(24px)',
                 WebkitBackdropFilter: 'blur(24px)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                boxShadow: '0 16px 48px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)',
               }}
             >
               {NAV_ITEMS.map((item, i) => (
@@ -73,7 +73,7 @@ const FloatingAssistantMenu = () => {
                       `flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${
                         isActive
                           ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/25'
-                          : 'text-zinc-400 hover:text-white hover:bg-white/6'
+                          : 'text-[color:var(--theme-text-muted)] hover:text-foreground hover:bg-[color:var(--theme-surface-muted)]'
                       }`
                     }
                   >
@@ -92,7 +92,8 @@ const FloatingAssistantMenu = () => {
           whileTap={{ scale: 0.88 }}
           onClick={() => setIsOpen(v => !v)}
           aria-label={isOpen ? 'Close navigation' : 'Open navigation'}
-          className="w-14 h-14 rounded-full flex items-center justify-center border border-white/15 relative overflow-hidden"
+          aria-expanded={isOpen}
+          className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-[color:var(--theme-border-strong)]"
           style={{
             background: isOpen
               ? 'linear-gradient(135deg, #f43f5e, #e11d48)'

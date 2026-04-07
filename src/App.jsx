@@ -14,7 +14,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/dashboard/Home';
 import Progress from './pages/dashboard/Progress';
-import Recite from './pages/dashboard/Recite';
+import Recite from './pages/dashboard/RecitePremium';
 import Community from './pages/dashboard/Community';
 import Review from './pages/dashboard/Review';
 import Profile from './pages/Profile';

@@ -4,6 +4,29 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/ThabatLogo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (() => {
+        const storageKey = 'thabat_theme';
+        const root = document.documentElement;
+
+        try {
+          const storedTheme = localStorage.getItem(storageKey);
+          const resolvedTheme =
+            storedTheme === 'light' || storedTheme === 'dark'
+              ? storedTheme
+              : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+          root.dataset.theme = resolvedTheme;
+          root.style.colorScheme = resolvedTheme;
+          root.classList.toggle('dark', resolvedTheme === 'dark');
+          root.classList.toggle('light', resolvedTheme === 'light');
+        } catch {
+          root.dataset.theme = 'dark';
+          root.style.colorScheme = 'dark';
+          root.classList.add('dark');
+        }
+      })();
+    </script>
     
     <!-- Google Fonts: Premium Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

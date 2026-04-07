@@ -57,14 +57,15 @@ const MindMapModal = ({ isOpen, onClose, pageNumber = 1 }) => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          className="absolute inset-0 backdrop-blur-sm"
+          style={{ background: 'var(--theme-backdrop)' }}
         />
         
         <motion.div
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          className="relative w-full max-w-2xl bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5"
+          className="glass-card-strong relative w-full max-w-2xl overflow-hidden rounded-[2.5rem]"
         >
           {/* Header */}
           <div className="bg-gradient-to-r from-emerald-600 to-teal-700 p-8 text-white relative">
@@ -87,16 +88,16 @@ const MindMapModal = ({ isOpen, onClose, pageNumber = 1 }) => {
           </div>
 
           {/* Content */}
-          <div className="p-8">
+          <div className="p-6 sm:p-8">
             {isLoading ? (
-              <div className="flex flex-col items-center justify-center py-20 text-slate-500">
+              <div className="flex flex-col items-center justify-center py-20 text-[color:var(--theme-text-muted)]">
                 <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} className="h-10 w-10 border-4 border-emerald-500 border-t-transparent rounded-full mb-4" />
                 <p className="animate-pulse">{i18n.language === 'ar' ? 'جاري بناء الخارطة...' : 'Building Map...'}</p>
               </div>
             ) : surahData ? (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-slate-800/50 p-6 rounded-3xl border border-white/5 group hover:border-emerald-500/20 transition-all">
+                  <div className="surface-inset p-6 rounded-3xl group hover:border-emerald-500/20 transition-all">
                     <div className="flex items-center gap-3 mb-4">
                       <BookOpen className="h-5 w-5 text-emerald-400" />
                       <h4 className="font-bold text-foreground">{i18n.language === 'ar' ? 'اسم السورة' : 'Surah Name'}</h4>
@@ -106,7 +107,7 @@ const MindMapModal = ({ isOpen, onClose, pageNumber = 1 }) => {
                     </p>
                   </div>
 
-                  <div className="bg-slate-800/50 p-6 rounded-3xl border border-white/5 group hover:border-emerald-500/20 transition-all">
+                  <div className="surface-inset p-6 rounded-3xl group hover:border-emerald-500/20 transition-all">
                     <div className="flex items-center gap-3 mb-4">
                       <Layers className="h-5 w-5 text-emerald-400" />
                       <h4 className="font-bold text-foreground">{i18n.language === 'ar' ? 'عدد الآيات' : 'Total Verses'}</h4>
@@ -131,7 +132,7 @@ const MindMapModal = ({ isOpen, onClose, pageNumber = 1 }) => {
                           ? `${surahData.revelationType === 'Meccan' ? 'مكية' : 'مدنية'} - نزلت بترتيب ${surahData.number}` 
                           : `${surahData.revelationType} - Revelation order: ${surahData.number}`}
                       </p>
-                      <p className="mt-4 text-sm text-slate-400 leading-relaxed">
+                      <p className="mt-4 text-sm text-[color:var(--theme-text-muted)] leading-relaxed">
                         {i18n.language === 'ar'
                           ? 'هذه الخارطة تساعدك على تثبيت المحفوظ من خلال فهم السياق التاريخي والهيكلي للسورة.'
                           : 'This map helps stabilize your memorization by understanding the historical and structural context.'}
@@ -140,7 +141,7 @@ const MindMapModal = ({ isOpen, onClose, pageNumber = 1 }) => {
                 </div>
               </div>
             ) : (
-                <p className="text-center py-20 opacity-50">Data unavailable.</p>
+                <p className="py-20 text-center text-[color:var(--theme-text-muted)] opacity-70">Data unavailable.</p>
             )}
           </div>
         </motion.div>

@@ -97,7 +97,7 @@ const Navbar = () => {
 
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-3 rounded-2xl bg-zinc-950 text-white shadow-xl shadow-zinc-950/20 active:scale-95 transition-all"
+              className="lg:hidden rounded-2xl border border-[color:var(--theme-border)] bg-[color:var(--theme-surface-elevated)] p-3 text-foreground shadow-xl shadow-black/10 active:scale-95 transition-all"
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -113,7 +113,8 @@ const Navbar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm lg:hidden h-screen w-screen"
+              className="fixed inset-0 z-[100] h-screen w-screen backdrop-blur-sm lg:hidden"
+              style={{ background: 'var(--theme-backdrop)' }}
             />
             <motion.div
               initial={{ x: i18n.language === 'ar' ? '100%' : '-100%' }}
@@ -152,7 +153,7 @@ const Navbar = () => {
                   >
                     {({ isActive }) => (
                       <>
-                        <div className={`p-2.5 rounded-xl ${isActive ? 'bg-zinc-950 shadow-sm' : 'bg-transparent'}`}>
+                        <div className={`p-2.5 rounded-xl ${isActive ? 'bg-[color:var(--theme-surface-elevated)] shadow-sm' : 'bg-transparent'}`}>
                           <item.icon className="h-5 w-5" />
                         </div>
                         {item.label}
@@ -162,7 +163,7 @@ const Navbar = () => {
                 ))}
               </div>
 
-              <div className="mt-auto pt-8 border-t border-white/5 space-y-4">
+              <div className="mt-auto pt-8 border-t border-[color:var(--theme-border)] space-y-4">
                  <button 
                    onClick={logout}
                    className="w-full flex items-center justify-center gap-3 p-5 rounded-[1.5rem] text-sm font-black text-white bg-rose-500 hover:bg-rose-600 shadow-xl shadow-rose-500/20 active:scale-95 transition-all"

@@ -1,22 +1,26 @@
 :root {
-  --theme-background: #07111d;
-  --theme-background-elevated: #0f1b2b;
-  --theme-surface: rgba(14, 24, 41, 0.74);
-  --theme-surface-overlay: rgba(9, 16, 28, 0.72);
+  --theme-background: #06101b;
+  --theme-background-elevated: #101c2c;
+  --theme-surface: rgba(14, 23, 38, 0.78);
+  --theme-surface-overlay: rgba(7, 13, 25, 0.78);
   --theme-surface-muted: rgba(148, 163, 184, 0.08);
-  --theme-surface-elevated: rgba(19, 31, 52, 0.94);
-  --theme-inset: rgba(8, 12, 23, 0.62);
+  --theme-surface-elevated: rgba(17, 29, 47, 0.96);
+  --theme-surface-input: rgba(8, 16, 29, 0.92);
+  --theme-floating: rgba(7, 13, 25, 0.84);
+  --theme-inset: rgba(8, 12, 23, 0.7);
+  --theme-backdrop: rgba(2, 6, 23, 0.56);
   --theme-text: #f8fafc;
-  --theme-text-muted: #91a4bd;
-  --theme-text-soft: #cbd5e1;
+  --theme-text-muted: #8ea3bc;
+  --theme-text-soft: #c9d4e3;
   --theme-border: rgba(148, 163, 184, 0.14);
-  --theme-border-strong: rgba(148, 163, 184, 0.26);
-  --theme-shadow: 0 24px 80px rgba(2, 6, 23, 0.34);
-  --theme-shadow-soft: 0 16px 50px rgba(2, 6, 23, 0.18);
+  --theme-border-strong: rgba(148, 163, 184, 0.22);
+  --theme-shadow: 0 28px 90px rgba(2, 6, 23, 0.42);
+  --theme-shadow-soft: 0 18px 52px rgba(2, 6, 23, 0.24);
   --theme-accent: #10b981;
   --theme-accent-soft: rgba(16, 185, 129, 0.14);
   --theme-amber-soft: rgba(245, 158, 11, 0.12);
   --theme-rose-soft: rgba(244, 63, 94, 0.12);
+  --theme-focus-ring: rgba(16, 185, 129, 0.18);
   --theme-chart-grid: rgba(148, 163, 184, 0.14);
   --theme-chart-tooltip: rgba(9, 16, 28, 0.92);
   --color-background: var(--theme-background);
@@ -26,23 +30,27 @@
 }
 
 :root[data-theme='light'] {
-  --theme-background: #f3f7fb;
+  --theme-background: #edf4f7;
   --theme-background-elevated: #ffffff;
-  --theme-surface: rgba(255, 255, 255, 0.76);
-  --theme-surface-overlay: rgba(248, 250, 252, 0.84);
+  --theme-surface: rgba(255, 255, 255, 0.8);
+  --theme-surface-overlay: rgba(250, 252, 255, 0.88);
   --theme-surface-muted: rgba(15, 23, 42, 0.05);
   --theme-surface-elevated: rgba(255, 255, 255, 0.96);
-  --theme-inset: rgba(226, 232, 240, 0.68);
+  --theme-surface-input: rgba(255, 255, 255, 0.96);
+  --theme-floating: rgba(255, 255, 255, 0.84);
+  --theme-inset: rgba(223, 232, 241, 0.72);
+  --theme-backdrop: rgba(133, 148, 168, 0.28);
   --theme-text: #10233c;
   --theme-text-muted: #5b6f86;
-  --theme-text-soft: #2f4259;
-  --theme-border: rgba(15, 23, 42, 0.1);
-  --theme-border-strong: rgba(15, 23, 42, 0.18);
-  --theme-shadow: 0 24px 60px rgba(148, 163, 184, 0.22);
-  --theme-shadow-soft: 0 14px 30px rgba(148, 163, 184, 0.16);
+  --theme-text-soft: #31445a;
+  --theme-border: rgba(15, 23, 42, 0.09);
+  --theme-border-strong: rgba(15, 23, 42, 0.16);
+  --theme-shadow: 0 24px 68px rgba(148, 163, 184, 0.26);
+  --theme-shadow-soft: 0 16px 36px rgba(148, 163, 184, 0.18);
   --theme-accent-soft: rgba(16, 185, 129, 0.12);
   --theme-amber-soft: rgba(245, 158, 11, 0.14);
   --theme-rose-soft: rgba(244, 63, 94, 0.12);
+  --theme-focus-ring: rgba(16, 185, 129, 0.14);
   --theme-chart-grid: rgba(15, 23, 42, 0.08);
   --theme-chart-tooltip: rgba(255, 255, 255, 0.96);
   --color-background: var(--theme-background);
@@ -61,8 +69,8 @@ html[data-theme='light'] {
 
 body {
   background:
-    radial-gradient(circle at top left, var(--theme-accent-soft), transparent 26%),
-    radial-gradient(circle at bottom right, var(--theme-amber-soft), transparent 28%),
+    radial-gradient(circle at top left, var(--theme-accent-soft), transparent 28%),
+    radial-gradient(circle at bottom right, var(--theme-amber-soft), transparent 32%),
     linear-gradient(180deg, var(--theme-background-elevated), var(--theme-background));
   color: var(--theme-text);
 }
@@ -116,6 +124,12 @@ body {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
+.surface-input {
+  background: var(--theme-surface-input);
+  border: 1px solid var(--theme-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
 .eyebrow {
   color: var(--theme-text-muted);
   font-size: 0.68rem;
@@ -137,6 +151,7 @@ body {
   font-weight: 900;
   letter-spacing: 0.16em;
   text-transform: uppercase;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .theme-toggle__track {
@@ -144,7 +159,7 @@ body {
   width: 3rem;
   align-items: center;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.08);
+  background: var(--theme-inset);
   padding: 0.15rem;
 }
 
