@@ -13,6 +13,7 @@ import HeartMessage from '../components/HeartMessage';
 import MindMapModal from '../components/MindMapModal';
 
 import Home from './dashboard/Home';
+import RevisionEngine from '../utils/RevisionEngine';
 
 const Dashboard = () => {
   const { t, i18n } = useTranslation();
@@ -29,6 +30,8 @@ const Dashboard = () => {
   const [pagesInput, setPagesInput] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [isTogglingSunnah, setIsTogglingSunnah] = useState(false);
+  const [isReciteLocked, setIsReciteLocked] = useState(false);
+  const [revisionQueue, setRevisionQueue] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -77,6 +80,16 @@ const Dashboard = () => {
       if (userResult.status === 'rejected') {
         console.error('Profile fetch failed:', userResult.reason?.message);
       }
+    }
+
+    // Revision Gatekeeper Logic
+    if (progressResult.status === 'fulfilled' && progressResult.value.data.success) {
+      const prog = progressResult.value.data.progress;
+      const locked = RevisionEngine.isReciteLocked(prog);
+      setIsReciteLocked(locked);
+      
+      const queue = await RevisionEngine.getDailyQueue(prog);
+      setRevisionQueue(queue);
     }
  
     setDailyVerse(QURAN_VERSES[Math.floor(Math.random() * QURAN_VERSES.length)]);
@@ -183,6 +196,8 @@ const Dashboard = () => {
     refreshData: loadInitialData,
     onVisualize: () => setIsMindMapOpen(true),
     shareProgress,
+    isReciteLocked,
+    revisionQueue,
     itemVariants: {
       hidden: { opacity: 0, y: 20 },
       visible: { opacity: 1, y: 0 },
@@ -191,7 +206,7 @@ const Dashboard = () => {
   }), [
     progress, user, dailyVerse, refreshKey, pagesInput,
     handleUpdateSubmit, isUpdating, handleSunnahToggle, isTogglingSunnah,
-    handleVoiceComplete, loadInitialData, shareProgress,
+    handleVoiceComplete, loadInitialData, shareProgress, isReciteLocked, revisionQueue
   ]);
 
   if (isLoading) {

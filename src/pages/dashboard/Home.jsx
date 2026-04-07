@@ -6,7 +6,8 @@ import DashboardLayout from '../../components/layout/DashboardLayout';
 import DailyMotivationCard from '../../components/DailyMotivationCard';
 import TargetSurahCard from '../../components/TargetSurahCard';
 import MemorizedGaugeCard from '../../components/MemorizedGaugeCard';
-import ReviewPacerCard from '../../components/ReviewPacerCard';
+import NextInQueueCard from '../../components/NextInQueueCard';
+import MasteryHeatmap from '../../components/MasteryHeatmap';
 import HifzStreaks from '../../components/HifzStreaks';
 
 const MOBILE_VIEWS = [
@@ -16,8 +17,10 @@ const MOBILE_VIEWS = [
 
 const Home = (props) => {
   const context = useOutletContext() || {};
-  const { progress, user, dailyVerse, itemVariants, onVisualize } = { progress: {}, user: {}, ...context, ...props };
+  const { progress, user, dailyVerse, itemVariants, onVisualize, isReciteLocked, revisionQueue } = { progress: {}, user: {}, ...context, ...props };
   const [mobileView, setMobileView] = useState('focus');
+
+  const isCompletedToday = progress?.revisionCompletedToday;
 
   return (
     <div className="space-y-4 pb-10 lg:pb-0">
@@ -51,17 +54,23 @@ const Home = (props) => {
           >
             {mobileView === 'focus' ? (
               <>
+                <NextInQueueCard 
+                  queue={revisionQueue} 
+                  isLocked={isReciteLocked} 
+                  isCompleted={isCompletedToday}
+                  itemVariants={itemVariants} 
+                />
                 <DailyMotivationCard dailyVerse={dailyVerse} itemVariants={itemVariants} />
                 <TargetSurahCard
                   surahName={progress?.currentSurahName || user?.currentTargetSurah}
                   progress={progress?.masteryPercent || 0}
+                  isLocked={isReciteLocked}
                   itemVariants={itemVariants}
                 />
               </>
             ) : (
               <>
                 <MemorizedGaugeCard percentage={progress?.masteryPercent || 0} itemVariants={itemVariants} />
-                <ReviewPacerCard itemVariants={itemVariants} />
                 <HifzStreaks
                   streak={progress?.streak}
                   isCompletedToday={progress?.doneToday >= progress?.dailyTarget}
@@ -71,6 +80,7 @@ const Home = (props) => {
                   history={progress?.history || []}
                   onVisualize={onVisualize}
                 />
+                <MasteryHeatmap progress={progress} itemVariants={itemVariants} />
               </>
             )}
           </motion.div>
@@ -79,6 +89,14 @@ const Home = (props) => {
 
       <div className="hidden lg:block">
         <DashboardLayout>
+        {/* Row 0 - Revision Gateway */}
+        <NextInQueueCard 
+            queue={revisionQueue} 
+            isLocked={isReciteLocked} 
+            isCompleted={isCompletedToday}
+            itemVariants={itemVariants} 
+        />
+
         {/* Row 1 — 8/4: wide motivation card + compact target tracker */}
         <DashboardLayout.Item cols={8}>
           <DailyMotivationCard dailyVerse={dailyVerse} itemVariants={itemVariants} />
@@ -87,18 +105,16 @@ const Home = (props) => {
           <TargetSurahCard
             surahName={progress?.currentSurahName || user?.currentTargetSurah}
             progress={progress?.masteryPercent || 0}
+            isLocked={isReciteLocked}
             itemVariants={itemVariants}
           />
         </DashboardLayout.Item>
 
-        {/* Row 2 — 4/4/4: three equal metric cards */}
-        <DashboardLayout.Item cols={4}>
+        {/* Row 2 — 6/6 */}
+        <DashboardLayout.Item cols={6}>
           <MemorizedGaugeCard percentage={progress?.masteryPercent || 0} itemVariants={itemVariants} />
         </DashboardLayout.Item>
-        <DashboardLayout.Item cols={4}>
-          <ReviewPacerCard itemVariants={itemVariants} />
-        </DashboardLayout.Item>
-        <DashboardLayout.Item cols={4}>
+        <DashboardLayout.Item cols={6}>
           <HifzStreaks
             streak={progress?.streak}
             isCompletedToday={progress?.doneToday >= progress?.dailyTarget}
@@ -108,6 +124,11 @@ const Home = (props) => {
             history={progress?.history || []}
             onVisualize={onVisualize}
           />
+        </DashboardLayout.Item>
+
+        {/* Row 3 - Full Width Progress Visualization */}
+        <DashboardLayout.Item cols={12}>
+           <MasteryHeatmap progress={progress} itemVariants={itemVariants} />
         </DashboardLayout.Item>
         </DashboardLayout>
       </div>

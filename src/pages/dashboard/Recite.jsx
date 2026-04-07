@@ -74,7 +74,9 @@ const Recite = (props) => {
   const [ayahFrom, setAyahFrom]         = useState(1);
   const [ayahTo, setAyahTo]             = useState(5);
   const [targetVerses, setTargetVerses] = useState([]);
-  const [previousVerse, setPreviousVerse] = useState(null);
+  const [previousVerses, setPreviousVerses] = useState([]); // Array of 5 verses for Al-Rabt
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+
   const [isLoadingVerses, setIsLoadingVerses] = useState(false);
   const [sessionDone, setSessionDone]   = useState(false);
 
@@ -94,7 +96,8 @@ const Recite = (props) => {
     correctionReps, correctionRepsRequired,
     linkWord, recognitionError, isActive,
     startSession, stopSession, resetSession,
-  } = useSmartRecitation({ targetVerses, previousVerseText: previousVerse?.text, onError: handleError });
+  } = useSmartRecitation({ targetVerses, previousVerseText: previousVerses[previousVerses.length - 1]?.text, onError: handleError });
+
 
   // Auto-scroll the active word into the center of the verse container
   useEffect(() => {
@@ -166,14 +169,21 @@ const Recite = (props) => {
       }));
 
       if (ayahFrom > 1) {
-        const previousAyah = await fetchAyah(selectedSurah, ayahFrom - 1, 'quran-uthmani', { signal: controller.signal });
-        setPreviousVerse({ text: previousAyah.text, numberInSurah: ayahFrom - 1 });
+        const startPrev = Math.max(1, ayahFrom - 5);
+        const prevAyahs = await Promise.all(
+          Array.from({ length: ayahFrom - startPrev }, (_, i) => 
+            fetchAyah(selectedSurah, startPrev + i, 'quran-uthmani', { signal: controller.signal })
+          )
+        );
+        setPreviousVerses(prevAyahs.map(a => ({ text: a.text, numberInSurah: a.numberInSurah })));
+        setIsReviewOpen(true); // Open Linking Review automatically
       } else {
-        setPreviousVerse(null);
+        setPreviousVerses([]);
       }
       setTargetVerses(fetched);
       resetSession();
       setSessionDone(false);
+
     } catch (error) {
       if (!isAbortedRequest(error)) {
         showError('Failed to fetch verses');
@@ -449,8 +459,60 @@ const Recite = (props) => {
               )}
             </AnimatePresence>
 
+            {/* Al-Rabt Review Modal (Overlay) */}
+            <AnimatePresence>
+                {isReviewOpen && previousVerses.length > 0 && (
+                    <motion.div 
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl"
+                    >
+                        <motion.div 
+                            initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }}
+                            className="max-w-2xl w-full bg-zinc-900 border border-amber-500/20 rounded-[2.5rem] p-8 lg:p-12 shadow-2xl overflow-hidden relative"
+                        >
+                            {/* Decorative Background */}
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 blur-[80px] rounded-full -mr-32 -mt-32" />
+
+                            <div className="relative text-center mb-8">
+                                <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-500/20">
+                                    <Link2 className="h-8 w-8 text-amber-500" />
+                                </div>
+                                <h3 className="text-3xl font-black text-foreground">الربط (Quick Review)</h3>
+                                <p className="text-sm font-bold text-amber-500/60 uppercase tracking-widest mt-2">
+                                    Link the old with the new — review the previous 5 ayahs
+                                </p>
+                            </div>
+
+                            <div className="space-y-6 max-h-[400px] overflow-y-auto pr-4 scrollbar-hide py-4" dir="rtl">
+                                {previousVerses.map(v => (
+                                    <div key={v.numberInSurah} className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-amber-500/20 transition-colors">
+                                        <span className="shrink-0 w-8 h-8 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs font-black border border-amber-500/20">
+                                            {v.numberInSurah}
+                                        </span>
+                                        <p className="font-quran text-xl text-foreground leading-relaxed">
+                                            {v.text}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="mt-10">
+                                <button 
+                                    onClick={() => setIsReviewOpen(false)}
+                                    className="w-full py-5 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-amber-500/20 transition-all active:scale-95 flex items-center justify-center gap-3"
+                                >
+                                    <span>أتممت المراجعة، ابدأ الحفظ</span>
+                                    <ChevronRight className="h-5 w-5 rotate-180" />
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* Reset */}
             {phase !== 'idle' && (
+
               <div className="flex justify-center">
                 <button onClick={resetSession} className="flex items-center gap-2 text-xs text-zinc-600 hover:text-zinc-400 transition-colors font-bold uppercase tracking-widest">
                   <RefreshCw className="h-3 w-3" /> إعادة التحميل
