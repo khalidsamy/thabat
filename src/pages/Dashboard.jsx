@@ -14,6 +14,7 @@ import MindMapModal from '../components/MindMapModal';
 
 import Home from './dashboard/Home';
 import RevisionEngine from '../utils/RevisionEngine';
+import notificationService from '../services/notificationService';
 
 const Dashboard = () => {
   const { t, i18n } = useTranslation();
@@ -90,13 +91,15 @@ const Dashboard = () => {
       
       const queue = await RevisionEngine.getDailyQueue(prog);
       setRevisionQueue(queue);
+
+      // Sheikh Alaa's Proactive Reminders
+      const isAr = authUser?.language === 'ar' || i18n.language === 'ar';
+      notificationService.checkAndRemind(prog, isAr);
     }
  
     setDailyVerse(QURAN_VERSES[Math.floor(Math.random() * QURAN_VERSES.length)]);
  
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
+    notificationService.requestPermission();
   } catch (err) {
     // This catch only fires for synchronous errors (e.g. QURAN_VERSES undefined)
     console.error('loadInitialData unexpected error:', err);
