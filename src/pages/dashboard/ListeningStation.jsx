@@ -504,7 +504,8 @@ const ListeningStation = (props) => {
 
     setIsLoadingSurah(true);
     setLoadError('');
-    setCurrentAyahIndex(0);
+    // No longer resetting index or payload here to avoid flickering 
+    // if a user selects something fast, but handled in selectivity logic.
 
     if (audioRef.current) {
       audioRef.current.pause();
@@ -546,15 +547,17 @@ const ListeningStation = (props) => {
       audio.dataset.sourceKey = sourceKey;
     }
 
-    if (!isPlaying) {
-      audio.pause();
+    if (!isPlaying || !currentAyah?.audio) {
+      if (audio.dataset.sourceKey === sourceKey) {
+        audio.pause();
+      }
       return;
     }
 
     const playPromise = audio.play();
     if (playPromise?.catch) {
-      playPromise.catch(() => {
-        setIsPlaying(false);
+      playPromise.catch((e) => {
+        if (e.name !== 'AbortError') setIsPlaying(false);
       });
     }
   }, [currentAyah?.audio, currentAyahIndex, isPlaying, selectedReciter.identifier, selectedSurahNumber]);
@@ -654,9 +657,19 @@ const ListeningStation = (props) => {
   }, [isMarkedListened, isPlaying, isTargetSurah, refreshData, selectedListenKey, selectedReciter.identifier, selectedReciter.name, selectedSurahMeta]);
 
   const handleSelectSurah = useCallback((surahNumber) => {
+    if (surahNumber === selectedSurahNumber) {
+        // If already playing, just resume if paused
+        setIsPlaying(true);
+        return;
+    }
+
+    // Reset for fresh start
     setSelectedSurahNumber(surahNumber);
+    setSurahPayload(null);
+    setCurrentAyahIndex(0);
+    setIsPlaying(true); // Auto-play on selection
     setLoadError('');
-  }, []);
+  }, [selectedSurahNumber]);
 
   const togglePlay = useCallback(() => {
     if (!selectedSurahMeta || isLoadingSurah) return;
