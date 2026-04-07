@@ -194,7 +194,7 @@ const DesktopPlayer = ({
             </p>
             <p className="truncate text-sm text-[color:var(--theme-text-muted)]">
               {selectedSurahMeta
-                ? `${isArabic ? 'الآية' : 'Ayah'} ${currentAyahIndex + 1}${currentAyah ? ` • ${isArabic ? selectedReciter.arabicName : selectedReciter.name}` : ''}`
+                ? `${isArabic ? 'الآية' : 'Ayah'} ${currentAyah?.numberInSurah === 0 ? (isArabic ? 'البسملة' : 'Basmala') : (currentAyah?.numberInSurah || currentAyahIndex + 1)}${currentAyah ? ` • ${isArabic ? selectedReciter.arabicName : selectedReciter.name}` : ''}`
                 : (isArabic ? 'اختر سورة وقارئًا لبدء البث' : 'Pick a reciter and Surah to begin streaming')}
             </p>
           </div>
@@ -438,7 +438,26 @@ const ListeningStation = (props) => {
       .includes(targetSurahLabel);
   }, [selectedSurahMeta, targetSurahLabel]);
 
-  const ayahs = surahPayload?.ayahs || [];
+  const ayahs = useMemo(() => {
+    if (!surahPayload) return [];
+    const baseAyahs = surahPayload.ayahs || [];
+    
+    // Some editions don't include Basmala in the ayahs array (except Fatiha)
+    // but provide it in surahPayload.bismillah
+    if (selectedSurahNumber !== 1 && selectedSurahNumber !== 9 && surahPayload.bismillah) {
+      return [
+        {
+          ...surahPayload.bismillah,
+          numberInSurah: 0,
+          text: isArabic ? 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ' : 'Bismillahir-Rahmanir-Rahim',
+          number: 'bismillah-' + selectedSurahNumber
+        },
+        ...baseAyahs
+      ];
+    }
+    return baseAyahs;
+  }, [surahPayload, selectedSurahNumber, isArabic]);
+
   const currentAyah = ayahs[currentAyahIndex] || null;
 
   const headerCopy = {
@@ -931,9 +950,11 @@ const ListeningStation = (props) => {
                             className={`ayah-inline font-quran ${active ? 'ayah-inline--active' : ''}`}
                         >
                             {ayah.text}
-                            <span className={`ayah-marker ${active ? 'ayah-marker--active' : ''}`}>
-                                {ayah.numberInSurah}
-                            </span>
+                            {ayah.numberInSurah !== 0 && (
+                                <span className={`ayah-marker ${active ? 'ayah-marker--active' : ''}`}>
+                                    {ayah.numberInSurah}
+                                </span>
+                            )}
                         </span>
                     );
                   }
@@ -959,7 +980,7 @@ const ListeningStation = (props) => {
                         <span className={`mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-black ${
                           active ? 'bg-emerald-500 text-white' : 'bg-[color:var(--theme-surface-muted)] text-foreground'
                         }`}>
-                          {ayah.numberInSurah}
+                          {ayah.numberInSurah === 0 ? 'ث' : ayah.numberInSurah}
                         </span>
                         <div className="min-w-0 flex-1">
                           <p className={`font-quran text-right transition-all ${active ? (isDark ? 'text-emerald-300' : 'text-emerald-700') : 'text-foreground'}`}>
