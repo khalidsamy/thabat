@@ -34,8 +34,8 @@ const Navbar = () => {
           
           <div className="flex items-center gap-6">
             <Link to="/dashboard" className="flex items-center gap-3 group">
-               <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-xl shadow-emerald-500/30 group-hover:scale-105 transition-transform duration-500">
-                  <span className="text-white font-black text-2xl">ث</span>
+               <div className="group-hover:scale-105 transition-transform duration-500">
+                  <img src="/ThabatLogo.png" alt="Thabat Logo" className="h-10 w-auto object-contain" />
                </div>
               <span className="font-black text-2xl tracking-tighter text-foreground group-hover:text-emerald-400 transition-colors hidden sm:block uppercase">
                 {t('navbar.app_name')}
@@ -126,8 +126,8 @@ const Navbar = () => {
             >
               <div className="flex items-center justify-between mb-10">
                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                       <span className="text-white font-black text-xl">ث</span>
+                    <div>
+                       <img src="/ThabatLogo.png" alt="Thabat Logo" className="h-8 w-auto object-contain" />
                     </div>
                     <span className="font-black text-xl text-foreground tracking-tight">Thabat</span>
                  </div>

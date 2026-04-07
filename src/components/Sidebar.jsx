@@ -39,8 +39,8 @@ const Sidebar = () => {
       dir={t('direction') || (i18n.language === 'ar' ? 'rtl' : 'ltr')}
     >
       <div className="p-6 flex items-center gap-4 overflow-hidden min-h-[80px]">
-        <div className="w-10 h-10 bg-emerald-600 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20 border border-white/10 group-hover:rotate-6 transition-transform">
-          <span className="text-white font-black text-xl">ث</span>
+        <div className="shrink-0 group-hover:rotate-6 transition-transform">
+           <img src="/ThabatLogo.png" alt="Thabat Logo" className="h-10 w-auto object-contain" />
         </div>
         <div className="hidden lg:flex flex-col opacity-0 lg:opacity-100 transition-opacity duration-300">
            <span className="text-xl font-black text-foreground tracking-tighter uppercase leading-none">Thabat</span>

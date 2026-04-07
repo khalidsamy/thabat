@@ -107,8 +107,8 @@ const Login = () => {
       <div className="relative z-10 w-full max-w-md">
 
         <div className="flex flex-col items-center mb-10">
-          <div className="w-20 h-20 bg-emerald-500 rounded-[2.5rem] flex items-center justify-center shadow-[0_20px_50px_rgba(16,185,129,0.3)] mb-6 animate-bounce-slow">
-            <span className="text-white font-black text-4xl">ث</span>
+          <div className="mb-6 animate-bounce-slow">
+            <img src="/ThabatLogo.png" alt="Thabat Logo" className="h-24 w-auto object-contain drop-shadow-2xl" />
           </div>
           <h1 className="text-4xl font-black text-foreground tracking-tighter uppercase mb-2">
             Thabat
