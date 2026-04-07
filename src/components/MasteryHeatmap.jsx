@@ -56,9 +56,9 @@ const MasteryHeatmap = ({ progress, itemVariants }) => {
 
             {/* The Grid */}
             <div className="flex-1 flex gap-1">
-              {heatmapData.map((week, wIndex) => (
+              {(heatmapData || []).map((week, wIndex) => (
                 <div key={wIndex} className="flex flex-col gap-1">
-                  {week.map((day, dIndex) => (
+                  {(week || []).map((day, dIndex) => (
                     <div
                       key={`${wIndex}-${dIndex}`}
                       title={`${day.date}: ${Math.round(day.score * 100)}% Mastery`}

@@ -83,34 +83,51 @@ class RevisionEngine {
 
   /**
    * Mastery Heatmap Logic:
-   * Converts user history into a grid of mastery levels.
+   * Converts user history into a nested grid (52 weeks x 7 days) of mastery levels.
    */
-  static generateHeatmapData(history = [], weakSurahs = []) {
-    // 604 pages in Quran. We'll group them into 30 Juz or 60 Hizbs for the heatmap.
-    const heatmap = Array.from({ length: 60 }, (_, i) => ({
-      hizb: i + 1,
-      status: 'none', // none, weak, solid, mastery
-      intensity: 0
-    }));
+  static getHeatmapData(progress) {
+    const history = progress?.history || [];
+    const weakSurahs = progress?.weakSurahs || [];
+    
+    // Create a 52-week grid (GitHub style)
+    // We'll calculate dates for the last 52 weeks
+    const weeks = [];
+    const now = new Date();
+    
+    // Start from the Sunday of the week 51 weeks ago
+    const startDate = new Date(now);
+    startDate.setDate(now.getDate() - (51 * 7 + now.getDay()));
+    startDate.setHours(0, 0, 0, 0);
 
-    // Mark weak surahs (This is a simplification, mapping surahs to hizbs)
-    weakSurahs.forEach(ws => {
-      // Approximation: every 10 pages is a Hizb
-      const index = Math.floor((ws.surahNumber * 5) % 60); // Mock mapping
-      heatmap[index].status = 'weak';
-      heatmap[index].intensity = ws.errorCount;
-    });
+    for (let w = 0; w < 52; w++) {
+      const week = [];
+      for (let d = 0; d < 7; d++) {
+        const currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + (w * 7 + d));
+        
+        // Find if any history entry matches this date
+        const dateStr = currentDate.toISOString().split('T')[0];
+        const entry = history.find(h => {
+          const hDate = new Date(h.date).toISOString().split('T')[0];
+          return hDate === dateStr;
+        });
 
-    // Mark history
-    history.forEach(entry => {
-        const index = Math.floor(entry.pages % 60);
-        if (heatmap[index].status !== 'weak') {
-            heatmap[index].status = 'solid';
-            heatmap[index].intensity += 1;
-        }
-    });
+        // Calculate score (0 to 1)
+        // In a real app, this would be based on pages/mastery
+        let score = entry ? Math.min(entry.pages / 20, 1) : 0;
+        
+        // Boost score if they have many pages or weak surahs were cleared (simplified)
+        if (score > 0 && score < 1) score += 0.2;
 
-    return heatmap;
+        week.push({
+          date: dateStr,
+          score: Math.min(score, 1)
+        });
+      }
+      weeks.push(week);
+    }
+
+    return weeks;
   }
 
   /**
