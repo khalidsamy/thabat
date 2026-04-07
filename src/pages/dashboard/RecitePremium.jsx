@@ -15,6 +15,7 @@ import {
   Trophy,
 } from 'lucide-react';
 import { useSmartRecitation } from '../../hooks/useSmartRecitationEngine';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '../../context/ToastContext';
 import api from '../../services/api';
 import { fetchAyah, fetchSurahList, isAbortedRequest } from '../../services/quranApi';
@@ -77,8 +78,10 @@ const WordChip = ({ word, isNext, activeRef }) => {
 
 const RecitePremium = (props) => {
   const context = useOutletContext() || {};
-  const { refreshData } = { ...context, ...props };
+  const { refreshData, isReciteLocked, revisionQueue } = { ...context, ...props };
+  const { t, i18n } = useTranslation();
   const { showError, showSuccess } = useToast();
+  const isArabic = i18n.language === 'ar';
 
   const [surahs, setSurahs] = useState([]);
   const [surahSearch, setSurahSearch] = useState('');
@@ -86,7 +89,8 @@ const RecitePremium = (props) => {
   const [ayahFrom, setAyahFrom] = useState(1);
   const [ayahTo, setAyahTo] = useState(5);
   const [targetVerses, setTargetVerses] = useState([]);
-  const [previousVerse, setPreviousVerse] = useState(null);
+  const [previousVerses, setPreviousVerses] = useState([]); // Sheikh Alaa's 5-verse Rabt
+  const [isLinkingReviewOpen, setIsLinkingReviewOpen] = useState(false);
   const [isLoadingVerses, setIsLoadingVerses] = useState(false);
   const [sessionDone, setSessionDone] = useState(false);
   const [showSelectorOnMobile, setShowSelectorOnMobile] = useState(true);
@@ -98,8 +102,15 @@ const RecitePremium = (props) => {
 
   const handleError = useCallback((word) => {
     playErrorChime();
-    showError(`Mistake on "${word}". Repeat it 3 times to continue.`);
-  }, [showError]);
+    showError(isArabic ? `خطأ في كلمة "${word}". كررها 3 مرات للمتابعة.` : `Mistake on "${word}". Repeat it 3 times to continue.`);
+    
+    // 3-Error Wall: Report to backend in real-time
+    const surahData = surahs.find(s => s.number === selectedSurah);
+    api.post('/progress/report-error', { 
+        surahNumber: selectedSurah, 
+        surahName: surahData?.name || surahData?.englishName || '' 
+    }).catch(() => {});
+  }, [showError, isArabic, surahs, selectedSurah]);
 
   const {
     correctionReps,
@@ -117,7 +128,7 @@ const RecitePremium = (props) => {
     words,
   } = useSmartRecitation({
     targetVerses,
-    previousVerseText: previousVerse?.text,
+    previousVerseText: previousVerses[previousVerses.length - 1]?.text,
     onError: handleError,
   });
 
@@ -200,10 +211,16 @@ const RecitePremium = (props) => {
       }));
 
       if (ayahFrom > 1) {
-        const previousAyah = await fetchAyah(selectedSurah, ayahFrom - 1, 'quran-uthmani', { signal: controller.signal });
-        setPreviousVerse({ text: previousAyah.text, numberInSurah: ayahFrom - 1 });
+        const startPrev = Math.max(1, ayahFrom - 5);
+        const prevAyahs = await Promise.all(
+          Array.from({ length: ayahFrom - startPrev }, (_, i) => 
+            fetchAyah(selectedSurah, startPrev + i, 'quran-uthmani', { signal: controller.signal })
+          )
+        );
+        setPreviousVerses(prevAyahs.map(a => ({ text: a.text, numberInSurah: a.numberInSurah })));
+        setIsLinkingReviewOpen(true); // Sheikh Alaa's Rabt Gate
       } else {
-        setPreviousVerse(null);
+        setPreviousVerses([]);
       }
 
       setTargetVerses(nextVerses);
@@ -246,16 +263,56 @@ const RecitePremium = (props) => {
         ),
       );
 
-      showSuccess('Session logged successfully.');
+      showSuccess(isArabic ? 'تم حفظ الجلسة في سجل التقدم' : 'Session logged successfully.');
       setSessionDone(true);
       void refreshData?.();
     } catch {
       showError('Failed to save session.');
     }
-  }, [ayahFrom, masteryScore, refreshData, selectedSurah, showError, showSuccess, stopSession, surahs, targetVerses, words]);
+  }, [ayahFrom, masteryScore, refreshData, selectedSurah, showError, showSuccess, stopSession, surahs, targetVerses, words, isArabic]);
 
   const nextWordIndex = words.findIndex((word) => word.status === 'pending');
   const shouldShowSelector = showSelectorOnMobile || targetVerses.length === 0;
+
+  if (isReciteLocked) {
+    return (
+        <div className="flex min-h-[70vh] items-center justify-center px-4">
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+                className="glass-card w-full max-w-lg rounded-[2.5rem] p-10 text-center relative overflow-hidden"
+            >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 blur-3xl rounded-full -mr-16 -mt-16" />
+                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/20">
+                    <AlertCircle className="h-10 w-10 text-amber-500" />
+                </div>
+                <h2 className="text-3xl font-black text-foreground">
+                    {isArabic ? 'المراجعة أولاً' : 'Review first!'}
+                </h2>
+                <p className="mt-4 text-sm text-[color:var(--theme-text-muted)] leading-relaxed">
+                    {isArabic 
+                        ? 'تطبيقاً لمنهجية الشيخ "المراجعة قبل الحفظ"، يرجى إتمام ورد المراجعة اليومي أولاً لفتح ميزة التلاوة والحفظ الجديد.' 
+                        : 'Following the Sheikh Hamed methodology, you must complete your daily revision queue before starting new memorization.'}
+                </p>
+                
+                <div className="mt-8 space-y-3">
+                    <button 
+                        onClick={() => window.location.href = '/dashboard/review'}
+                        className="w-full py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-black shadow-xl shadow-amber-500/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+                    >
+                        {isArabic ? 'الذهاب للمراجعة الآن' : 'Go to Revision'}
+                        <ChevronRight className={`h-5 w-5 ${isArabic ? 'rotate-180' : ''}`} />
+                    </button>
+                    <button 
+                        onClick={() => window.location.href = '/dashboard'}
+                        className="w-full py-4 bg-white/5 hover:bg-white/10 text-foreground rounded-2xl font-black transition-all"
+                    >
+                        {isArabic ? 'العودة للرئيسية' : 'Back to Home'}
+                    </button>
+                </div>
+            </motion.div>
+        </div>
+    );
+  }
 
   if (sessionDone) {
     const errorCount = words.filter((word) => word.status === 'error').length;
@@ -270,16 +327,20 @@ const RecitePremium = (props) => {
           <div className="mx-auto mb-5 flex h-18 w-18 items-center justify-center rounded-full bg-emerald-500/12">
             <Trophy className="h-9 w-9 text-emerald-400" />
           </div>
-          <h2 className="text-3xl font-black text-foreground sm:text-4xl">Session Complete</h2>
-          <p className="mt-2 text-sm text-[color:var(--theme-text-muted)]">Your recitation session has been recorded.</p>
+          <h2 className="text-3xl font-black text-foreground sm:text-4xl">
+            {isArabic ? 'تم بحمد الله' : 'Session Complete'}
+          </h2>
+          <p className="mt-2 text-sm text-[color:var(--theme-text-muted)]">
+            {isArabic ? 'تم تسجيل تلاوتك بنجاح في سجل التقدم.' : 'Your recitation session has been recorded.'}
+          </p>
 
           <div className="mt-8 grid grid-cols-2 gap-4">
             <div className="surface-inset rounded-2xl p-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-500/70">Accuracy</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-500/70">{isArabic ? 'الإتقان' : 'Accuracy'}</p>
               <p className="mt-2 text-4xl font-black text-emerald-400">{masteryScore}%</p>
             </div>
             <div className="surface-inset rounded-2xl p-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-rose-500/70">Errors</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-rose-500/70">{isArabic ? 'أخطاء' : 'Errors'}</p>
               <p className="mt-2 text-4xl font-black text-rose-400">{errorCount}</p>
             </div>
           </div>
@@ -294,7 +355,7 @@ const RecitePremium = (props) => {
             className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-6 py-4 font-black text-white transition-all hover:bg-emerald-600 active:scale-[0.98]"
           >
             <RotateCcw className="h-5 w-5" />
-            Start Another Session
+            {isArabic ? 'جلسة جديدة' : 'Start Another Session'}
           </button>
         </motion.div>
       </div>
@@ -314,9 +375,9 @@ const RecitePremium = (props) => {
               <SlidersHorizontal className="h-5 w-5" />
             </span>
             <span>
-              <span className="block text-sm font-black text-foreground">Session Setup</span>
+              <span className="block text-sm font-black text-foreground">{isArabic ? 'إعداد الجلسة' : 'Session Setup'}</span>
               <span className="block text-xs text-[color:var(--theme-text-muted)]">
-                {targetVerses.length > 0 ? `Loaded ${targetVerses.length} ayah(s)` : 'Choose a Surah and ayah range'}
+                {targetVerses.length > 0 ? (isArabic ? `تم تحميل ${targetVerses.length} آية` : `Loaded ${targetVerses.length} ayah(s)`) : (isArabic ? 'اختر سورة ونطاق الآيات' : 'Choose a Surah and ayah range')}
               </span>
             </span>
           </span>
@@ -339,8 +400,8 @@ const RecitePremium = (props) => {
                     <Search className="h-5 w-5" />
                   </span>
                   <div>
-                    <p className="text-sm font-black uppercase tracking-[0.24em] text-[color:var(--theme-text-muted)]">Target Range</p>
-                    <h3 className="text-lg font-black text-foreground">Build the session</h3>
+                    <p className="text-sm font-black uppercase tracking-[0.24em] text-[color:var(--theme-text-muted)]">{isArabic ? 'نطاق الحفظ' : 'Target Range'}</p>
+                    <h3 className="text-lg font-black text-foreground">{isArabic ? 'إعداد الجلسة' : 'Build the session'}</h3>
                   </div>
                 </div>
 
@@ -351,7 +412,7 @@ const RecitePremium = (props) => {
                       type="text"
                       value={surahSearch}
                       onChange={(event) => setSurahSearch(event.target.value)}
-                      placeholder="Search for a Surah"
+                      placeholder={isArabic ? 'ابحث عن سورة...' : 'Search for a Surah'}
                       className="surface-input h-11 w-full rounded-xl pl-10 pr-3 text-sm text-foreground outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
                       dir="rtl"
                     />
@@ -399,8 +460,8 @@ const RecitePremium = (props) => {
                       <span className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
                     ) : (
                       <>
-                        <span>Load Ayahs</span>
-                        <ChevronRight className="h-4 w-4" />
+                        <span>{isArabic ? 'تحميل الآيات' : 'Load Ayahs'}</span>
+                        <ChevronRight className={`h-4 w-4 ${isArabic ? 'rotate-180' : ''}`} />
                       </>
                     )}
                   </button>
@@ -408,11 +469,11 @@ const RecitePremium = (props) => {
               </div>
 
               <div className="glass-card rounded-[2rem] p-5 sm:p-6">
-                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-500/70">Recitation Accuracy</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-500/70">{isArabic ? 'دقة التلاوة الحالية' : 'Recitation Accuracy'}</p>
                 <div className="mt-3 flex items-end justify-between gap-4">
                   <p className="text-4xl font-black text-emerald-400 sm:text-5xl">{masteryScore}%</p>
                   <p className="text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--theme-text-muted)]">
-                    {isActive ? 'Live session' : 'Ready state'}
+                    {isActive ? (isArabic ? 'بث مباشر' : 'Live session') : (isArabic ? 'جاهز للبدء' : 'Ready state')}
                   </p>
                 </div>
                 <div className="mt-4 h-2 overflow-hidden rounded-full bg-black/10">
@@ -440,7 +501,7 @@ const RecitePremium = (props) => {
                   <div className="flex items-center gap-3">
                     <Link2 className="h-5 w-5 shrink-0 text-amber-400" />
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-amber-400/70">Linking cue</p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-amber-400/70">{isArabic ? 'ربط الآيات' : 'Linking cue'}</p>
                       <p className="mt-1 font-quran text-2xl text-amber-200">{linkWord}</p>
                     </div>
                   </div>
@@ -459,11 +520,11 @@ const RecitePremium = (props) => {
                   <div className="flex items-start gap-3">
                     <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-rose-400" />
                     <div className="flex-1">
-                      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-rose-400/70">Correction drill</p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-rose-400/70">{isArabic ? 'تمرين التصحيح' : 'Correction drill'}</p>
                       <p className="mt-1 font-quran text-2xl text-rose-200">{errorWord.text}</p>
                       <div className="mt-4 flex flex-wrap items-center gap-3">
                         <span className="text-[11px] font-black uppercase tracking-[0.18em] text-rose-300/70">
-                          Repetition {correctionReps}/{correctionRepsRequired}
+                          {isArabic ? `التكرار ${correctionReps}/${correctionRepsRequired}` : `Repetition ${correctionReps}/${correctionRepsRequired}`}
                         </span>
                         <div className="flex gap-2">
                           {Array.from({ length: correctionRepsRequired }).map((_, index) => (
@@ -499,9 +560,9 @@ const RecitePremium = (props) => {
                 ))
               ) : (
                 <div className="flex h-full w-full flex-col items-center justify-center text-center">
-                  <p className="text-sm font-black uppercase tracking-[0.24em] text-[color:var(--theme-text-muted)]">Ready when you are</p>
+                  <p className="text-sm font-black uppercase tracking-[0.24em] text-[color:var(--theme-text-muted)]">{isArabic ? 'جاهز عند استعدادك' : 'Ready when you are'}</p>
                   <p className="mt-3 max-w-sm text-sm text-[color:var(--theme-text-soft)]">
-                    Load a Surah and ayah range to begin the guided recitation session.
+                    {isArabic ? 'اختر السورة ونطاق الآيات لبدء جلسة التلاوة الموجهة.' : 'Load a Surah and ayah range to begin the guided recitation session.'}
                   </p>
                 </div>
               )}
@@ -551,7 +612,7 @@ const RecitePremium = (props) => {
                         className="flex flex-col items-center"
                       >
                         <MicOff className="h-8 w-8 sm:h-9 sm:w-9" />
-                        <span className="mt-1 text-[10px] font-black uppercase tracking-[0.24em]">Stop</span>
+                        <span className="mt-1 text-[10px] font-black uppercase tracking-[0.24em]">{isArabic ? 'إيقاف' : 'Stop'}</span>
                       </motion.div>
                     ) : (
                       <motion.div
@@ -562,17 +623,17 @@ const RecitePremium = (props) => {
                         className="flex flex-col items-center"
                       >
                         <Mic className="h-8 w-8 sm:h-9 sm:w-9" />
-                        <span className="mt-1 text-[10px] font-black uppercase tracking-[0.24em]">Start</span>
+                        <span className="mt-1 text-[10px] font-black uppercase tracking-[0.24em]">{isArabic ? 'ابدأ' : 'Start'}</span>
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </motion.button>
 
                 <p className="text-center text-[11px] font-black uppercase tracking-[0.22em] text-[color:var(--theme-text-muted)]">
-                  {phase === 'idle' && 'Tap the mic to begin'}
-                  {phase === 'linking' && 'Speak the bridge word from the previous ayah'}
-                  {phase === 'reciting' && 'Continuous listening is active'}
-                  {phase === 'complete' && 'Recitation completed'}
+                  {phase === 'idle' && (isArabic ? 'اضغط على الميكروفون للبدء' : 'Tap the mic to begin')}
+                  {phase === 'linking' && (isArabic ? 'قل كلمة الربط من الآية السابقة' : 'Speak the bridge word from the previous ayah')}
+                  {phase === 'reciting' && (isArabic ? 'الاستماع المستمر نشط' : 'Continuous listening is active')}
+                  {phase === 'complete' && (isArabic ? 'اكتملت التلاوة' : 'Recitation completed')}
                 </p>
               </div>
             )}
@@ -591,7 +652,7 @@ const RecitePremium = (props) => {
                     className="inline-flex items-center gap-3 rounded-2xl bg-white px-6 py-4 text-sm font-black uppercase tracking-[0.2em] text-zinc-950 shadow-xl transition-all hover:bg-slate-100 active:scale-[0.98]"
                   >
                     <Trophy className="h-5 w-5 text-emerald-500" />
-                    Save Session
+                    {isArabic ? 'حفظ الجلسة' : 'Save Session'}
                   </button>
                 </motion.div>
               )}
@@ -605,13 +666,67 @@ const RecitePremium = (props) => {
                   className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-[color:var(--theme-text-muted)] transition-colors hover:text-foreground"
                 >
                   <RefreshCw className="h-3.5 w-3.5" />
-                  Reset session
+                  {isArabic ? 'إعادة ضبط الجلسة' : 'Reset session'}
                 </button>
               </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* Al-Rabt Review Modal — Sheikh Alaa Pedagogy */}
+      <AnimatePresence>
+          {isLinkingReviewOpen && previousVerses.length > 0 && (
+              <motion.div 
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-2xl"
+              >
+                  <motion.div 
+                      initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }}
+                      className="max-w-2xl w-full bg-[#09090b] border border-amber-500/20 rounded-[2.5rem] p-8 lg:p-12 shadow-[0_30px_100px_rgba(0,0,0,0.5)] overflow-hidden relative"
+                  >
+                      {/* Decorative elements */}
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 blur-[100px] rounded-full -mr-32 -mt-32" />
+                      <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/5 blur-[80px] rounded-full -ml-24 -mb-24" />
+
+                      <div className="relative text-center mb-8">
+                          <div className="w-20 h-20 bg-amber-500/12 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-amber-500/20 shadow-xl">
+                              <Link2 className="h-10 w-10 text-amber-500" />
+                          </div>
+                          <h3 className="text-3xl font-black text-foreground">
+                            {isArabic ? 'بروتوكول الربط' : 'Linking Protocol'}
+                          </h3>
+                          <p className="text-xs font-bold text-amber-500/60 uppercase tracking-[0.2em] mt-3">
+                              {isArabic ? 'ربط القديم بالجديد — راجع آخر 5 آيات' : 'Review previous 5 verses before new memorization'}
+                          </p>
+                      </div>
+
+                      <div className="space-y-4 max-h-[380px] overflow-y-auto pr-2 custom-scrollbar py-4" dir="rtl">
+                          {previousVerses.map(v => (
+                              <div key={v.numberInSurah} className="flex gap-5 p-5 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-amber-500/20 transition-all duration-300 group">
+                                  <span className="shrink-0 w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs font-black border border-amber-500/10 group-hover:bg-amber-500 group-hover:text-white transition-all">
+                                      {v.numberInSurah}
+                                  </span>
+                                  <p className="font-quran text-2xl text-foreground leading-[1.8] text-right">
+                                      {v.text}
+                                  </p>
+                              </div>
+                          ))}
+                      </div>
+
+                      <div className="mt-10">
+                          <button 
+                              onClick={() => setIsLinkingReviewOpen(false)}
+                              className="w-full py-5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-2xl font-black text-lg shadow-2xl shadow-amber-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                          >
+                              <span>{isArabic ? 'أتممت المراجعة، ابدأ الحفظ' : 'Review Done, Start Memorization'}</span>
+                              <ChevronRight className={`h-5 w-5 ${isArabic ? 'rotate-180' : ''}`} />
+                          </button>
+                      </div>
+                  </motion.div>
+              </motion.div>
+          )}
+      </AnimatePresence>
     </div>
   );
 };
