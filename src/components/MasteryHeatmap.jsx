@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import RevisionEngine from '../utils/RevisionEngine';
+import { getHeatmapData } from '../utils/RevisionEngine';
 
 const MasteryHeatmap = ({ progress, itemVariants }) => {
   const heatmapData = useMemo(() => {
-    return RevisionEngine.getHeatmapData(progress);
+    return getHeatmapData(progress);
   }, [progress]);
 
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

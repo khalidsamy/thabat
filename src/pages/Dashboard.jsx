@@ -13,7 +13,7 @@ import HeartMessage from '../components/HeartMessage';
 import MindMapModal from '../components/MindMapModal';
 
 import Home from './dashboard/Home';
-import RevisionEngine from '../utils/RevisionEngine';
+import { getDailyQueue, isReciteLocked } from '../utils/RevisionEngine';
 import notificationService from '../services/notificationService';
 
 const Dashboard = () => {
@@ -86,10 +86,10 @@ const Dashboard = () => {
     // Revision Gatekeeper Logic
     if (progressResult.status === 'fulfilled' && progressResult.value.data.success) {
       const prog = progressResult.value.data.progress;
-      const locked = RevisionEngine.isReciteLocked(prog);
+      const locked = isReciteLocked(prog);
       setIsReciteLocked(locked);
       
-      const queue = await RevisionEngine.getDailyQueue(prog);
+      const queue = await getDailyQueue(prog);
       setRevisionQueue(queue);
 
       // Sheikh Alaa's Proactive Reminders
