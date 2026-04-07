@@ -14,7 +14,7 @@ const ReviewPacerCard = ({ data = [], itemVariants }) => {
 
   return (
     <motion.div variants={itemVariants} className="lg:col-span-4 group h-full">
-      <div className="bg-card/40 border border-white/5 rounded-3xl p-8 shadow-xl shadow-black/5 h-full min-h-[320px] flex flex-col justify-between transition-all duration-300 hover:shadow-indigo-500/10 backdrop-blur-md">
+      <div className="glass-card rounded-3xl p-8 h-full min-h-[320px] flex flex-col justify-between transition-all duration-300 hover:shadow-indigo-500/10">
         <div>
           <span className="text-[10px] font-black text-indigo-500/40 uppercase tracking-[0.4em] mb-2 px-1 block">
             {t('dashboard.review_pacer_label') || 'REVIEW PACER'}
@@ -45,9 +45,9 @@ const ReviewPacerCard = ({ data = [], itemVariants }) => {
         <div className="flex items-center justify-between mt-auto pt-4">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
-            <span className="text-xs font-bold text-slate-500">Live Pacer</span>
+            <span className="text-xs font-bold text-[color:var(--theme-text-muted)]">Live Pacer</span>
           </div>
-          <span className="text-sm font-black text-white">30-min pacer</span>
+          <span className="text-sm font-black text-foreground">30-min pacer</span>
         </div>
       </div>
     </motion.div>

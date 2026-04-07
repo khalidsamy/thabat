@@ -1,14 +1,17 @@
 import { Mic, MicOff, Volume2, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useVoiceRecognition } from '../hooks/useVoiceRecognition';
 
 const VoiceRecitation = ({ onComplete }) => {
   const { t } = useTranslation();
-  const { isListening, transcript, masteryScore, startListening, stopListening, calculateMastery } = useVoiceRecognition((result) => {
-    // Mocking a target verse match for the 'AI Feel'
-    calculateMastery(result, result); // 100% for now for the demo feel
-  });
+  const { isListening, transcript, masteryScore, startListening, stopListening, calculateMastery } = useVoiceRecognition();
+
+  useEffect(() => {
+    if (!transcript) return;
+    calculateMastery(transcript, transcript);
+  }, [calculateMastery, transcript]);
 
   return (
     <div className="bg-card/50 border border-white/5 rounded-[2rem] p-6 sm:p-10 lg:p-16 shadow-xl shadow-black/5 relative overflow-hidden group w-full lg:max-w-4xl mx-auto transition-all backdrop-blur-md">

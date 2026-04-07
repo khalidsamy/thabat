@@ -13,7 +13,7 @@ const MemorizedGaugeCard = ({ percentage, itemVariants }) => {
       variants={itemVariants}
       className="lg:col-span-4 group h-full"
     >
-      <div className="bg-card/40 border border-white/5 rounded-3xl p-8 shadow-xl shadow-black/5 h-full min-h-[320px] flex flex-col justify-between transition-all duration-300 hover:shadow-emerald-500/10 backdrop-blur-md inner-glow">
+      <div className="glass-card rounded-3xl p-8 h-full min-h-[320px] flex flex-col justify-between transition-all duration-300 hover:shadow-emerald-500/10 inner-glow">
         <div className="flex flex-col">
           <span className="text-[10px] font-black text-emerald-500/40 uppercase tracking-[0.4em] mb-2 px-1">
             {t('dashboard.total_memorized_label') || 'Hifz Progress'}
@@ -33,7 +33,7 @@ const MemorizedGaugeCard = ({ percentage, itemVariants }) => {
               stroke="currentColor"
               strokeWidth="20"
               fill="transparent"
-              className="text-slate-900 shadow-inner"
+              className="text-[color:var(--theme-surface-muted)] shadow-inner"
             />
             {/* Progress Circle (Sleek Emerald) */}
             <motion.circle
@@ -54,7 +54,7 @@ const MemorizedGaugeCard = ({ percentage, itemVariants }) => {
           
           {/* Percentage Text with High-End Label */}
           <div className="absolute flex flex-col items-center z-20">
-            <span className="text-5xl font-black text-white tracking-tighter">{percentage}%</span>
+            <span className="text-5xl font-black text-foreground tracking-tighter">{percentage}%</span>
             <span className="text-[9px] font-black text-emerald-500/60 uppercase tracking-[0.2em] mt-1">
                {t('dashboard.memorized') || 'Memorized'}
             </span>

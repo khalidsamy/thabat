@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PlusCircle, BookMarked, Clock, AlertCircle, Loader2, Trash2, BookOpen } from 'lucide-react';
+import { PlusCircle, BookMarked, Clock, Loader2, Trash2, BookOpen } from 'lucide-react';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
-import Button from '../components/Button';
+import { fetchAyahText as fetchAyahPreview, isAbortedRequest } from '../services/quranApi';
 
 // ── Error type config ─────────────────────────────────────────────────────
 const ERROR_TYPES = [
@@ -33,7 +33,7 @@ const formatDueDate = (dateStr) => {
 };
 
 // ── Quran API fetch ───────────────────────────────────────────────────────
-const fetchAyahText = async (surahNumber, ayahNumber) => {
+const _fetchAyahText = async (surahNumber, ayahNumber) => {
   try {
     const res = await fetch(
       `https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}`
@@ -81,6 +81,8 @@ const ErrorLog = () => {
     note: '',
   });
   const [resolvedLocation, setResolvedLocation] = useState(null);
+  const previewAbortRef = useRef(null);
+  const previewTimerRef = useRef(null);
 
   // ── Fetch active errors ───────────────────────────────────────
   const fetchErrors = useCallback(async () => {
@@ -92,26 +94,68 @@ const ErrorLog = () => {
     } finally {
       setIsLoadingList(false);
     }
-  }, []);
+  }, [showError]);
 
   useEffect(() => { fetchErrors(); }, [fetchErrors]);
 
   // ── Auto-fetch ayah text when surah + ayah are filled ────────
   useEffect(() => {
-    const surah = parseInt(form.surahNumber);
-    const ayah = parseInt(form.ayahNumber);
-    if (surah >= 1 && surah <= 114 && ayah >= 1) {
-      const timer = setTimeout(async () => {
-        setIsFetchingAyah(true);
-        const result = await fetchAyahText(surah, ayah);
-        setResolvedLocation(result);
-        setIsFetchingAyah(false);
-      }, 700);
-      return () => clearTimeout(timer);
-    } else {
-      setResolvedLocation(null);
+    const surah = Number.parseInt(form.surahNumber, 10);
+    const ayah = Number.parseInt(form.ayahNumber, 10);
+
+    if (previewTimerRef.current) {
+      clearTimeout(previewTimerRef.current);
+      previewTimerRef.current = null;
     }
+
+    previewAbortRef.current?.abort();
+
+    if (!(surah >= 1 && surah <= 114 && ayah >= 1)) {
+      setResolvedLocation(null);
+      setIsFetchingAyah(false);
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    previewAbortRef.current = controller;
+    previewTimerRef.current = setTimeout(async () => {
+      setIsFetchingAyah(true);
+
+      try {
+        const result = await fetchAyahPreview(surah, ayah, { signal: controller.signal });
+        if (previewAbortRef.current === controller) {
+          setResolvedLocation(result);
+        }
+      } catch (error) {
+        if (!isAbortedRequest(error) && previewAbortRef.current === controller) {
+          setResolvedLocation(null);
+        }
+      } finally {
+        if (previewAbortRef.current === controller) {
+          previewAbortRef.current = null;
+        }
+        setIsFetchingAyah(false);
+      }
+    }, 400);
+
+    return () => {
+      if (previewTimerRef.current) {
+        clearTimeout(previewTimerRef.current);
+        previewTimerRef.current = null;
+      }
+      controller.abort();
+      if (previewAbortRef.current === controller) {
+        previewAbortRef.current = null;
+      }
+    };
   }, [form.surahNumber, form.ayahNumber]);
+
+  useEffect(() => () => {
+    if (previewTimerRef.current) {
+      clearTimeout(previewTimerRef.current);
+    }
+    previewAbortRef.current?.abort();
+  }, []);
 
   const handleFormChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -146,7 +190,7 @@ const ErrorLog = () => {
         showSuccess('Error logged successfully!');
         setForm({ surahNumber: '', ayahNumber: '', juzNumber: '', pageNumber: '', errorType: 'other', note: '' });
         setResolvedLocation(null);
-        fetchErrors();
+        await fetchErrors();
       }
     } catch (err) {
       showError(err.message);

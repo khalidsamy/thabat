@@ -31,8 +31,8 @@ const Sidebar = () => {
 
   return (
     <aside 
-      className={`hidden md:flex flex-col h-screen sticky top-0 z-40 bg-card/50 backdrop-blur-md border-white/5 transition-all duration-300 w-20 lg:w-64 overflow-y-auto overflow-x-hidden group shrink-0 ${
-        i18n.language === 'ar' ? 'border-s shadow-[-10px_0_30px_rgba(0,0,0,0.01)]' : 'border-e shadow-[10px_0_30px_rgba(0,0,0,0.01)]'
+      className={`hidden md:flex flex-col h-screen sticky top-0 z-40 border-[color:var(--theme-border)] bg-[color:var(--theme-surface-overlay)] backdrop-blur-xl transition-all duration-300 w-20 lg:w-64 overflow-y-auto overflow-x-hidden group shrink-0 ${
+        i18n.language === 'ar' ? 'border-s shadow-[-10px_0_30px_rgba(15,23,42,0.08)]' : 'border-e shadow-[10px_0_30px_rgba(15,23,42,0.08)]'
       }`}
       dir={t('direction') || (i18n.language === 'ar' ? 'rtl' : 'ltr')}
     >
@@ -56,7 +56,7 @@ const Sidebar = () => {
               `relative flex items-center gap-4 p-3.5 rounded-2xl transition-all duration-300 group/item ${
                 isActive 
                   ? 'bg-emerald-500/10 text-emerald-400 font-bold' 
-                  : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+                  : 'text-[color:var(--theme-text-muted)] hover:bg-[color:var(--theme-surface-muted)] hover:text-foreground'
               }`
             }
           >
@@ -79,12 +79,12 @@ const Sidebar = () => {
         ))}
       </nav>
 
-      <div className="px-3 space-y-2 mb-8 border-t border-white/5 pt-6">
+      <div className="px-3 space-y-2 mb-8 border-t border-[color:var(--theme-border)] pt-6">
         {secondaryItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
-            className="flex items-center gap-4 p-3 rounded-2xl text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-all duration-300"
+            className="flex items-center gap-4 p-3 rounded-2xl text-[color:var(--theme-text-muted)] hover:bg-[color:var(--theme-surface-muted)] hover:text-foreground transition-all duration-300"
           >
             <item.icon className="h-6 w-6 shrink-0" />
             <span className="hidden lg:block text-sm font-bold truncate">

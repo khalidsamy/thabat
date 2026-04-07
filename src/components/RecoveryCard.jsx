@@ -1,5 +1,6 @@
 import { HeartPulse, ArrowRight, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const MOTIVATIONAL_HADITHS = [
@@ -22,7 +23,9 @@ const MOTIVATIONAL_HADITHS = [
 
 const RecoveryCard = ({ onStartSmall }) => {
   const { t } = useTranslation();
-  const hadith = MOTIVATIONAL_HADITHS[Math.floor(Math.random() * MOTIVATIONAL_HADITHS.length)];
+  const [hadith] = useState(
+    () => MOTIVATIONAL_HADITHS[Math.floor(Math.random() * MOTIVATIONAL_HADITHS.length)],
+  );
 
   return (
     <motion.div

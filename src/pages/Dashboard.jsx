@@ -91,7 +91,7 @@ const Dashboard = () => {
   } finally {
     setIsLoading(false);
   }
-}, [t, authUser, showError]);
+}, [authUser]);
 
   useEffect(() => { loadInitialData(); }, [loadInitialData]);
 

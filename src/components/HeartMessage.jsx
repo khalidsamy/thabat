@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, X, RefreshCw, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -6,18 +6,14 @@ import { HEART_VERSES } from '../utils/heartVerses';
 
 const HeartMessage = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
-  const [currentVerse, setCurrentVerse] = useState(null);
+  const [currentVerse, setCurrentVerse] = useState(
+    () => HEART_VERSES[Math.floor(Math.random() * HEART_VERSES.length)] || null,
+  );
 
-  const getRandomVerse = () => {
+  const getRandomVerse = useCallback(() => {
     const randomIndex = Math.floor(Math.random() * HEART_VERSES.length);
-    setCurrentVerse(HEART_VERSES[randomIndex]);
-  };
-
-  useEffect(() => {
-    if (isOpen) {
-      getRandomVerse();
-    }
-  }, [isOpen]);
+    setCurrentVerse(HEART_VERSES[randomIndex] || null);
+  }, []);
 
   return (
     <AnimatePresence>

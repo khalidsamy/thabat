@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Loader2, Sparkles, Eye, EyeOff, GitMerge, RotateCcw, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
@@ -83,6 +83,7 @@ const MutashabihatReview = () => {
   const [sessionComplete, setSessionComplete] = useState(false);
   const [hintRevealed, setHintRevealed] = useState(false);
   const [slideOut, setSlideOut]         = useState(false);
+  const slideTimerRef = useRef(null);
 
   const fetchDue = useCallback(async () => {
     setIsLoading(true);
@@ -97,6 +98,11 @@ const MutashabihatReview = () => {
   }, [showError]);
 
   useEffect(() => { fetchDue(); }, [fetchDue]);
+  useEffect(() => () => {
+    if (slideTimerRef.current) {
+      clearTimeout(slideTimerRef.current);
+    }
+  }, []);
 
   const handleReview = async (rating) => {
     const current = queue[currentIndex];
@@ -108,7 +114,10 @@ const MutashabihatReview = () => {
       setReviewed((prev) => prev + 1);
 
       setSlideOut(true);
-      setTimeout(() => {
+      if (slideTimerRef.current) {
+        clearTimeout(slideTimerRef.current);
+      }
+      slideTimerRef.current = setTimeout(() => {
         setSlideOut(false);
         setHintRevealed(false);
         if (currentIndex + 1 >= queue.length) {
@@ -117,6 +126,7 @@ const MutashabihatReview = () => {
           setCurrentIndex((prev) => prev + 1);
         }
         setIsSubmitting(false);
+        slideTimerRef.current = null;
       }, 350);
     } catch (err) {
       showError(err.message);
@@ -157,7 +167,7 @@ const MutashabihatReview = () => {
         <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
           <div
             className="h-full bg-teal-500 rounded-full transition-all duration-500"
-            style={{ width: `${(currentIndex / queue.length) * 100}%` }}
+            style={{ width: `${((currentIndex + 1) / queue.length) * 100}%` }}
           />
         </div>
       </div>

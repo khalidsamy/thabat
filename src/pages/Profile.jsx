@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { User, Lock, Mail, Save, KeyRound, CheckCircle, CalendarCheck } from 'lucide-react';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
@@ -8,8 +7,7 @@ import Input from '../components/Input';
 import Button from '../components/Button';
 
 const Profile = () => {
-  const { t } = useTranslation();
-  const { user, login } = useContext(AuthContext);
+  const { user, updateUser } = useContext(AuthContext);
   const { showSuccess, showError } = useToast();
 
   const [name, setName] = useState(user?.name || '');
@@ -24,23 +22,24 @@ const Profile = () => {
   });
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await api.get('/user/profile');
-        if (res.data.success) {
-          setName(res.data.user.name);
-          setEmail(res.data.user.email);
-          setReviewPace(res.data.user.reviewPace || 10);
-        }
-      } catch (err) {
-        showError(err.message);
+  const fetchProfile = useCallback(async () => {
+    try {
+      const res = await api.get('/user/profile');
+      if (res.data.success) {
+        setName(res.data.user.name);
+        setEmail(res.data.user.email);
+        setReviewPace(res.data.user.reviewPace || 10);
       }
-    };
-    fetchProfile();
-  }, []);
+    } catch (err) {
+      showError(err.message);
+    }
+  }, [showError]);
 
-  const handleProfileSave = async (e) => {
+  useEffect(() => {
+    void fetchProfile();
+  }, [fetchProfile]);
+
+  const handleProfileSave = useCallback(async (e) => {
     e.preventDefault();
     if (!name.trim()) {
       showError('Name cannot be empty.');
@@ -53,8 +52,7 @@ const Profile = () => {
         reviewPace
       });
       if (res.data.success) {
-        const currentToken = localStorage.getItem('thabat_token');
-        login(currentToken, res.data.user);
+        updateUser(res.data.user);
         showSuccess('Profile updated successfully!');
       }
     } catch (err) {
@@ -62,7 +60,7 @@ const Profile = () => {
     } finally {
       setIsSavingProfile(false);
     }
-  };
+  }, [name, reviewPace, showError, showSuccess, updateUser]);
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();

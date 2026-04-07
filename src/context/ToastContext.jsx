@@ -1,18 +1,29 @@
-import React, { createContext, useState, useCallback, useContext } from 'react';
+import React, { createContext, useState, useCallback, useContext, useEffect, useRef } from 'react';
 
 export const ToastContext = createContext();
 
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
+  const toastCounterRef = useRef(0);
+  const timeoutRefs = useRef(new Map());
+
+  useEffect(() => () => {
+    timeoutRefs.current.forEach((timeoutId) => clearTimeout(timeoutId));
+    timeoutRefs.current.clear();
+  }, []);
 
   const addToast = useCallback((message, type) => {
-    const id = Date.now();
+    toastCounterRef.current += 1;
+    const id = toastCounterRef.current;
     setToasts((prev) => [...prev, { id, message, type }]);
 
     // Auto-dismiss smoothly after 4 seconds
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
+      timeoutRefs.current.delete(id);
       setToasts((prev) => prev.filter((toast) => toast.id !== id));
     }, 4000);
+
+    timeoutRefs.current.set(id, timeoutId);
   }, []);
 
   const showSuccess = useCallback((message) => addToast(message, 'success'), [addToast]);
@@ -20,6 +31,11 @@ export const ToastProvider = ({ children }) => {
   const showInfo = useCallback((message) => addToast(message, 'info'), [addToast]);
 
   const removeToast = useCallback((id) => {
+    const timeoutId = timeoutRefs.current.get(id);
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutRefs.current.delete(id);
+    }
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 

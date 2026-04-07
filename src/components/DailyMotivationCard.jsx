@@ -11,46 +11,46 @@ const DailyMotivationCard = ({ dailyVerse, itemVariants }) => {
       variants={itemVariants}
       className="lg:col-span-8 group h-full"
     >
-      <div className="relative h-full min-h-[400px] overflow-hidden bg-card/40 rounded-3xl p-8 sm:p-10 shadow-xl shadow-black/5 border border-white/10 flex flex-col justify-between transition-all duration-500 hover:shadow-emerald-500/10 backdrop-blur-md relative overflow-hidden group">
+      <div className="glass-card relative h-full min-h-[400px] overflow-hidden rounded-3xl p-8 sm:p-10 flex flex-col justify-between transition-all duration-500 hover:shadow-emerald-500/10 group">
         {/* Glassmorphism Accents */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full -mr-40 -mt-40 blur-3xl transition-transform duration-1000 group-hover:scale-110"></div>
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full -ml-32 -mb-32 blur-3xl"></div>
+        <div className="absolute top-0 right-0 w-80 h-80 rounded-full -mr-40 -mt-40 blur-3xl transition-transform duration-1000 group-hover:scale-110 bg-[color:var(--theme-accent-soft)]"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full -ml-32 -mb-32 blur-3xl bg-[color:var(--theme-amber-soft)]"></div>
 
         {/* Header: Title */}
         <div className="relative flex items-center justify-between">
           <div className="flex flex-col">
-            <span className="text-[10px] font-black text-emerald-100/40 uppercase tracking-[0.4em] mb-1">
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] mb-1 text-[color:var(--theme-text-muted)]">
               {t('dashboard.daily_motivation') || 'DAILY MOTIVATION'}
             </span>
-            <h2 className="text-xl font-bold text-white tracking-tight">
+            <h2 className="text-xl font-bold text-foreground tracking-tight">
               {t('dashboard.daily_verse') || 'Daily Verse'}
             </h2>
           </div>
-          <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/20 shadow-xl group-hover:rotate-6 transition-transform">
-            <Sparkles className="h-6 w-6 text-white animate-pulse" />
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center backdrop-blur-md border border-[color:var(--theme-border)] bg-[color:var(--theme-surface-muted)] shadow-xl group-hover:rotate-6 transition-transform">
+            <Sparkles className="h-6 w-6 text-emerald-500 animate-pulse" />
           </div>
         </div>
 
         {/* Content: Verse */}
         <div className="relative py-6">
-          <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white leading-[1.4] drop-shadow-sm mb-4 text-center sm:text-right" dir="rtl">
+          <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-foreground leading-[1.4] drop-shadow-sm mb-4 text-center sm:text-right" dir="rtl">
             {dailyVerse?.arabic}
           </p>
           <div className="flex flex-col items-center sm:items-end gap-2">
-            <p className="text-[11px] font-black text-emerald-100/60 uppercase tracking-[0.2em]" dir="rtl">
+            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-500/80" dir="rtl">
               — {dailyVerse?.reference}
             </p>
-            <p className="text-sm sm:text-base font-medium text-white/80 italic leading-relaxed max-w-xl text-center sm:text-right">
+            <p className="text-sm sm:text-base font-medium italic leading-relaxed max-w-xl text-center sm:text-right text-[color:var(--theme-text-soft)]">
               {dailyVerse?.english}
             </p>
           </div>
         </div>
 
         {/* Footer: Spiritual Status Icons */}
-        <div className="relative pt-6 border-t border-white/10">
+        <div className="relative pt-6 border-t border-[color:var(--theme-border)]">
           <div className="flex items-center justify-between sm:justify-start gap-4 sm:gap-6">
             <div className="flex flex-col max-sm:items-center">
-              <span className="text-[9px] font-black text-emerald-100/30 uppercase tracking-widest mb-3 px-1">
+              <span className="text-[9px] font-black uppercase tracking-widest mb-3 px-1 text-[color:var(--theme-text-muted)]">
                 {t('dashboard.spiritual_status') || 'Spiritual Status'}
               </span>
               <div className="flex items-center gap-3">

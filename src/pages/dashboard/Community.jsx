@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOutletContext } from 'react-router-dom';
 import { Sparkles, MessageCircle, Heart, Send } from 'lucide-react';
@@ -22,7 +22,17 @@ const Community = (props) => {
   const [isPosting, setIsPosting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchReflections = async () => {
+  const currentUserId = user?._id;
+
+  const hasCurrentUserDua = useCallback((reflection) => (
+    reflection?.duas?.some((duaEntry) => {
+      if (!duaEntry) return false;
+      if (typeof duaEntry === 'string') return duaEntry === currentUserId || duaEntry === 'me';
+      return duaEntry._id === currentUserId;
+    })
+  ), [currentUserId]);
+
+  const fetchReflections = useCallback(async () => {
     try {
       const response = await api.get('/community');
       if (response.data.success) {
@@ -34,11 +44,11 @@ const Community = (props) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [showError, t]);
 
   useEffect(() => {
-    fetchReflections();
-  }, []);
+    void fetchReflections();
+  }, [fetchReflections]);
 
   const handlePostReflection = async (e) => {
     e.preventDefault();
@@ -61,13 +71,13 @@ const Community = (props) => {
 
   const handleAddDua = async (id) => {
     const reflection = reflections.find(r => r._id === id);
-    if (reflection?.duas?.includes('me')) return;
+    if (hasCurrentUserDua(reflection)) return;
 
     setReflections(prev => prev.map(r => 
       r._id === id ? { 
         ...r, 
         duaCount: r.duaCount + 1, 
-        duas: [...(r.duas || []), 'me'] 
+        duas: [...(r.duas || []), currentUserId || 'me'] 
       } : r
     ));
 
@@ -81,7 +91,7 @@ const Community = (props) => {
         r._id === id ? { 
           ...r, 
           duaCount: r.duaCount - 1, 
-          duas: (r.duas || []).filter(u => u !== 'me') 
+          duas: (r.duas || []).filter(u => u !== (currentUserId || 'me')) 
         } : r
       ));
       showError(err.response?.data?.message || err.message);
@@ -184,13 +194,13 @@ const Community = (props) => {
                   <button
                     onClick={() => handleAddDua(reflection._id)}
                     className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-2xl transition-all ${
-                      reflection.duas?.includes('me') 
+                      hasCurrentUserDua(reflection)
                         ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' 
                         : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
                     }`}
                   >
                     <span className="text-sm font-bold">{reflection.duaCount}</span>
-                    <Heart className={`h-4 w-4 ${reflection.duas?.includes('me') ? 'fill-white' : ''}`} />
+                    <Heart className={`h-4 w-4 ${hasCurrentUserDua(reflection) ? 'fill-white' : ''}`} />
                   </button>
                 </div>
               </motion.div>

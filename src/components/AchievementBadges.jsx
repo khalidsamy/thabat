@@ -16,7 +16,7 @@ const AchievementBadges = ({ pages = 0 }) => {
       </div>
 
       <div className="flex gap-6 overflow-x-auto pb-4 hide-scrollbar snap-x snap-mandatory">
-        {MILESTONES.map((milestone, index) => {
+        {MILESTONES.map((milestone) => {
           const isUnlocked = pages >= milestone.pages;
           
           return (

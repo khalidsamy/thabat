@@ -34,7 +34,7 @@ const ProgressChart = ({ refreshTrigger }) => {
 
   if (isLoading) {
     return (
-      <div className="bg-card/40 rounded-3xl border border-white/5 p-8 shadow-xl shadow-black/40 flex items-center justify-center" style={{ height: 400 }}>
+      <div className="glass-card rounded-3xl p-8 flex items-center justify-center" style={{ height: 400 }}>
         <svg className="animate-spin h-10 w-10 text-emerald-500 opacity-50" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -45,14 +45,14 @@ const ProgressChart = ({ refreshTrigger }) => {
 
   if (error) {
     return (
-      <div className="bg-card/40 rounded-3xl border border-white/5 p-8 shadow-xl shadow-black/40 flex items-center justify-center" style={{ height: 400 }}>
+      <div className="glass-card rounded-3xl p-8 flex items-center justify-center" style={{ height: 400 }}>
         <p className="text-sm font-bold text-rose-500">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-card/40 rounded-3xl border border-white/5 p-8 lg:p-10 shadow-xl shadow-black/40">
+    <div className="glass-card rounded-3xl p-8 lg:p-10">
       <h3 className="text-xl font-black text-foreground mb-8 uppercase tracking-widest">
         {t('chart.title')}
       </h3>
@@ -69,23 +69,23 @@ const ProgressChart = ({ refreshTrigger }) => {
                   <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--theme-chart-grid)" />
               <XAxis
                 dataKey="displayDate"
                 axisLine={false} tickLine={false}
-                tick={{ fontSize: 12, fill: '#94a3b8' }} dy={10}
+                tick={{ fontSize: 12, fill: 'var(--theme-text-muted)' }} dy={10}
               />
               <YAxis
                 axisLine={false} tickLine={false}
-                tick={{ fontSize: 12, fill: '#94a3b8' }} allowDecimals={false}
+                tick={{ fontSize: 12, fill: 'var(--theme-text-muted)' }} allowDecimals={false}
               />
               <Tooltip
                 contentStyle={{
-                  borderRadius: '8px', border: '1px solid #1e293b',
-                  backgroundColor: '#0f172a', color: '#f8fafc',
-                  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
+                  borderRadius: '16px', border: '1px solid var(--theme-border)',
+                  backgroundColor: 'var(--theme-chart-tooltip)', color: 'var(--theme-text)',
+                  boxShadow: 'var(--theme-shadow-soft)',
                 }}
-                cursor={{ stroke: '#334155', strokeWidth: 1, strokeDasharray: '3 3' }}
+                cursor={{ stroke: 'var(--theme-border-strong)', strokeWidth: 1, strokeDasharray: '3 3' }}
               />
               <Area
                 type="monotone" dataKey="pages" name={t('dashboard.pages')}
@@ -97,7 +97,7 @@ const ProgressChart = ({ refreshTrigger }) => {
           </ResponsiveContainer>
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-center p-8">
-            <p className="text-sm font-medium text-slate-500">{t('chart.no_data')}</p>
+            <p className="text-sm font-medium text-[color:var(--theme-text-muted)]">{t('chart.no_data')}</p>
           </div>
         )}
       </div>

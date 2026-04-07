@@ -2,11 +2,9 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
+import { ThemeProvider } from './context/ThemeContext';
 
-// Components
-import Navbar from './components/Navbar';
 import Toast from './components/Toast';
-import Footer from './components/Footer';
 import { useContext } from 'react';
 import { AuthContext } from './context/AuthContext';
 
@@ -24,6 +22,7 @@ import ErrorLog from './pages/ErrorLog';
 import ReviewSession from './pages/ReviewSession';
 import MutashabihatLog from './pages/MutashabihatLog';
 import MutashabihatReview from './pages/MutashabihatReview';
+import Settings from './pages/Settings';
 
 // Auth Guards
 import ProtectedRoute from './components/ProtectedRoute';
@@ -33,62 +32,65 @@ import ResponsiveLayout from './components/layout/ResponsiveLayout';
 
 function App() {
   return (
-    <ToastProvider>
-      <AuthProvider>
-        <Router>
-          <div className="min-h-screen bg-background">
-            <Toast />
-            <Routes>
+    <ThemeProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <Router>
+            <div className="min-h-screen bg-background">
+              <Toast />
+              <Routes>
               {/* Global Root Transition Logic */}
-              <Route path="/" element={<RootRedirect />} />
+                <Route path="/" element={<RootRedirect />} />
 
               {/* Public Routes with standalone layout */}
-              <Route 
-                path="/register" 
-                element={
-                  <PublicOnlyRoute>
-                    <AnimatedPage>
-                      <Register />
-                    </AnimatedPage>
-                  </PublicOnlyRoute>
-                } 
-              />
+                <Route
+                  path="/register"
+                  element={
+                    <PublicOnlyRoute>
+                      <AnimatedPage>
+                        <Register />
+                      </AnimatedPage>
+                    </PublicOnlyRoute>
+                  }
+                />
               
-              <Route 
-                path="/login" 
-                element={
-                  <PublicOnlyRoute>
-                    <AnimatedPage>
-                      <Login />
-                    </AnimatedPage>
-                  </PublicOnlyRoute>
-                } 
-              />
+                <Route
+                  path="/login"
+                  element={
+                    <PublicOnlyRoute>
+                      <AnimatedPage>
+                        <Login />
+                      </AnimatedPage>
+                    </PublicOnlyRoute>
+                  }
+                />
 
               {/* Unified Dashboard Hub */}
-              <Route element={<ProtectedRoute><ResponsiveLayout /></ProtectedRoute>}>
-                <Route path="/dashboard" element={<Dashboard />}>
-                  <Route index element={<Home />} />
-                  <Route path="progress" element={<Progress />} />
-                  <Route path="recite" element={<Recite />} />
-                  <Route path="community" element={<Community />} />
-                  <Route path="review" element={<Review />} />
+                <Route element={<ProtectedRoute><ResponsiveLayout /></ProtectedRoute>}>
+                  <Route path="/dashboard" element={<Dashboard />}>
+                    <Route index element={<Home />} />
+                    <Route path="progress" element={<Progress />} />
+                    <Route path="recite" element={<Recite />} />
+                    <Route path="community" element={<Community />} />
+                    <Route path="review" element={<Review />} />
                   
                   {/* Specialized Tools Consolidated Under Dashboard Layout */}
-                  <Route path="errors" element={<ErrorLog />} />
-                  <Route path="review-session" element={<ReviewSession />} />
-                  <Route path="mutashabihat" element={<MutashabihatLog />} />
-                  <Route path="mutashabihat-review" element={<MutashabihatReview />} />
-                  <Route path="profile" element={<Profile />} />
+                    <Route path="errors" element={<ErrorLog />} />
+                    <Route path="review-session" element={<ReviewSession />} />
+                    <Route path="mutashabihat" element={<MutashabihatLog />} />
+                    <Route path="mutashabihat-review" element={<MutashabihatReview />} />
+                    <Route path="profile" element={<Profile />} />
+                    <Route path="settings" element={<Settings />} />
+                  </Route>
                 </Route>
-              </Route>
 
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            </Routes>
-          </div>
-        </Router>
-    </AuthProvider>
-    </ToastProvider>
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+              </Routes>
+            </div>
+          </Router>
+        </AuthProvider>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }
 

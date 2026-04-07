@@ -7,16 +7,18 @@ import StatCard from '../../components/StatCard';
 import ProgressChart from '../../components/ProgressChart';
 import AchievementBadges from '../../components/AchievementBadges';
 import HifzProgress from '../../components/HifzProgress';
+import { THABAT_PLAN } from '../../utils/PlanManager';
 
 const Progress = (props) => {
   const { t } = useTranslation();
   const context = useOutletContext() || {};
-  const { progress, user, refreshKey, itemVariants, oldDailyTarget, newDailyTarget, reviewPace, planLabels } = { 
+  const { progress, refreshKey, itemVariants, reviewPace = 10 } = {
     progress: {}, 
-    user: {}, 
     ...context, 
     ...props 
   };
+  const distantReviewPages = THABAT_PLAN.DISTANT_REVIEW_FRACTION;
+  const intensiveReviewPages = Math.min(progress?.totalMemorized || 0, THABAT_PLAN.INTENSIVE_REVIEW_SIZE);
 
   return (
     <div className="space-y-8 pb-32">
@@ -72,14 +74,14 @@ const Progress = (props) => {
           />
           <StatCard 
             title={t('dashboard.distant_review_card')}
-            value={`${oldDailyTarget} ${t('dashboard.pages')}`} 
+            value={`${distantReviewPages} ${t('dashboard.pages')}`} 
             icon={<CalendarCheck className="h-6 w-6 text-sky-500" />}
             subtitle={t('dashboard.days_system', { days: reviewPace })}
             className="border-sky-500/10"
           />
           <StatCard 
             title={t('dashboard.intensive_review_card')}
-            value={`${newDailyTarget} ${t('dashboard.pages')}`} 
+            value={`${intensiveReviewPages} ${t('dashboard.pages')}`} 
             icon={<Flame className="h-6 w-6 text-emerald-500" />}
             subtitle={t('dashboard.intensive_system')}
             className="border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/20"

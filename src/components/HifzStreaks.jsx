@@ -1,12 +1,10 @@
-import { Flame, Star, Trophy, Calendar, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { getStreakMood, getMoodVariants, MOODS } from '../utils/streakMoods';
+import { getStreakMood } from '../utils/streakMoods';
 
-const HifzStreaks = ({ streak = 0, isCompletedToday = false, wasActiveYesterday = true, currentSurah = "", completion = 0, history = [], onVisualize }) => {
+const HifzStreaks = ({ streak = 0, isCompletedToday = false, wasActiveYesterday = true, history = [], onVisualize }) => {
   const { t, i18n } = useTranslation();
   const mood = getStreakMood(streak, isCompletedToday, wasActiveYesterday);
-  const moodVariant = getMoodVariants(mood.id);
 
   // Localization for mood labels
   const moodLabels = {

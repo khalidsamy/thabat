@@ -94,7 +94,11 @@ export const useSmartRecitation = ({ targetVerses = [], previousVerseText = null
   };
 
   const stopRecognition = useCallback(() => {
-    try { recognitionRef.current?.stop(); } catch (_) {}
+    try {
+      recognitionRef.current?.stop();
+    } catch {
+      // SpeechRecognition can throw when the instance has already been stopped.
+    }
     recognitionRef.current = null;
   }, []);
 
@@ -153,7 +157,7 @@ export const useSmartRecitation = ({ targetVerses = [], previousVerseText = null
           setCorrectionReps(0);
           setPhase('reciting');
           phaseRef.current = 'reciting';
-          startRecognition(processChunk); // eslint-disable-line no-use-before-define
+          startRecognition(processChunk);
         }
       }
     });

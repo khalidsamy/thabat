@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { CheckCircle2, XCircle, Loader2, Sparkles, BookOpen, RotateCcw, Flame } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
-import { ErrorTypeBadge } from './ErrorLog';
+import ErrorTypeBadge from '../components/ErrorTypeBadge';
 
 // ── Celebration screen ────────────────────────────────────────────────────
 const AllDoneScreen = ({ reviewed }) => (
@@ -76,6 +76,7 @@ const ReviewSession = () => {
   const [reviewed, setReviewed] = useState(0);
   const [sessionComplete, setSessionComplete] = useState(false);
   const [isSliding, setIsSliding] = useState(false);
+  const slideTimerRef = useRef(null);
 
   const fetchDueErrors = useCallback(async () => {
     setIsLoading(true);
@@ -92,6 +93,11 @@ const ReviewSession = () => {
   }, [showError]);
 
   useEffect(() => { fetchDueErrors(); }, [fetchDueErrors]);
+  useEffect(() => () => {
+    if (slideTimerRef.current) {
+      clearTimeout(slideTimerRef.current);
+    }
+  }, []);
 
   const handleReview = async (result) => {
     const current = queue[currentIndex];
@@ -102,7 +108,10 @@ const ReviewSession = () => {
       await api.put(`/errors/${current._id}/review`, { result });
       setReviewed((n) => n + 1);
       setIsSliding(true);
-      setTimeout(() => {
+      if (slideTimerRef.current) {
+        clearTimeout(slideTimerRef.current);
+      }
+      slideTimerRef.current = setTimeout(() => {
         setIsSliding(false);
         if (currentIndex + 1 >= queue.length) {
           setSessionComplete(true);
@@ -110,6 +119,7 @@ const ReviewSession = () => {
           setCurrentIndex((n) => n + 1);
         }
         setIsSubmitting(false);
+        slideTimerRef.current = null;
       }, 280);
     } catch (err) {
       showError(err.message);
@@ -129,7 +139,7 @@ const ReviewSession = () => {
   if (queue.length === 0) return <NothingDueScreen />;
 
   const current = queue[currentIndex];
-  const progress = Math.round((currentIndex / queue.length) * 100);
+  const progress = Math.round(((currentIndex + 1) / queue.length) * 100);
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-10">

@@ -9,10 +9,31 @@ const api = axios.create({
 
 // Retry a failed request once after a short delay — handles cold Railway starts.
 const retryRequest = (config) =>
-  new Promise(resolve => setTimeout(() => resolve(axios(config)), 2000));
+  new Promise((resolve, reject) => {
+    if (config.signal?.aborted) {
+      reject(new axios.CanceledError('Request aborted'));
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        resolve(await api.request(config));
+      } catch (retryError) {
+        reject(retryError);
+      }
+    }, 1200);
+
+    if (config.signal) {
+      config.signal.addEventListener('abort', () => {
+        clearTimeout(timeoutId);
+        reject(new axios.CanceledError('Request aborted'));
+      }, { once: true });
+    }
+  });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('thabat_token');
+  config.headers = config.headers || {};
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -20,16 +41,25 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
+    if (axios.isCancel(error) || error.code === 'ERR_CANCELED') {
+      return Promise.reject(error);
+    }
+
     // Single automatic retry on network timeout or 502/503 (Railway cold start)
     const status = error.response?.status;
     const isRetryable = !error.response || status === 502 || status === 503 || status === 504;
-    if (isRetryable && !error.config._retried) {
+    if (isRetryable && error.config && !error.config._retried) {
       error.config._retried = true;
-      try { return await retryRequest(error.config); } catch (_) {}
+      try {
+        return await retryRequest(error.config);
+      } catch (retryError) {
+        return Promise.reject(retryError);
+      }
     }
 
     if (status === 401) {
       localStorage.removeItem('thabat_token');
+      localStorage.removeItem('thabat_user');
       if (window.location.pathname !== '/login') window.location.href = '/login';
     }
 

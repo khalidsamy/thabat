@@ -3,6 +3,7 @@ import { PlusCircle, Trash2, GitMerge, Loader2, Clock, Sparkles, ChevronDown, Ch
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/Button';
+import { fetchAyahText as fetchAyahPreview, isAbortedRequest } from '../services/quranApi';
 
 // ── Constants ─────────────────────────────────────────────────────────────
 const MAX_VERSES = 5;
@@ -29,7 +30,7 @@ const MASTERY_COLORS = [
 ];
 
 // ── Quran API fetch ───────────────────────────────────────────────────────
-const fetchAyahData = async (surahNumber, ayahNumber) => {
+const _fetchAyahData = async (surahNumber, ayahNumber) => {
   try {
     const res = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}`);
     const data = await res.json();
@@ -40,7 +41,9 @@ const fetchAyahData = async (surahNumber, ayahNumber) => {
         surahEnglishName: data.data.surah.englishName,
       };
     }
-  } catch (_) {}
+  } catch (_error) {
+    // Optional preview failures should not block logging the group.
+  }
   return null;
 };
 
@@ -55,21 +58,39 @@ const emptyVerse = () => ({
 // ── Verse Input Block ─────────────────────────────────────────────────────
 const VerseBlock = ({ index, verse, onChange, onRemove, canRemove }) => {
   useEffect(() => {
-    const surah = parseInt(verse.surahNumber);
-    const ayah = parseInt(verse.ayahNumber);
-    if (surah >= 1 && surah <= 114 && ayah >= 1) {
-      onChange(index, '_fetching', true);
-      const timer = setTimeout(async () => {
-        const result = await fetchAyahData(surah, ayah);
-        onChange(index, '_resolved', result);
-        onChange(index, '_fetching', false);
-        if (result) onChange(index, '_surahName', result.surahName);
-      }, 700);
-      return () => clearTimeout(timer);
-    } else {
+    const surah = Number.parseInt(verse.surahNumber, 10);
+    const ayah = Number.parseInt(verse.ayahNumber, 10);
+
+    if (!(surah >= 1 && surah <= 114 && ayah >= 1)) {
       onChange(index, '_resolved', null);
+      onChange(index, '_fetching', false);
+      return undefined;
     }
-  }, [verse.surahNumber, verse.ayahNumber]);
+
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      onChange(index, '_fetching', true);
+
+      try {
+        const result = await fetchAyahPreview(surah, ayah, { signal: controller.signal });
+        onChange(index, '_resolved', result);
+        if (result) {
+          onChange(index, '_surahName', result.surahName);
+        }
+      } catch (error) {
+        if (!isAbortedRequest(error)) {
+          onChange(index, '_resolved', null);
+        }
+      } finally {
+        onChange(index, '_fetching', false);
+      }
+    }, 400);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [index, onChange, verse.ayahNumber, verse.surahNumber]);
 
   return (
     <div className="relative bg-teal-950/20 rounded-2xl border border-white/5 p-5 mb-4 backdrop-blur-sm">
@@ -176,13 +197,13 @@ const MutashabihatLog = () => {
 
   useEffect(() => { fetchRecords(); }, [fetchRecords]);
 
-  const handleVerseChange = (index, field, value) => {
+  const handleVerseChange = useCallback((index, field, value) => {
     setVerses((prev) => {
       const updated = [...prev];
       updated[index] = { ...updated[index], [field]: value };
       return updated;
     });
-  };
+  }, []);
 
   const addVerse = () => {
     if (verses.length < MAX_VERSES) setVerses((prev) => [...prev, emptyVerse()]);

@@ -4,7 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
  * Real-time Quranic recitation feedback hook.
  * Handles normalization and word-level diffing between speech and target text.
  */
-export const useVoiceCorrection = (targetVerses = [], onComplete) => {
+export const useVoiceCorrection = (targetVerses = [], _onComplete) => {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');

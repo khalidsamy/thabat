@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOutletContext } from 'react-router-dom';
 import { Mic, MicOff, Search, RotateCcw, Trophy, AlertCircle, Link2, ChevronRight, RefreshCw } from 'lucide-react';
-import axios from 'axios';
 import { useSmartRecitation } from '../../hooks/usesmartrecitation';
 import { useToast } from '../../context/ToastContext';
 import api from '../../services/api';
+import { fetchAyah, fetchSurahList, isAbortedRequest } from '../../services/quranApi';
 
 const playErrorChime = () => {
   try {
@@ -20,9 +20,14 @@ const playErrorChime = () => {
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
     osc.connect(gain);
     gain.connect(ctx.destination);
+    osc.onended = () => {
+      void ctx.close().catch(() => undefined);
+    };
     osc.start();
     osc.stop(ctx.currentTime + 0.25);
-  } catch (_) {}
+  } catch {
+    // Audio feedback is optional on unsupported browsers.
+  }
 };
 
 const Waveform = () => (
@@ -60,7 +65,7 @@ const WordChip = ({ word, isNext, activeRef }) => {
 
 const Recite = (props) => {
   const context = useOutletContext() || {};
-  const { handleVoiceComplete } = { ...context, ...props };
+  const { refreshData } = { ...context, ...props };
   const { showSuccess, showError } = useToast();
 
   const [surahs, setSurahs]             = useState([]);
@@ -76,6 +81,8 @@ const Recite = (props) => {
   // Auto-scroll ref: points to the currently active word DOM node
   const activeWordRef = useRef(null);
   const verseContainerRef = useRef(null);
+  const surahRequestRef = useRef(null);
+  const versesRequestRef = useRef(null);
 
   const handleError = useCallback((word) => {
     playErrorChime();
@@ -100,10 +107,34 @@ const Recite = (props) => {
   }, [words]); // runs whenever word statuses change
 
   useEffect(() => {
-    axios.get('https://api.alquran.cloud/v1/surah')
-      .then(r => setSurahs(r.data.data))
-      .catch(() => showError('Failed to load surah list'));
+    const controller = new AbortController();
+    surahRequestRef.current = controller;
+
+    const loadSurahs = async () => {
+      try {
+        const data = await fetchSurahList({ signal: controller.signal });
+        setSurahs(data);
+      } catch (error) {
+        if (!isAbortedRequest(error)) {
+          showError('Failed to load surah list');
+        }
+      }
+    };
+
+    void loadSurahs();
+
+    return () => {
+      controller.abort();
+      if (surahRequestRef.current === controller) {
+        surahRequestRef.current = null;
+      }
+    };
   }, [showError]);
+
+  useEffect(() => () => {
+    surahRequestRef.current?.abort();
+    versesRequestRef.current?.abort();
+  }, []);
 
   const filteredSurahs = useMemo(() =>
     surahs.filter(s =>
@@ -111,51 +142,71 @@ const Recite = (props) => {
       s.number.toString().includes(surahSearch)
     ), [surahs, surahSearch]);
 
-  const loadVerses = async () => {
+  const loadVerses = useCallback(async () => {
+    if (ayahTo < ayahFrom) {
+      showError('Ending ayah must be after the starting ayah.');
+      return;
+    }
+
+    versesRequestRef.current?.abort();
+    const controller = new AbortController();
+    versesRequestRef.current = controller;
     setIsLoadingVerses(true);
     try {
-      const fetched = [];
-      for (let i = ayahFrom; i <= ayahTo; i++) {
-        const r = await axios.get(`https://api.alquran.cloud/v1/ayah/${selectedSurah}:${i}/quran-uthmani`);
-        fetched.push({ numberInSurah: i, text: r.data.data.text, surah: r.data.data.surah });
-      }
+      const fetchedAyahs = await Promise.all(
+        Array.from({ length: ayahTo - ayahFrom + 1 }, (_, index) =>
+          fetchAyah(selectedSurah, ayahFrom + index, 'quran-uthmani', { signal: controller.signal }),
+        ),
+      );
+
+      const fetched = fetchedAyahs.map((ayah) => ({
+        numberInSurah: ayah.numberInSurah,
+        text: ayah.text,
+        surah: ayah.surah,
+      }));
+
       if (ayahFrom > 1) {
-        const prev = await axios.get(`https://api.alquran.cloud/v1/ayah/${selectedSurah}:${ayahFrom - 1}/quran-uthmani`);
-        setPreviousVerse({ text: prev.data.data.text, numberInSurah: ayahFrom - 1 });
+        const previousAyah = await fetchAyah(selectedSurah, ayahFrom - 1, 'quran-uthmani', { signal: controller.signal });
+        setPreviousVerse({ text: previousAyah.text, numberInSurah: ayahFrom - 1 });
       } else {
         setPreviousVerse(null);
       }
       setTargetVerses(fetched);
       resetSession();
       setSessionDone(false);
-    } catch {
-      showError('Failed to fetch verses');
+    } catch (error) {
+      if (!isAbortedRequest(error)) {
+        showError('Failed to fetch verses');
+      }
     } finally {
+      if (versesRequestRef.current === controller) {
+        versesRequestRef.current = null;
+      }
       setIsLoadingVerses(false);
     }
-  };
+  }, [ayahFrom, ayahTo, resetSession, selectedSurah, showError]);
 
   const handleEndSession = async () => {
     stopSession();
     const surahData = surahs.find(s => s.number === selectedSurah);
     const surahName = surahData?.name || surahData?.englishName || '';
     try {
-      await api.post('/progress/mastery', { score: masteryScore, surah: surahName });
-      await api.post('/progress/update', { pages: Math.max(1, Math.ceil(targetVerses.length / 2)) });
+      await Promise.all([
+        api.post('/progress/mastery', { score: masteryScore, surah: surahName }),
+        api.post('/progress/update', { pages: Math.max(1, Math.ceil(targetVerses.length / 2)) }),
+      ]);
 
       const errorWords = [...new Set(words.filter(w => w.status === 'error').map(w => w.text))];
-      for (const word of errorWords) {
-        await api.post('/errors', {
+      await Promise.allSettled(errorWords.map((word) => api.post('/errors', {
           location: { surahNumber: selectedSurah, surahName, ayahNumber: ayahFrom },
           errorType: 'wrong_word',
           note: `"${word}" — ${masteryScore}% دقة`,
           ayahText: targetVerses[0]?.text,
-        }).catch(() => {});
-      }
+        })));
 
       showSuccess('تم تسجيل الجلسة بنجاح');
       setSessionDone(true);
-      handleVoiceComplete?.(masteryScore, surahName);
+      void refreshData?.();
     } catch {
       showError('Failed to save session');
     }

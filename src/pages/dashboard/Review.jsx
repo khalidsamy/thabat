@@ -10,9 +10,8 @@ import MindMapModal from '../../components/MindMapModal';
 const Review = (props) => {
   const { t } = useTranslation();
   const context = useOutletContext() || {};
-  const { progress, user, itemVariants } = { 
+  const { progress, itemVariants } = {
     progress: {}, 
-    user: {}, 
     ...context, 
     ...props 
   };

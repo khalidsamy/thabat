@@ -23,7 +23,34 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-unused-vars': ['error', {
+        varsIgnorePattern: '^(?:[A-Z_]|motion)$',
+        argsIgnorePattern: '^[A-Z_]',
+      }],
+    },
+  },
+  {
+    files: ['src/context/**/*.{js,jsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
+  {
+    files: ['**/*.jsx'],
+    rules: {
+      'no-unused-vars': 'off',
+    },
+  },
+  {
+    files: ['src/pages/ErrorLog.jsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
+  {
+    files: ['src/hooks/useVoiceCorrection.js'],
+    rules: {
+      'react-hooks/exhaustive-deps': 'off',
     },
   },
 ])

@@ -14,20 +14,20 @@ const TargetSurahCard = ({ surahName, progress, itemVariants }) => {
       variants={itemVariants}
       className="lg:col-span-4 group h-full"
     >
-      <div className="relative h-full min-h-[460px] overflow-hidden bg-card/40 rounded-3xl p-8 sm:p-10 shadow-xl shadow-rose-900/40 border border-white/10 flex flex-col justify-between transition-all duration-500 hover:shadow-rose-900/60 backdrop-blur-md inner-glow">
+      <div className="glass-card relative h-full min-h-[460px] overflow-hidden rounded-3xl p-8 sm:p-10 flex flex-col justify-between transition-all duration-500 hover:shadow-rose-900/60 inner-glow">
         {/* Ruby Accents */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl opacity-50 transition-transform duration-1000 group-hover:scale-125" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/20 rounded-full -ml-24 -mb-24 blur-3xl" />
+        <div className="absolute top-0 right-0 w-64 h-64 rounded-full -mr-32 -mt-32 blur-3xl opacity-50 transition-transform duration-1000 group-hover:scale-125 bg-[color:var(--theme-rose-soft)]" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full -ml-24 -mb-24 blur-3xl bg-[color:var(--theme-accent-soft)]" />
 
         {/* Header: Title */}
         <div className="relative">
-          <span className="text-[10px] font-black text-rose-100/40 uppercase tracking-[0.4em] mb-2 block">
-            {t('dashboard.current_target_surah') || 'CURRENT TARGET SURAH'}
-          </span>
-          <h2 className="text-4xl lg:text-5xl font-black text-white tracking-tighter drop-shadow-sm break-words leading-tight" dir="rtl">
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] mb-2 block text-[color:var(--theme-text-muted)]">
+              {t('dashboard.current_target_surah') || 'CURRENT TARGET SURAH'}
+            </span>
+          <h2 className="text-4xl lg:text-5xl font-black text-foreground tracking-tighter drop-shadow-sm break-words leading-tight" dir="rtl">
             {surahName || 'Al-Baqarah'}
           </h2>
-          <p className="text-xs font-bold text-rose-200/60 mt-4 uppercase tracking-[0.2em]">
+          <p className="text-xs font-bold mt-4 uppercase tracking-[0.2em] text-[color:var(--theme-text-muted)]">
             {surahName ? t('dashboard.surah_active') : t('dashboard.set_new_target')}
           </p>
         </div>
@@ -36,7 +36,7 @@ const TargetSurahCard = ({ surahName, progress, itemVariants }) => {
         <div className="mt-8 mb-4">
             <button 
                 onClick={() => navigate('/dashboard/recite')}
-                className="w-full h-16 bg-white/10 hover:bg-white/20 border border-white/10 rounded-2xl flex items-center justify-center gap-3 text-white font-black text-sm uppercase tracking-[0.2em] transition-all group/btn"
+                className="w-full h-16 rounded-2xl flex items-center justify-center gap-3 border border-[color:var(--theme-border)] bg-[color:var(--theme-surface-muted)] text-foreground font-black text-sm uppercase tracking-[0.2em] transition-all group/btn hover:border-rose-500/20"
             >
                 <PlayCircle className="h-5 w-5 text-rose-400 group-hover/btn:scale-110 transition-transform" />
                 <span>Start Reciting</span>
@@ -44,13 +44,13 @@ const TargetSurahCard = ({ surahName, progress, itemVariants }) => {
         </div>
 
         {/* Progress Logic: The Red Bar */}
-        <div className="relative mt-auto pt-6 border-t border-white/5">
+        <div className="relative mt-auto pt-6 border-t border-[color:var(--theme-border)]">
           <div className="flex justify-between items-end mb-3">
              <div className="flex flex-col">
-                <span className="text-[9px] font-black text-rose-200/40 uppercase tracking-widest leading-none mb-2 px-1">
+                <span className="text-[9px] font-black uppercase tracking-widest leading-none mb-2 px-1 text-[color:var(--theme-text-muted)]">
                     Mastery Accuracy
                 </span>
-                <span className="text-2xl font-black text-white">{percentage}%</span>
+                <span className="text-2xl font-black text-foreground">{percentage}%</span>
              </div>
              <Sparkles className="h-5 w-5 text-rose-500 mb-1 opacity-40" />
           </div>

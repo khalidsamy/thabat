@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, BookOpen, Layers, Type, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import { fetchSurahMetadata, isAbortedRequest } from '../services/quranApi';
 
 const MindMapModal = ({ isOpen, onClose, pageNumber = 1 }) => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const [surahData, setSurahData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,23 +17,34 @@ const MindMapModal = ({ isOpen, onClose, pageNumber = 1 }) => {
   };
 
   useEffect(() => {
-    if (isOpen) {
-      const fetchSurahMetadata = async () => {
-        setIsLoading(true);
-        try {
-          const surahNum = getSurahFromPage(pageNumber);
-          const response = await axios.get(`https://api.alquran.cloud/v1/surah/${surahNum}`);
-          if (response.data.code === 200) {
-            setSurahData(response.data.data);
-          }
-        } catch (err) {
-          console.error('Failed to fetch mind map data:', err);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      fetchSurahMetadata();
+    if (!isOpen) {
+      setSurahData(null);
+      return undefined;
     }
+
+    const controller = new AbortController();
+
+    const loadSurahMetadata = async () => {
+      setIsLoading(true);
+      try {
+        const surahNum = getSurahFromPage(pageNumber);
+        const metadata = await fetchSurahMetadata(surahNum, { signal: controller.signal });
+        setSurahData(metadata);
+      } catch (error) {
+        if (!isAbortedRequest(error)) {
+          console.error('Failed to fetch mind map data:', error);
+          setSurahData(null);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void loadSurahMetadata();
+
+    return () => {
+      controller.abort();
+    };
   }, [isOpen, pageNumber]);
 
   if (!isOpen) return null;
