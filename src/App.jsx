@@ -15,6 +15,7 @@ import Dashboard from './pages/Dashboard';
 import Home from './pages/dashboard/Home';
 import Progress from './pages/dashboard/Progress';
 import Recite from './pages/dashboard/RecitePremium';
+import ListeningStation from './pages/dashboard/ListeningStation';
 import Community from './pages/dashboard/Community';
 import Review from './pages/dashboard/Review';
 import Profile from './pages/Profile';
@@ -71,6 +72,7 @@ function App() {
                     <Route index element={<Home />} />
                     <Route path="progress" element={<Progress />} />
                     <Route path="recite" element={<Recite />} />
+                    <Route path="listen" element={<ListeningStation />} />
                     <Route path="community" element={<Community />} />
                     <Route path="review" element={<Review />} />
                   

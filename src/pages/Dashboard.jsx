@@ -206,7 +206,9 @@ const Dashboard = () => {
   }
 
   const isDashboardRoot = location.pathname === '/dashboard' || location.pathname === '/dashboard/';
-  const isReciteRoute = location.pathname.startsWith('/dashboard/recite');
+  const hasBottomPlayerRoute =
+    location.pathname.startsWith('/dashboard/recite') ||
+    location.pathname.startsWith('/dashboard/listen');
 
   return (
     <div className="relative w-full h-full">
@@ -228,7 +230,7 @@ const Dashboard = () => {
         whileHover={{ scale: 1.1, rotate: 12 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setIsHeartOpen(true)}
-        className={`fixed z-[100] items-center justify-center rounded-3xl border-2 border-white/20 bg-gradient-to-br from-amber-400 to-amber-600 shadow-[0_20px_50px_rgba(245,158,11,0.3)] ${isReciteRoute ? 'hidden sm:flex' : 'flex'} bottom-[calc(env(safe-area-inset-bottom)+5.25rem)] right-4 h-12 w-12 sm:bottom-8 sm:right-8 sm:h-14 sm:w-14`}
+        className={`fixed z-[100] items-center justify-center rounded-3xl border-2 border-white/20 bg-gradient-to-br from-amber-400 to-amber-600 shadow-[0_20px_50px_rgba(245,158,11,0.3)] ${hasBottomPlayerRoute ? 'hidden sm:flex' : 'flex'} bottom-[calc(env(safe-area-inset-bottom)+5.25rem)] right-4 h-12 w-12 sm:bottom-8 sm:right-8 sm:h-14 sm:w-14`}
       >
         <Heart className="h-5 w-5 fill-white text-white sm:h-6 sm:w-6" />
       </motion.button>

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Home, TrendingUp, Mic, MessageCircle, BookOpen, User, Settings, LogOut } from 'lucide-react';
+import { Home, TrendingUp, Mic, Headphones, MessageCircle, BookOpen, User, Settings, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
@@ -9,6 +9,7 @@ const Sidebar = () => {
   const { t, i18n } = useTranslation();
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const isArabic = i18n.language === 'ar';
 
   const handleLogout = () => {
     logout();
@@ -19,6 +20,7 @@ const Sidebar = () => {
     { path: '/dashboard', icon: Home, label: t('nav.home'), exact: true },
     { path: '/dashboard/progress', icon: TrendingUp, label: t('nav.progress') },
     { path: '/dashboard/recite', icon: Mic, label: t('nav.recite') },
+    { path: '/dashboard/listen', icon: Headphones, label: isArabic ? 'الاستماع' : 'Listening Station' },
     { path: '/dashboard/community', icon: MessageCircle, label: t('nav.community') },
     { path: '/dashboard/review-session', icon: BookOpen, label: t('nav.review_sessions') },
   ];

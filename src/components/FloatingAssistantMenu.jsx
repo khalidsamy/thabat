@@ -3,13 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Home, TrendingUp, Mic, MessageCircle,
+  Home, TrendingUp, Mic, Headphones, MessageCircle,
   BookOpen, BookMarked, UserCircle, Plus, X, GitMerge,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { path: '/dashboard',                icon: Home,          label: 'الرئيسية',     exact: true },
   { path: '/dashboard/recite',         icon: Mic,           label: 'تسميع' },
+  { path: '/dashboard/listen',         icon: Headphones,    label: 'الاستماع' },
   { path: '/dashboard/review-session', icon: BookOpen,      label: 'المراجعة' },
   { path: '/dashboard/errors',         icon: BookMarked,    label: 'الأخطاء' },
   { path: '/dashboard/mutashabihat',   icon: GitMerge,      label: 'المتشابهات' },

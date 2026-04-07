@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { LogOut, Globe, UserCircle2, BookMarked, Brain, GitMerge, Menu, X, Settings } from 'lucide-react';
+import { LogOut, Globe, UserCircle2, BookMarked, Brain, GitMerge, Headphones, Menu, X, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,6 +14,7 @@ const Navbar = () => {
   const menuItems = [
     { path: '/dashboard/errors', icon: BookMarked, label: t('nav.errors'), color: 'text-red-500' },
     { path: '/dashboard/review-session', icon: Brain, label: t('nav.review_sessions'), color: 'text-emerald-500' },
+    { path: '/dashboard/listen', icon: Headphones, label: i18n.language === 'ar' ? 'الاستماع' : 'Listening Station', color: 'text-sky-500' },
     { path: '/dashboard/mutashabihat', icon: GitMerge, label: t('nav.mutashabihat'), color: 'text-teal-500' },
     { path: '/dashboard/profile', icon: UserCircle2, label: t('nav.profile'), color: 'text-blue-500' },
     { path: '/dashboard/settings', icon: Settings, label: t('nav.settings'), color: 'text-slate-500' },
