@@ -15,6 +15,10 @@ import {
   SkipForward,
   Volume2,
   Waves,
+  Crosshair, // New icon for "Back to Ayah"
+  ArrowUp,
+  Layout,
+  Book,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
@@ -367,9 +371,31 @@ const ListeningStation = (props) => {
   const [isMarkingListened, setIsMarkingListened] = useState(false);
   const [optimisticListenedKey, setOptimisticListenedKey] = useState('');
 
+  const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(true);
+  const [isReadingMode, setIsReadingMode] = useState(false);
+
   const audioRef = useRef(null);
   const ayahRefs = useRef({});
   const markAttemptRef = useRef(new Set());
+  const scrollingRef = useRef(false);
+
+  // Detect manual scroll to disable auto-scroll
+  useEffect(() => {
+    const handleScrollIntent = () => {
+      if (!scrollingRef.current) {
+        setIsAutoScrollEnabled(false);
+      }
+    };
+
+    window.addEventListener('wheel', handleScrollIntent, { passive: true });
+    window.addEventListener('touchmove', handleScrollIntent, { passive: true });
+
+    return () => {
+      window.removeEventListener('wheel', handleScrollIntent);
+      window.removeEventListener('touchmove', handleScrollIntent);
+    };
+  }, []);
+
 
   const selectedReciter = useMemo(
     () => RECITERS.find((reciter) => reciter.id === selectedReciterId) || RECITERS[0],
@@ -515,12 +541,18 @@ const ListeningStation = (props) => {
   }, [currentAyah?.audio, currentAyahIndex, isPlaying, selectedReciter.identifier, selectedSurahNumber]);
 
   useEffect(() => {
-    if (!currentAyah) return;
+    if (!currentAyah || !isAutoScrollEnabled) return;
+
+    scrollingRef.current = true;
     ayahRefs.current[currentAyah.numberInSurah]?.scrollIntoView({
       behavior: 'smooth',
       block: 'center',
     });
-  }, [currentAyah]);
+
+    const timeout = setTimeout(() => { scrollingRef.current = false; }, 1000);
+    return () => clearTimeout(timeout);
+  }, [currentAyah, isAutoScrollEnabled]);
+
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -833,12 +865,46 @@ const ListeningStation = (props) => {
             <div className="mb-5 flex items-center justify-between gap-3">
               <div>
                 <p className="eyebrow">{headerCopy.nowListening}</p>
-                <h2 className="text-xl font-black text-foreground">
-                  {selectedSurahMeta ? (isArabic ? selectedSurahMeta.name : selectedSurahMeta.englishName) : headerCopy.chooseSurah}
-                </h2>
+                <div className="flex items-center gap-3">
+                    <h2 className="text-xl font-black text-foreground">
+                    {selectedSurahMeta ? (isArabic ? selectedSurahMeta.name : selectedSurahMeta.englishName) : headerCopy.chooseSurah}
+                    </h2>
+                    <button 
+                        onClick={() => setIsReadingMode(!isReadingMode)}
+                        className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${isReadingMode ? 'bg-emerald-500 text-white' : 'bg-zinc-800 text-zinc-400'}`}
+                    >
+                        {isReadingMode ? <Book className="h-3 w-3" /> : <Layout className="h-3 w-3" />}
+                        {isReadingMode ? (isArabic ? 'وضع القراءة' : 'Mushaf View') : (isArabic ? 'وضع القوائم' : 'List View')}
+                    </button>
+                </div>
               </div>
               {isLoadingSurah && <Loader2 className="h-6 w-6 animate-spin text-emerald-500" />}
             </div>
+
+            {/* Sticky Quick Access (Reading Mode) */}
+            {isReadingMode && !isLoadingSurah && (
+               <div className="sticky-selector flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-2 min-w-0">
+                     <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                     <select 
+                        value={selectedSurahNumber} 
+                        onChange={(e) => handleSelectSurah(Number(e.target.value))}
+                        className="bg-transparent border-none text-[10px] font-black uppercase tracking-widest text-emerald-500 outline-none cursor-pointer truncate"
+                     >
+                        {surahs.map(s => (
+                            <option key={s.number} value={s.number} className="bg-zinc-900 text-white">{s.number}. {isArabic ? s.name : s.englishName}</option>
+                        ))}
+                     </select>
+                  </div>
+                  <div className="flex items-center gap-4 shrink-0">
+                    <button onClick={playPreviousAyah} className="text-zinc-500 hover:text-white transition-colors"><SkipBack size={16}/></button>
+                    <span className="text-xs font-black text-foreground">
+                        {isArabic ? 'الآية' : 'Ayah'} {currentAyahIndex + 1}
+                    </span>
+                    <button onClick={playNextAyah} className="text-zinc-500 hover:text-white transition-colors"><SkipForward size={16}/></button>
+                  </div>
+               </div>
+            )}
 
             {loadError ? (
               <div className="rounded-[1.6rem] border border-rose-500/20 bg-rose-500/8 p-4 text-sm font-bold text-rose-400">
@@ -852,9 +918,25 @@ const ListeningStation = (props) => {
                 </div>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className={isReadingMode ? "mushaf-reading-mode" : "space-y-3"}>
                 {ayahs.map((ayah, index) => {
                   const active = index === currentAyahIndex;
+
+                  if (isReadingMode) {
+                    return (
+                        <span 
+                            key={ayah.number}
+                            ref={(node) => { ayahRefs.current[ayah.numberInSurah] = node; }}
+                            onClick={() => playSpecificAyah(index)}
+                            className={`ayah-inline font-quran ${active ? 'ayah-inline--active' : ''}`}
+                        >
+                            {ayah.text}
+                            <span className={`ayah-marker ${active ? 'ayah-marker--active' : ''}`}>
+                                {ayah.numberInSurah}
+                            </span>
+                        </span>
+                    );
+                  }
 
                   return (
                     <button
@@ -904,6 +986,29 @@ const ListeningStation = (props) => {
           </div>
         </div>
       </section>
+
+      <AnimatePresence>
+        {!isAutoScrollEnabled && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            className="sync-fab-container"
+          >
+            <button
+              onClick={() => setIsAutoScrollEnabled(true)}
+              className="sync-fab flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-white shadow-xl shadow-emerald-500/30 transition-transform active:scale-95"
+            >
+              <Crosshair className="h-6 w-6" />
+            </button>
+            <div className="rounded-full bg-emerald-500/12 px-3 py-1 backdrop-blur-md">
+                <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500">
+                    {isArabic ? 'مزامنة' : 'Sync View'}
+                </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <DesktopPlayer
         currentAyah={currentAyah}
