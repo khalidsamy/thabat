@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOutletContext } from 'react-router-dom';
 import { Mic, MicOff, Search, RotateCcw, Trophy, AlertCircle, Link2, ChevronRight, RefreshCw } from 'lucide-react';
-import { useSmartRecitation } from '../../hooks/usesmartrecitation';
+import { useSmartRecitation } from '../../hooks/Usesmartrecitation.JS';
 import { useToast } from '../../context/ToastContext';
 import api from '../../services/api';
 import { fetchAyah, fetchSurahList, isAbortedRequest } from '../../services/quranApi';
