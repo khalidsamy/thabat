@@ -14,7 +14,7 @@ import {
   SlidersHorizontal,
   Trophy,
 } from 'lucide-react';
-import { useSmartRecitation } from '../../hooks/useSmartRecitationEngine';
+import { useSmartRecitation } from '../../hooks/usesmartrecitation';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../../context/ToastContext';
 import api from '../../services/api';
@@ -113,12 +113,8 @@ const RecitePremium = (props) => {
   }, [showError, isArabic, surahs, selectedSurah]);
 
   const {
-    correctionReps,
-    correctionRepsRequired,
-    errorWord,
     isActive,
-    linkWord,
-    liveTranscript,
+    isProcessing,
     masteryScore,
     phase,
     recognitionError,
@@ -570,9 +566,16 @@ const RecitePremium = (props) => {
 
             <div className="flex min-h-[3rem] flex-col items-center justify-center gap-2">
               <AnimatePresence>
-                {phase === 'reciting' && (
+                {(phase === 'reciting' || isProcessing) && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                    <Waveform />
+                    {isProcessing ? (
+                      <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                        <RefreshCw className="h-4 w-4 text-emerald-400 animate-spin" />
+                        <span className="text-xs font-black text-emerald-400 uppercase tracking-widest">AI is Transcribing...</span>
+                      </div>
+                    ) : (
+                      <Waveform />
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -631,9 +634,9 @@ const RecitePremium = (props) => {
 
                 <p className="text-center text-[11px] font-black uppercase tracking-[0.22em] text-[color:var(--theme-text-muted)]">
                   {phase === 'idle' && (isArabic ? 'اضغط على الميكروفون للبدء' : 'Tap the mic to begin')}
-                  {phase === 'linking' && (isArabic ? 'قل كلمة الربط من الآية السابقة' : 'Speak the bridge word from the previous ayah')}
-                  {phase === 'reciting' && (isArabic ? 'الاستماع المستمر نشط' : 'Continuous listening is active')}
-                  {phase === 'complete' && (isArabic ? 'اكتملت التلاوة' : 'Recitation completed')}
+                  {phase === 'reciting' && (isArabic ? 'جاري التسجيل... اضغط للتوقف' : 'Recording... Tap to stop')}
+                  {isProcessing && (isArabic ? 'جاري التحليل بالذكاء الاصطناعي...' : 'AI Analysis in progress...')}
+                  {phase === 'complete' && (isArabic ? 'اكتمل التحليل' : 'Analysis completed')}
                 </p>
               </div>
             )}
