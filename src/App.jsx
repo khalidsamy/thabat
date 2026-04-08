@@ -16,7 +16,7 @@ import Home from './pages/dashboard/Home';
 import Progress from './pages/dashboard/Progress';
 import Recite from './pages/dashboard/RecitePremium';
 import ListeningStation from './pages/dashboard/ListeningStation';
-import Community from './pages/dashboard/Community';
+import Community from './pages/dashboard/CommunityDashboard';
 import Review from './pages/dashboard/Review';
 import Profile from './pages/Profile';
 import ErrorLog from './pages/ErrorLog';
