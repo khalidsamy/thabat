@@ -11,7 +11,7 @@ const DailyMotivationCard = ({ dailyVerse, itemVariants }) => {
       variants={itemVariants}
       className="lg:col-span-8 group h-full"
     >
-      <div className="glass-card relative h-full min-h-[400px] overflow-hidden rounded-3xl p-8 sm:p-10 flex flex-col justify-between transition-all duration-500 hover:shadow-emerald-500/10 group">
+      <div className="glass-card relative h-full min-h-[320px] sm:min-h-[400px] overflow-hidden rounded-3xl p-6 sm:p-10 flex flex-col justify-between transition-all duration-500 hover:shadow-emerald-500/10 group">
         {/* Glassmorphism Accents */}
         <div className="absolute top-0 right-0 w-80 h-80 rounded-full -mr-40 -mt-40 blur-3xl transition-transform duration-1000 group-hover:scale-110 bg-[color:var(--theme-accent-soft)]"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full -ml-32 -mb-32 blur-3xl bg-[color:var(--theme-amber-soft)]"></div>
@@ -32,9 +32,9 @@ const DailyMotivationCard = ({ dailyVerse, itemVariants }) => {
         </div>
 
         {/* Content: Verse */}
-        <div className="relative py-6">
-          <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-foreground leading-[1.4] drop-shadow-sm mb-4 text-center sm:text-right" dir="rtl">
-            {dailyVerse?.arabic}
+        <div className="relative py-4 sm:py-6">
+          <p className="text-xl sm:text-3xl lg:text-4xl font-extrabold text-foreground leading-[1.4] drop-shadow-sm mb-4 text-center sm:text-right" dir="rtl">
+            {dailyVerse?.arabic || (i18n.language === 'ar' ? '«وَقُل رَّبِّ زِدْنِي عِلْمًا»' : '«And say, My Lord, increase me in knowledge»')}
           </p>
           <div className="flex flex-col items-center sm:items-end gap-2">
             <p className="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-500/80" dir="rtl">

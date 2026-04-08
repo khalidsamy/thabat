@@ -102,13 +102,13 @@ const Community = (props) => {
 
   return (
     <div className="space-y-12 pb-32 animate-fade-in bg-background min-h-screen">
-      <motion.section variants={itemVariants} className="text-center max-w-2xl mx-auto py-8">
-        <h2 className="text-4xl font-black text-foreground tracking-tight mb-4 uppercase">{t('community.title')}</h2>
-        <p className="text-sm font-bold text-slate-500 uppercase tracking-[0.2em] leading-relaxed">{t('community.subtitle')}</p>
+      <motion.section variants={itemVariants} className="text-center max-w-2xl mx-auto py-6 sm:py-8">
+        <h2 className="text-2xl sm:text-4xl font-black text-foreground tracking-tight mb-4 uppercase">{t('community.title')}</h2>
+        <p className="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-[0.2em] leading-relaxed px-4">{t('community.subtitle')}</p>
       </motion.section>
 
-      <motion.section variants={itemVariants} className="max-w-2xl mx-auto w-full">
-        <div className={`bg-card/40 rounded-3xl border border-white/5 p-10 shadow-xl shadow-black/20 transition-all duration-500 ${
+      <motion.section variants={itemVariants} className="max-w-2xl mx-auto w-full px-4 sm:px-0">
+        <div className={`bg-card/40 rounded-3xl border border-white/5 p-6 sm:p-10 shadow-xl shadow-black/20 transition-all duration-500 ${
           canPost ? 'shadow-emerald-500/5' : 'bg-amber-500/5 opacity-90'
         }`}>
           {!canPost ? (
@@ -149,7 +149,7 @@ const Community = (props) => {
         </div>
       </motion.section>
 
-      <motion.section variants={itemVariants} className="max-w-2xl mx-auto w-full space-y-4">
+      <motion.section variants={itemVariants} className="max-w-2xl mx-auto w-full space-y-4 px-4 sm:px-0">
         {isLoading ? (
           <div className="flex justify-center py-12">
             <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} className="h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full" />

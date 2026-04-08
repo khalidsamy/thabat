@@ -62,7 +62,7 @@ const Home = (props) => {
                 />
                 <DailyMotivationCard dailyVerse={dailyVerse} itemVariants={itemVariants} />
                 <TargetSurahCard
-                  surahName={progress?.currentSurahName || user?.currentTargetSurah}
+                  surahName={progress?.currentSurahName || user?.currentTargetSurah || (isArabic ? 'سورة البقرة' : 'Al-Baqara')}
                   progress={progress?.masteryPercent || 0}
                   isLocked={isReciteLocked}
                   itemVariants={itemVariants}

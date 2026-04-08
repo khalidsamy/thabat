@@ -52,7 +52,7 @@ const ProgressChart = ({ refreshTrigger }) => {
   }
 
   return (
-    <div className="glass-card rounded-3xl p-8 lg:p-10">
+    <div className="glass-card rounded-3xl p-6 sm:p-10">
       <h3 className="text-xl font-black text-foreground mb-8 uppercase tracking-widest">
         {t('chart.title')}
       </h3>

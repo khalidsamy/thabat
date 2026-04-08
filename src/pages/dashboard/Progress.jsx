@@ -122,7 +122,7 @@ const Progress = (props) => {
             ))}
           </div>
         ) : (
-          <div className="glass-card p-10 text-center">
+          <div className="glass-card p-6 sm:p-10 text-center">
               <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-2xl">✨</span>
               </div>

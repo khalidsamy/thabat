@@ -43,8 +43,8 @@ const MasteryHeatmap = ({ progress, itemVariants }) => {
           </div>
         </div>
 
-        <div className="relative overflow-x-auto pb-4 scrollbar-hide">
-          <div className="flex gap-1 min-w-[800px]">
+        <div className="relative overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="flex gap-1 min-w-[500px] sm:min-w-[800px]">
             {/* Weekday Labels */}
             <div className="flex flex-col gap-1 pr-3 pt-6">
               {days.map((day, i) => (

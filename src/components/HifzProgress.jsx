@@ -8,7 +8,7 @@ const HifzProgress = ({ current = 0, total = 604, label = "Hifz Journey" }) => {
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="bg-card/50 border border-white/5 rounded-3xl p-8 shadow-xl shadow-black/40 flex flex-col items-center justify-center transition-all duration-300">
+    <div className="bg-card/50 border border-white/5 rounded-3xl p-6 sm:p-8 shadow-xl shadow-black/40 flex flex-col items-center justify-center transition-all duration-300">
       <div className="relative flex items-center justify-center">
         <svg className="w-40 h-40 transform -rotate-90">
           {/* Background Circle */}

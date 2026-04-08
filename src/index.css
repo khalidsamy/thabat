@@ -60,6 +60,23 @@
     font: inherit;
   }
 
+  /* Global Touch Target Optimization */
+  button, 
+  .touch-target,
+  select,
+  .mobile-nav-link {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent focus zoom on iOS */
+  input[type="text"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
   #root {
     overflow-x: hidden;
     width: 100%;
