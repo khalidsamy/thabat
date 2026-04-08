@@ -21,8 +21,9 @@ const Progress = (props) => {
   
   const isArabic = i18n.language === 'ar';
   
-  // Dynamic Revision Target mapping
-  const currentPlan = Object.values(REVISION_PLANS).find(p => p.id === progress?.revisionGoal);
+  // Dynamic Revision Target mapping - Prioritize User Intensity over Progress Goal
+  const activePlanId = user?.revisionIntensity || progress?.revisionGoal;
+  const currentPlan = Object.values(REVISION_PLANS).find(p => p.id === activePlanId);
   const revisionTargetLabel = currentPlan 
     ? (isArabic ? currentPlan.label.replace('Day', 'يوم') : currentPlan.label)
     : (isArabic ? 'بدون خطة' : 'No Active Plan');

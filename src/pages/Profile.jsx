@@ -12,7 +12,7 @@ const Profile = () => {
 
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
-  const [reviewPace, setReviewPace] = useState(user?.reviewPace || 10);
+  const [revisionIntensity, setRevisionIntensity] = useState(user?.revisionIntensity || 'HIZB');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   const [passwords, setPasswords] = useState({
@@ -28,7 +28,7 @@ const Profile = () => {
       if (res.data.success) {
         setName(res.data.user.name);
         setEmail(res.data.user.email);
-        setReviewPace(res.data.user.reviewPace || 10);
+        setRevisionIntensity(res.data.user.revisionIntensity || 'HIZB');
       }
     } catch (err) {
       showError(err.message);
@@ -40,27 +40,28 @@ const Profile = () => {
   }, [fetchProfile]);
 
   const handleProfileSave = useCallback(async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!name.trim()) {
       showError('Name cannot be empty.');
       return;
     }
     setIsSavingProfile(true);
     try {
-      const res = await api.put('/user/profile', { 
+      // Endpoint is now PATCH as per latest backend updates
+      const res = await api.patch('/user/profile', { 
         name: name.trim(),
-        reviewPace
+        revisionIntensity
       });
       if (res.data.success) {
         updateUser(res.data.user);
-        showSuccess('Profile updated successfully!');
+        showSuccess('Profile and Mission plan updated!');
       }
     } catch (err) {
       showError(err.message);
     } finally {
       setIsSavingProfile(false);
     }
-  }, [name, reviewPace, showError, showSuccess, updateUser]);
+  }, [name, revisionIntensity, showError, showSuccess, updateUser]);
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
@@ -107,7 +108,7 @@ const Profile = () => {
             Account Settings
           </h1>
           <p className="text-sm font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
-            Manage your personal information and security settings.
+            Manage your personal data and Hifz commitment.
           </p>
         </div>
 
@@ -167,7 +168,7 @@ const Profile = () => {
           </form>
         </div>
 
-        {/* Review Plan Selection */}
+        {/* Revision Plan Selection - Sheikh Alaa methodology */}
         <div className="bg-slate-800/80 rounded-3xl border border-white/5 shadow-xl shadow-black/40 mb-10 overflow-hidden transition-all duration-300">
           
           <div className="flex items-center gap-3 px-8 py-6 border-b border-white/5 bg-emerald-900/10">
@@ -175,37 +176,38 @@ const Profile = () => {
               <CalendarCheck className="h-6 w-6 text-emerald-400" />
             </div>
             <div>
-              <h2 className="text-lg font-black text-foreground uppercase tracking-tight">Review Plan</h2>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Select your daily target preference</p>
+              <h2 className="text-lg font-black text-foreground uppercase tracking-tight">Mission Goal (الورد اليومي)</h2>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Select your daily revision intensity</p>
             </div>
           </div>
 
           <div className="px-8 py-10 transition-all duration-300">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
               {[
-                { val: 7, label: 'Ideal (المثالي)', sub: 'Complete in 7 Days', color: 'emerald' },
-                { val: 10, label: 'Medium (المتوسط)', sub: 'Complete in 10 Days', color: 'blue' },
-                { val: 14, label: 'Minimum (الحد الأدنى)', sub: 'Complete in 14 Days', color: 'amber' }
+                { val: 'HIZB', label: 'Balanced (حزب/يوم)', sub: '1/2 Juz Daily', color: 'emerald' },
+                { val: '1_JUZ', label: 'Strong (جزء/يوم)', sub: '1 Juz Daily', color: 'blue' },
+                { val: '2_JUZ', label: 'Intensive (جزئين/يوم)', sub: '2 Juz Daily', color: 'amber' },
+                { val: 'RUB_EL_HIZB', label: 'Light (ربع/يوم)', sub: '1/4 Hizb Daily', color: 'slate' }
               ].map((plan) => (
                 <button
                   key={plan.val}
                   type="button"
-                  onClick={() => setReviewPace(plan.val)}
-                  className={`relative p-6 rounded-2xl border-4 text-start transition-all duration-300 group ${
-                    reviewPace === plan.val 
+                  onClick={() => setRevisionIntensity(plan.val)}
+                  className={`relative p-5 rounded-2xl border-2 text-start transition-all duration-300 group ${
+                    revisionIntensity === plan.val 
                       ? 'border-emerald-500 bg-emerald-900/20 shadow-lg' 
-                      : 'border-slate-900 bg-slate-900/50 hover:border-slate-700'
+                      : 'border-white/5 bg-white/5 hover:border-white/10'
                   }`}
                 >
-                  {reviewPace === plan.val && (
-                    <div className="absolute top-3 end-3">
-                      <CheckCircle className="h-5 w-5 text-emerald-400" />
-                    </div>
-                  )}
-                  <h4 className={`text-base font-black ${reviewPace === plan.val ? 'text-emerald-400' : 'text-foreground'}`}>
-                    {plan.label}
-                  </h4>
-                  <p className="text-[10px] font-bold text-slate-500 mt-2 uppercase tracking-widest">{plan.sub}</p>
+                  <div className="flex items-center justify-between">
+                    <h4 className={`text-sm font-black ${revisionIntensity === plan.val ? 'text-emerald-400' : 'text-foreground'}`}>
+                        {plan.label}
+                    </h4>
+                    {revisionIntensity === plan.val && (
+                        <CheckCircle className="h-4 w-4 text-emerald-400" />
+                    )}
+                  </div>
+                  <p className="text-[9px] font-bold text-slate-500 mt-1 uppercase tracking-widest">{plan.sub}</p>
                 </button>
               ))}
             </div>
