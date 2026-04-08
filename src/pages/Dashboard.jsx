@@ -11,6 +11,7 @@ import { getUserRank } from '../utils/rankManager';
 import confetti from 'canvas-confetti';
 import HeartMessage from '../components/HeartMessage';
 import MindMapModal from '../components/MindMapModal';
+import ChatAssistant from '../components/ChatAssistant';
 
 import Home from './dashboard/Home';
 import { getDailyQueue, isReciteLocked } from '../utils/RevisionEngine';
@@ -255,6 +256,7 @@ const Dashboard = () => {
 
       <HeartMessage isOpen={isHeartOpen} onClose={() => setIsHeartOpen(false)} />
       <MindMapModal isOpen={isMindMapOpen} onClose={() => setIsMindMapOpen(false)} pageNumber={progress?.currentPage} />
+      <ChatAssistant />
     </div>
   );
 };
