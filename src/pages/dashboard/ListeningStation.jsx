@@ -17,6 +17,7 @@ import {
   Waves,
   Crosshair, // New icon for "Back to Ayah"
   ArrowUp,
+  ArrowDown,
   Layout,
   Book,
 } from 'lucide-react';
