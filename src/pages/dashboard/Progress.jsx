@@ -9,9 +9,12 @@ import AchievementBadges from '../../components/AchievementBadges';
 import HifzProgress from '../../components/HifzProgress';
 import { REVISION_PLANS } from '../../utils/RevisionEngine';
 import { AlertCircle, History, ShieldAlert } from 'lucide-react';
+import ExamModal from '../../components/ExamModal';
+import { useState } from 'react';
 
 const Progress = (props) => {
   const { t, i18n } = useTranslation();
+  const [isExamOpen, setIsExamOpen] = useState(false);
   const context = useOutletContext() || {};
   const { progress, user, refreshKey, itemVariants } = {
     progress: {}, 
@@ -92,6 +95,34 @@ const Progress = (props) => {
             className="border-sky-500/10"
           />
         </div>
+      </motion.section>
+
+      {/* Quick Exam Trigger Section */}
+      <motion.section variants={itemVariants}>
+        <div className="glass-card p-8 rounded-[2rem] border-sky-500/10 bg-gradient-to-br from-sky-500/[0.03] to-transparent flex flex-col sm:flex-row items-center justify-between gap-6 overflow-hidden relative group">
+          <div className="absolute -right-4 -top-4 w-32 h-32 bg-sky-500/5 blur-3xl rounded-full transition-all group-hover:scale-150" />
+          <div className="relative space-y-2 text-center sm:text-left">
+            <h3 className="text-xl font-black text-white">{isArabic ? 'اختبر ثباتك' : 'Test Your Thabat'}</h3>
+            <p className="text-sm text-slate-400 font-bold max-w-sm">
+                {isArabic 
+                   ? 'سيقوم النظام باقتراح آيات عشوائية من محفوظك لاختبار جودة الربط.' 
+                   : 'The system will pick random verses from your memorized range to test your stability.'}
+            </p>
+          </div>
+          <button 
+            onClick={() => setIsExamOpen(true)}
+            className="relative px-8 py-4 bg-sky-500 text-zinc-950 font-black rounded-2xl shadow-xl shadow-sky-500/20 active:scale-95 transition-all whitespace-nowrap"
+          >
+            {isArabic ? 'ابدأ الاختبار السريع' : 'Start Quick Test'}
+          </button>
+        </div>
+        
+        <ExamModal 
+          isOpen={isExamOpen} 
+          onClose={() => setIsExamOpen(false)} 
+          user={user}
+          onResult={refreshData} 
+        />
       </motion.section>
 
       {/* Weak Areas (Mawaqi' al-Khata') - Sheikh Alaa Pedagogy */}

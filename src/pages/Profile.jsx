@@ -221,6 +221,57 @@ const Profile = () => {
           </div>
         </div>
 
+        {/* Exam Statistics - Qualitative Metric */}
+        <div className="bg-slate-800/80 rounded-3xl border border-white/5 shadow-xl shadow-black/40 mb-10 overflow-hidden transition-all duration-300">
+          
+          <div className="flex items-center gap-3 px-8 py-6 border-b border-white/5 bg-sky-900/10">
+            <div className="p-3 bg-sky-900/40 rounded-2xl">
+              <Sparkles className="h-6 w-6 text-sky-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-foreground uppercase tracking-tight">Exam Readiness</h2>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Random test performance history</p>
+            </div>
+          </div>
+
+          <div className="px-8 py-10">
+            <div className="grid grid-cols-2 gap-6 mb-8">
+               <div className="p-6 bg-white/[0.03] rounded-2xl border border-white/5 text-center">
+                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Total Tests</p>
+                  <p className="text-3xl font-black text-white">{user?.examStats?.passed + user?.examStats?.failed || 0}</p>
+               </div>
+               <div className="p-6 bg-white/[0.03] rounded-2xl border border-white/5 text-center">
+                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Success Rate</p>
+                  <p className="text-3xl font-black text-emerald-400">
+                    {user?.examStats?.passed ? Math.round((user.examStats.passed / (user.examStats.passed + user.examStats.failed)) * 100) : 0}%
+                  </p>
+               </div>
+            </div>
+
+            {user?.examHistory?.length > 0 ? (
+              <div className="space-y-3">
+                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3">Recent Attempts</p>
+                {user.examHistory.slice(-3).reverse().map((exam, i) => (
+                   <div key={i} className="flex items-center justify-between p-4 bg-white/[0.02] rounded-xl border border-white/5">
+                      <div className="flex items-center gap-3">
+                         <div className={`w-2 h-2 rounded-full ${exam.status === 'PASSED' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                         <span className="text-xs font-bold text-white">{exam.surah}</span>
+                         <span className="text-[9px] font-black text-slate-500 uppercase">Juz {exam.juz}</span>
+                      </div>
+                      <span className="text-[9px] font-black text-slate-600">
+                        {new Date(exam.date).toLocaleDateString()}
+                      </span>
+                   </div>
+                ))}
+              </div>
+            ) : (
+                <div className="text-center py-4">
+                   <p className="text-xs font-bold text-slate-500">No exams taken yet. Test your stability on the Progress page!</p>
+                </div>
+            )}
+          </div>
+        </div>
+
         {/* Security Settings */}
         <div className="bg-slate-800/80 rounded-3xl border border-white/5 shadow-xl shadow-black/40 overflow-hidden transition-all duration-300">
 
