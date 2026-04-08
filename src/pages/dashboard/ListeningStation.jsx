@@ -368,6 +368,25 @@ const ListeningStation = (props) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [repeatMode, setRepeatMode] = useState('off');
   const [isMobilePlayerExpanded, setIsMobilePlayerExpanded] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showScrollBottom, setShowScrollBottom] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const fullHeight = document.body.offsetHeight;
+      
+      setShowScrollTop(scrollY > 400);
+      setShowScrollBottom(scrollY + windowHeight < fullHeight - 400);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  const scrollToBottom = () => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   const [isMarkingListened, setIsMarkingListened] = useState(false);
   const [optimisticListenedKey, setOptimisticListenedKey] = useState('');
 
@@ -1034,6 +1053,25 @@ const ListeningStation = (props) => {
       </section>
 
       <AnimatePresence>
+        {showScrollTop && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="fixed right-6 z-[9998] flex flex-col items-center gap-2"
+            style={{ bottom: selectedSurahMeta ? "16.5rem" : "11rem" }}
+          >
+            <button
+              onClick={scrollToTop}
+              className="sync-fab flex h-12 w-12 items-center justify-center rounded-full bg-zinc-900 border border-zinc-800 text-emerald-500 shadow-xl backdrop-blur-md transition-transform active:scale-95"
+            >
+              <ArrowUp className="h-5 w-5" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
         {!isAutoScrollEnabled && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
@@ -1041,7 +1079,7 @@ const ListeningStation = (props) => {
                 opacity: 1, 
                 scale: 1, 
                 y: 0,
-                bottom: selectedSurahMeta ? "7.5rem" : "2rem" // Slide up when player is active
+                bottom: selectedSurahMeta ? "11.5rem" : "6rem"
             }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
             className="fixed right-6 z-[9998] flex flex-col items-center gap-2"
@@ -1057,6 +1095,25 @@ const ListeningStation = (props) => {
                     {isArabic ? 'مزامنة' : 'Sync View'}
                 </span>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showScrollBottom && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="fixed right-6 z-[9998] flex flex-col items-center gap-2"
+            style={{ bottom: selectedSurahMeta ? "6.5rem" : "1rem" }}
+          >
+            <button
+              onClick={scrollToBottom}
+              className="sync-fab flex h-12 w-12 items-center justify-center rounded-full bg-zinc-900 border border-zinc-800 text-emerald-500 shadow-xl backdrop-blur-md transition-transform active:scale-95"
+            >
+              <ArrowDown className="h-5 w-5" />
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
