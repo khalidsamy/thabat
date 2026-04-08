@@ -1,9 +1,19 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Circle, Star, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { CheckCircle2, ShieldCheck, Zap, ArrowRight } from 'lucide-react';
 
 const TodayMissionCard = ({ mission, itemVariants }) => {
+  const navigate = useNavigate();
   if (!mission) return null;
+
+  const handleTaskClick = (type) => {
+    if (type === 'REVIEW') {
+      navigate('/dashboard/review-session');
+    } else {
+      navigate('/dashboard/recite');
+    }
+  };
 
   const tasks = [mission.part1, mission.part2].filter(Boolean);
 
@@ -38,6 +48,7 @@ const TodayMissionCard = ({ mission, itemVariants }) => {
             <motion.div
               key={task.id || idx}
               whileHover={{ y: -5 }}
+              onClick={() => handleTaskClick(task.type)}
               className={`p-6 rounded-[2rem] border-2 transition-all cursor-pointer relative overflow-hidden group/task ${
                 task.completed 
                   ? 'border-emerald-500/30 bg-emerald-500/5' 
@@ -72,7 +83,7 @@ const TodayMissionCard = ({ mission, itemVariants }) => {
                 <span className={`text-[10px] font-black uppercase tracking-[0.15em] ${
                   task.completed ? 'text-emerald-400' : 'text-slate-500'
                 }`}>
-                  {task.completed ? 'Completed' : 'Task Pending'}
+                  {task.completed ? 'Completed' : 'Start Task'}
                 </span>
                 <ArrowRight className={`h-4 w-4 transition-transform ${
                   task.completed ? 'text-emerald-500' : 'text-slate-700 group-hover/task:translate-x-1 group-hover/task:text-emerald-500'
