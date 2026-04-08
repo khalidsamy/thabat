@@ -8,19 +8,37 @@ import ProgressChart from '../../components/ProgressChart';
 import AchievementBadges from '../../components/AchievementBadges';
 import HifzProgress from '../../components/HifzProgress';
 import { REVISION_PLANS } from '../../utils/RevisionEngine';
-import { AlertCircle, History, ShieldAlert } from 'lucide-react';
+import { AlertCircle, History, ShieldAlert, FileText, Download } from 'lucide-react';
 import ExamModal from '../../components/ExamModal';
 import { useState } from 'react';
+import { generateProgressReport } from '../../utils/ReportGenerator';
+import { useToast } from '../../context/ToastContext';
+import MasteryHeatmap from '../../components/MasteryHeatmap';
 
 const Progress = (props) => {
   const { t, i18n } = useTranslation();
   const [isExamOpen, setIsExamOpen] = useState(false);
   const context = useOutletContext() || {};
-  const { progress, user, refreshKey, itemVariants } = {
+  const { progress, user, refreshKey, itemVariants, refreshData } = {
     progress: {}, 
     user: {},
     ...context, 
     ...props 
+  };
+
+  const { showSuccess, showError } = useToast();
+  const [isGenerating, setIsGenerating] = useState(false);
+  
+  const handleDownloadReport = async () => {
+    setIsGenerating(true);
+    try {
+      await generateProgressReport(user, progress, t, i18n.language === 'ar');
+      showSuccess(i18n.language === 'ar' ? 'تم استخراج التقرير بنجاح!' : 'Progress report generated!');
+    } catch (e) {
+      showError('Failed to generate report');
+    } finally {
+      setIsGenerating(false);
+    }
   };
   
   const isArabic = i18n.language === 'ar';
@@ -34,6 +52,29 @@ const Progress = (props) => {
 
   return (
     <div className="space-y-8 pb-32">
+      {/* Header with Export Action */}
+      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-6 sm:p-8 rounded-[2rem] border-emerald-500/10 bg-gradient-to-r from-emerald-500/[0.02] to-transparent">
+         <div>
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">{t('dashboard.stats_overview') || (isArabic ? 'نظرة العامة' : 'Stats Overview')}</h1>
+            <p className="text-sm font-bold text-slate-400 mt-1">{isArabic ? 'تتبع تقدمك في حفظ ومراجعة القرآن الكريم' : 'Track your Hifz & Revision journey patterns'}</p>
+         </div>
+         <button
+            onClick={handleDownloadReport}
+            disabled={isGenerating}
+            className={`flex items-center justify-center gap-3 px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 ${
+              isGenerating 
+                ? 'bg-slate-800 text-slate-500 cursor-not-allowed' 
+                : 'bg-emerald-500 text-zinc-950 shadow-xl shadow-emerald-500/20 hover:bg-emerald-400'
+            }`}
+         >
+            {isGenerating ? (
+               <div className="h-4 w-4 border-2 border-slate-600 border-t-emerald-500 rounded-full animate-spin" />
+            ) : (
+               <Download className="h-4 w-4" />
+            )}
+            {isGenerating ? (isArabic ? 'جاري الاستخراج...' : 'Generating...') : (isArabic ? 'تحميل التقرير' : 'Download Report')}
+         </button>
+      </motion.div>
       {/* Mastery Heatmap - Priority 1 Visualization */}
       <MasteryHeatmap user={user} progress={progress} itemVariants={itemVariants} />
 

@@ -7,7 +7,8 @@ import Input from '../components/Input';
 import Button from '../components/Button';
 import { BADGES, getUnlockedBadges, getBadgeProgress } from '../utils/AchievementEngine';
 import { useTranslation } from 'react-i18next';
-import { Sparkles as SparklesIcon, Trophy as TrophyIcon } from 'lucide-react';
+import { Sparkles as SparklesIcon, Trophy as TrophyIcon, Download, FileText } from 'lucide-react';
+import { generateProgressReport } from '../utils/ReportGenerator';
 
 const Profile = () => {
   const { user: authUser, updateUser } = useContext(AuthContext);
@@ -16,7 +17,20 @@ const Profile = () => {
   const user = contextUser || authUser;
   
   const { showSuccess, showError } = useToast();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportJourney = async () => {
+    setIsExporting(true);
+    try {
+      await generateProgressReport(user, progress, t, i18n.language === 'ar');
+      showSuccess(i18n.language === 'ar' ? 'تم تصدير رحلتك بنجاح!' : 'Journey exported successfully!');
+    } catch (e) {
+       showError('Export failed');
+    } finally {
+       setIsExporting(false);
+    }
+  };
 
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
@@ -120,17 +134,26 @@ const Profile = () => {
           </p>
         </div>
 
-        {/* Personal Information */}
+        {/* Basic Info */}
         <div className="bg-slate-800/80 rounded-3xl border border-white/5 shadow-xl shadow-black/40 mb-10 overflow-hidden transition-all duration-300">
-          
-          <div className="flex items-center gap-3 px-8 py-6 border-b border-white/5 bg-emerald-900/10">
-            <div className="p-3 bg-emerald-900/40 rounded-2xl">
-              <User className="h-6 w-6 text-emerald-400" />
+          <div className="flex items-center justify-between px-8 py-6 border-b border-white/5 bg-white/[0.02]">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-emerald-500/10 rounded-2xl">
+                <SparklesIcon className="h-6 w-6 text-emerald-400" />
+              </div>
+              <div>
+                <h2 className="text-lg font-black text-foreground uppercase tracking-tight">Personal Information</h2>
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Manage your identity and export progress</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-lg font-black text-foreground uppercase tracking-tight">Personal Information</h2>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Update your display name</p>
-            </div>
+            <button
+               onClick={handleExportJourney}
+               disabled={isExporting}
+               className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20 hover:bg-emerald-500 hover:text-zinc-950 transition-all text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
+            >
+               {isExporting ? <div className="h-3 w-3 border-2 border-emerald-400 border-t-transparent animate-spin rounded-full" /> : <Download className="h-3.5 w-3.5" />}
+               {isExporting ? 'Exporting...' : 'Export Journey'}
+            </button>
           </div>
 
           <form onSubmit={handleProfileSave} className="px-8 py-10 space-y-6">
