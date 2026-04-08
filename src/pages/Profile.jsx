@@ -5,10 +5,18 @@ import { AuthContext } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Input from '../components/Input';
 import Button from '../components/Button';
+import { BADGES, getUnlockedBadges, getBadgeProgress } from '../utils/AchievementEngine';
+import { useTranslation } from 'react-i18next';
+import { Sparkles as SparklesIcon, Trophy as TrophyIcon } from 'lucide-react';
 
 const Profile = () => {
-  const { user, updateUser } = useContext(AuthContext);
+  const { user: authUser, updateUser } = useContext(AuthContext);
+  const context = useOutletContext() || {};
+  const { progress, user: contextUser } = context;
+  const user = contextUser || authUser;
+  
   const { showSuccess, showError } = useToast();
+  const { t } = useTranslation();
 
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
@@ -221,7 +229,83 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Exam Statistics - Qualitative Metric */}
+        {/* Hifz Mastery Achievements */}
+        <div className="bg-slate-800/80 rounded-3xl border border-white/5 shadow-xl shadow-black/40 mb-10 overflow-hidden transition-all duration-300">
+          <div className="flex items-center gap-3 px-8 py-6 border-b border-white/5 bg-amber-900/10">
+            <div className="p-3 bg-amber-900/40 rounded-2xl">
+              <TrophyIcon className="h-6 w-6 text-amber-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-foreground uppercase tracking-tight">Hifz Achievements</h2>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Your spiritual milestones and honors</p>
+            </div>
+          </div>
+
+          <div className="px-8 py-10">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+              {BADGES.map((badge) => {
+                const isUnlocked = badge.requirement(user, progress);
+                const perc = getBadgeProgress(badge.id, user, progress);
+                const Icon = badge.icon;
+                
+                return (
+                  <div key={badge.id} className="relative group flex flex-col items-center text-center">
+                    {/* Badge Icon */}
+                    <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center relative z-10 transition-all duration-700 ${
+                      isUnlocked 
+                        ? `bg-${badge.color}-500/20 border-2 border-${badge.color}-500 shadow-[0_0_20px_rgba(0,0,0,0.3)]` 
+                        : 'bg-white/5 border border-white/10 grayscale opacity-40'
+                    }`}>
+                      <Icon className={`w-8 h-8 sm:w-10 sm:h-10 ${isUnlocked ? `text-${badge.color}-400` : 'text-slate-500'}`} />
+                      
+                      {/* Unlock Glow */}
+                      {isUnlocked && (
+                        <div className={`absolute inset-0 rounded-full blur-xl opacity-20 bg-${badge.color}-500 animate-pulse`} />
+                      )}
+                    </div>
+
+                    {/* Progress Ring for Locked Badges */}
+                    {!isUnlocked && (
+                      <div className="absolute top-0 w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center">
+                         <svg className="w-full h-full -rotate-90">
+                            <circle
+                               cx="50%" cy="50%" r="48%"
+                               stroke="currentColor" strokeWidth="2" fill="transparent"
+                               className="text-white/5"
+                            />
+                            <circle
+                               cx="50%" cy="50%" r="48%"
+                               stroke="currentColor" strokeWidth="2" fill="transparent"
+                               strokeDasharray="300"
+                               strokeDashoffset={300 - (3 * perc)}
+                               className="text-emerald-500/20"
+                            />
+                         </svg>
+                      </div>
+                    )}
+
+                    <div className="mt-4 space-y-1">
+                      <h4 className={`text-xs sm:text-sm font-black uppercase tracking-tight ${isUnlocked ? 'text-white' : 'text-slate-600'}`}>
+                        {t(badge.nameKey)}
+                      </h4>
+                      <p className="text-[9px] font-bold text-slate-500 leading-tight px-1 uppercase tracking-tighter">
+                        {t(badge.descKey)}
+                      </p>
+                    </div>
+
+                    {/* Locked Requirement Tooltip */}
+                    {!isUnlocked && (
+                      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-900 border border-white/10 p-2 rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 w-32 border-b-2 border-b-emerald-500">
+                        <p className="text-[9px] font-black text-emerald-500 uppercase mb-1">Requirement</p>
+                        <p className="text-[10px] text-white font-medium">{badge.goal - badge.current(user, progress)} more to go</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
         <div className="bg-slate-800/80 rounded-3xl border border-white/5 shadow-xl shadow-black/40 mb-10 overflow-hidden transition-all duration-300">
           
           <div className="flex items-center gap-3 px-8 py-6 border-b border-white/5 bg-sky-900/10">

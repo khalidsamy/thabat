@@ -72,8 +72,20 @@ const SuccessCelebration = ({ isVisible, isStreakRepair, onClose }) => {
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight">Mission Done!</h2>
-            {isStreakRepair ? (
+            <h2 className="text-2xl sm:text-4xl font-black text-white uppercase tracking-tight">
+              {achievement ? 'Honor Earned!' : 'Mission Done!'}
+            </h2>
+            {achievement ? (
+               <div className="flex flex-col items-center gap-3">
+                  <div className={`w-20 h-20 rounded-full flex items-center justify-center bg-white/5 border-2 border-${achievement.color}-500 shadow-lg shadow-${achievement.color}-500/20 mt-4 group`}>
+                      <achievement.icon className={`h-10 w-10 text-${achievement.color}-400`} />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-white font-black uppercase text-sm tracking-widest">{achievement.name}</p>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">{achievement.description}</p>
+                  </div>
+               </div>
+            ) : isStreakRepair ? (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
