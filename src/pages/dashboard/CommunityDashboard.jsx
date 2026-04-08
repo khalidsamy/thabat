@@ -25,9 +25,17 @@ import Button from '../../components/Button';
 const CommunityDashboard = (props) => {
   const { t, i18n } = useTranslation();
   const context = useOutletContext() || {};
-  const { progress, user, itemVariants } = { 
-    progress: {}, 
-    user: {}, 
+  const { 
+    progress, 
+    user, 
+    dailyVerse, 
+    itemVariants, 
+    onVisualize, 
+    reciteLocked, 
+    refreshData 
+  } = { 
+    progress: context?.progress || {}, 
+    user: context?.user || {}, 
     ...context, 
     ...props 
   };
@@ -359,6 +367,13 @@ const CommunityDashboard = (props) => {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl space-y-3">
             <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.24em] text-amber-500">
+              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid rgba(16, 185, 129, 0.2)', paddingBottom: '30px', marginBottom: '40px'}}>
+                <div style={{flex: 1}}>
+                  <h1 style={{fontSize: '36px', fontWeight: 900, margin: 0, color: '#fff', letterSpacing: '-1px', textAlign: isArabic ? 'right' : 'left'}}>
+                    {isArabic ? 'تقارير الثبات' : 'THABAT REPORT'}
+                  </h1>
+                </div>
+              </div>
               <Users className="h-4 w-4" />
               {isArabic ? 'المجتـــمع' : 'The Thabat Ummah'}
             </div>

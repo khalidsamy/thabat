@@ -28,9 +28,14 @@ const Home = (props) => {
     dailyVerse, 
     itemVariants, 
     onVisualize, 
-    isReciteLocked, 
+    reciteLocked, 
     refreshData 
-  } = { progress: {}, user: {}, ...context, ...props };
+  } = { 
+    progress: context?.progress || {}, 
+    user: context?.user || {}, 
+    ...context, 
+    ...props 
+  };
   
   const [mobileView, setMobileView] = useState('focus');
   const [showCelebration, setShowCelebration] = useState(false);

@@ -31,7 +31,7 @@ const Dashboard = () => {
   const [pagesInput, setPagesInput] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [isTogglingSunnah, setIsTogglingSunnah] = useState(false);
-  const [isReciteLocked, setIsReciteLocked] = useState(false);
+  const [reciteLocked, setReciteLocked] = useState(false);
   const [revisionQueue, setRevisionQueue] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -86,8 +86,8 @@ const Dashboard = () => {
     // Revision Gatekeeper Logic
     if (progressResult.status === 'fulfilled' && progressResult.value.data.success) {
       const prog = progressResult.value.data.progress;
-      const locked = isReciteLocked(prog);
-      setIsReciteLocked(locked);
+      const locked = typeof isReciteLocked === 'function' ? isReciteLocked(prog) : false;
+      setReciteLocked(locked);
       
       const queue = await getDailyQueue(prog);
       setRevisionQueue(queue);
@@ -199,7 +199,7 @@ const Dashboard = () => {
     refreshData: loadInitialData,
     onVisualize: () => setIsMindMapOpen(true),
     shareProgress,
-    isReciteLocked,
+    reciteLocked,
     revisionQueue,
     itemVariants: {
       hidden: { opacity: 0, y: 20 },
@@ -209,7 +209,7 @@ const Dashboard = () => {
   }), [
     progress, user, dailyVerse, refreshKey, pagesInput,
     handleUpdateSubmit, isUpdating, handleSunnahToggle, isTogglingSunnah,
-    handleVoiceComplete, loadInitialData, shareProgress, isReciteLocked, revisionQueue
+    handleVoiceComplete, loadInitialData, shareProgress, reciteLocked, revisionQueue
   ]);
 
   if (isLoading) {
@@ -245,8 +245,8 @@ const Dashboard = () => {
       </AnimatePresence>
 
       <motion.button
-        whileHover={{ scale: 1.1, rotate: 12 }}
-        whileTap={{ scale: 0.9 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         onClick={() => setIsHeartOpen(true)}
         className={`fixed z-[100] items-center justify-center rounded-3xl border-2 border-white/20 bg-gradient-to-br from-amber-400 to-amber-600 shadow-[0_20px_50px_rgba(245,158,11,0.3)] ${hasBottomPlayerRoute ? 'hidden sm:flex' : 'flex'} bottom-[calc(env(safe-area-inset-bottom)+5.25rem)] right-4 h-12 w-12 sm:bottom-8 sm:right-8 sm:h-14 sm:w-14`}
       >

@@ -26,8 +26,8 @@ export const generateProgressReport = async (user, progress, t, isArabic) => {
     <div style="border: 2px solid #10b981; border-radius: 40px; padding: 40px; background: linear-gradient(135deg, #020617 0%, #064e3b 100%);">
       <!-- Header -->
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(16, 185, 129, 0.2); padding-bottom: 30px; margin-bottom: 40px;">
-        <div>
-          <h1 style="font-size: 36px; font-weight: 900; margin: 0; color: #fff; letter-spacing: -1px;">
+        <div style="flex: 1;">
+          <h1 style="font-size: 36px; font-weight: 900; margin: 0; color: #fff; letter-spacing: -1px; text-align: ${isArabic ? 'right' : 'left'};">
             ${isArabic ? 'تقارير الثبات' : 'THABAT REPORT'}
           </h1>
           <p style="font-size: 14px; color: #10b981; font-weight: 800; text-transform: uppercase; margin-top: 5px; letter-spacing: 2px;">
