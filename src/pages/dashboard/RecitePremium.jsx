@@ -14,7 +14,7 @@ import {
   SlidersHorizontal,
   Trophy,
 } from 'lucide-react';
-import { useSmartRecitation } from '../../hooks/usesmartrecitation';
+import { useSmartRecitation } from '../../hooks/useSmartRecitation';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '../../context/ToastContext';
 import api from '../../services/api';

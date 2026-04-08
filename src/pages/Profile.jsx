@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { User, Lock, Mail, Save, KeyRound, CheckCircle, CalendarCheck, Download } from 'lucide-react';
+import { User, Lock, Mail, Save, KeyRound, CheckCircle, CalendarCheck, Download, Sparkles as SparklesIcon, Trophy as TrophyIcon, FileText } from 'lucide-react';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -8,7 +8,6 @@ import Input from '../components/Input';
 import Button from '../components/Button';
 import { BADGES, getUnlockedBadges, getBadgeProgress } from '../utils/AchievementEngine';
 import { useTranslation } from 'react-i18next';
-import { Sparkles as SparklesIcon, Trophy as TrophyIcon, Download, FileText } from 'lucide-react';
 import { generateProgressReport } from '../utils/ReportGenerator';
 
 const Profile = () => {
