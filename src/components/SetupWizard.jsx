@@ -20,12 +20,26 @@ const SetupWizard = ({ user, onComplete }) => {
   const totalSteps = 4;
 
   const handleNext = () => {
-    if (step < totalSteps) setStep(s => s + 1);
-    else handleSubmit();
+    if (step < totalSteps && isStepValid()) setStep(s => s + 1);
+    else if (step === totalSteps && isStepValid()) handleSubmit();
   };
 
   const handleBack = () => {
     if (step > 1) setStep(s => s - 1);
+  };
+
+  const setJuzCount = (val) => {
+    setFormData(d => ({ 
+      ...d, 
+      hifzStatus: { 
+        ...(d.hifzStatus || { surahs: [] }), 
+        juzCount: val 
+      } 
+    }));
+  };
+
+  const setCurrentGoal = (id) => {
+    setFormData(d => ({ ...d, currentGoal: id }));
   };
 
   const handleSubmit = async () => {
@@ -37,7 +51,7 @@ const SetupWizard = ({ user, onComplete }) => {
       });
       if (res.data.success) {
         showSuccess('Your hifz journey is ready! Bismillah.');
-        onComplete(res.data.user);
+        if (typeof onComplete === 'function') onComplete(res.data.user);
       }
     } catch (err) {
       showError(err.message || 'Failed to complete setup.');
@@ -47,9 +61,9 @@ const SetupWizard = ({ user, onComplete }) => {
   };
 
   const isStepValid = () => {
-    if (step === 1) return formData.hifzStatus.juzCount !== null;
+    if (step === 1) return formData.hifzStatus?.juzCount !== null;
     if (step === 2) return formData.currentGoal !== null;
-    if (step === 3) return formData.dailyCapacity.pages > 0 && formData.revisionIntensity;
+    if (step === 3) return formData.dailyCapacity?.pages > 0 && formData.revisionIntensity;
     return true; // Step 4 is a summary
   };
 
@@ -109,9 +123,9 @@ const SetupWizard = ({ user, onComplete }) => {
                 ].map((opt) => (
                   <button
                     key={opt.val}
-                    onClick={() => setFormData(d => ({ ...d, hifzStatus: { ...d.hifzStatus, juzCount: opt.val } }))}
+                    onClick={() => setJuzCount(opt.val)}
                     className={`text-left p-6 rounded-3xl border-2 transition-all active:scale-[0.98] ${
-                      formData.hifzStatus.juzCount === opt.val 
+                      formData.hifzStatus?.juzCount === opt.val 
                         ? 'border-emerald-500 bg-emerald-500/10 shadow-xl shadow-emerald-500/10' 
                         : 'border-white/5 bg-white/5 hover:bg-white/10'
                     }`}
@@ -143,24 +157,24 @@ const SetupWizard = ({ user, onComplete }) => {
 
               <div className="space-y-4">
                 {[
-                  { id: 'MEMORIZING_NEW', label: 'Memorizing New', desc: 'Continue moving forward with new Surahs.', icon: Flame },
-                  { id: 'REVIEWING_OLD', label: 'Perfecting Revision', desc: 'Focus specifically on stabilizing past hifz.', icon: BookOpen }
-                ].map((opt) => (
+                  { id: 'MEMORIZING_NEW', label: 'Memorizing New', desc: 'Continue moving forward with new Surahs.', Icon: Flame },
+                  { id: 'REVIEWING_OLD', label: 'Perfecting Revision', desc: 'Focus specifically on stabilizing past hifz.', Icon: BookOpen }
+                ].map(({ id, label, desc, Icon }) => (
                   <button
-                    key={opt.id}
-                    onClick={() => setFormData(d => ({ ...d, currentGoal: opt.id }))}
+                    key={id}
+                    onClick={() => setCurrentGoal(id)}
                     className={`w-full flex items-center gap-6 p-6 rounded-3xl border-2 transition-all text-left ${
-                      formData.currentGoal === opt.id 
+                      formData.currentGoal === id 
                         ? 'border-emerald-500 bg-emerald-500/10' 
                         : 'border-white/5 bg-white/5 hover:bg-white/10'
                     }`}
                   >
                     <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center">
-                      <opt.icon className={`h-6 w-6 ${formData.currentGoal === opt.id ? 'text-emerald-500' : 'text-slate-500'}`} />
+                      <Icon className={`h-6 w-6 ${formData.currentGoal === id ? 'text-emerald-500' : 'text-slate-500'}`} />
                     </div>
                     <div>
-                      <p className="font-black text-white">{opt.label}</p>
-                      <p className="text-sm text-slate-500">{opt.desc}</p>
+                      <p className="font-black text-white">{label}</p>
+                      <p className="text-sm text-slate-500">{desc}</p>
                     </div>
                   </button>
                 ))}

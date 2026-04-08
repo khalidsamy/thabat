@@ -144,7 +144,7 @@ const Home = (props) => {
                 <TargetSurahCard
                   surahName={progress?.currentSurahName || user?.currentTargetSurah || 'Al-Baqara'}
                   progress={progress?.masteryPercent || 0}
-                  isLocked={isReciteLocked}
+                  isLocked={reciteLocked}
                   itemVariants={itemVariants}
                 />
               </>
@@ -180,7 +180,7 @@ const Home = (props) => {
             <TargetSurahCard
               surahName={progress?.currentSurahName || user?.currentTargetSurah}
               progress={progress?.masteryPercent || 0}
-              isLocked={isReciteLocked}
+              isLocked={reciteLocked}
               itemVariants={itemVariants}
             />
           </DashboardLayout.Item>

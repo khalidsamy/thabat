@@ -89,27 +89,40 @@ const Dashboard = () => {
       const prog = progressResult.value.data.progress;
       
       // Safety check for RevisionEngine functions
-      const locked = typeof isReciteLocked === 'function' ? isReciteLocked(prog) : false;
-      setReciteLocked(locked);
-      
-      if (typeof getDailyQueue === 'function') {
-        const queue = await getDailyQueue(prog);
-        setRevisionQueue(queue);
+      try {
+        const locked = typeof isReciteLocked === 'function' ? isReciteLocked(prog) : false;
+        setReciteLocked(locked);
+        
+        if (typeof getDailyQueue === 'function') {
+          const queue = await getDailyQueue(prog);
+          setRevisionQueue(queue);
+        }
+      } catch (revErr) {
+        console.warn('RevisionEngine calculation failure:', revErr);
       }
 
       // Sheikh Alaa's Proactive Reminders logic
       const isAr = authUser?.language === 'ar' || i18n?.language === 'ar';
       if (notificationService && typeof notificationService.checkAndRemind === 'function') {
-        notificationService.checkAndRemind(prog, isAr);
+        try {
+          notificationService.checkAndRemind(prog, isAr);
+        } catch (notifErr) {
+          console.warn('NotificationService error:', notifErr);
+        }
       }
     }
  
     if (QURAN_VERSES && Array.isArray(QURAN_VERSES) && QURAN_VERSES.length > 0) {
-      setDailyVerse(QURAN_VERSES[Math.floor(Math.random() * QURAN_VERSES.length)]);
+      const randomVerse = QURAN_VERSES[Math.floor(Math.random() * QURAN_VERSES.length)];
+      setDailyVerse(randomVerse);
     }
  
     if (notificationService && typeof notificationService.requestPermission === 'function') {
-      notificationService.requestPermission();
+      try {
+        notificationService.requestPermission();
+      } catch (permErr) {
+        console.warn('Permission request error:', permErr);
+      }
     }
   } catch (err) {
     console.error('loadInitialData unexpected error detail:', {
@@ -121,7 +134,7 @@ const Dashboard = () => {
   } finally {
     setIsLoading(false);
   }
-}, [authUser, i18n]);
+}, [authUser, i18n?.language]); // Use .language for stable dependency
 
   useEffect(() => { loadInitialData(); }, [loadInitialData]);
 
