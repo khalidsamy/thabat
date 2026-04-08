@@ -264,9 +264,9 @@ const MobilePlayerSheet = ({
 }) => (
   <div className="fixed inset-x-0 bottom-0 z-[9999] md:hidden">
     <motion.div
-      animate={{ y: isExpanded ? 0 : 96 }}
+      animate={{ y: 0 }}
       transition={{ type: 'spring', stiffness: 280, damping: 28 }}
-      className="glass-card-strong rounded-t-[2rem] border-zinc-700 bg-zinc-900/95 shadow-[0_-8px_40px_rgba(0,0,0,0.5)] border-b-0 px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3"
+      className="glass-card-strong rounded-t-[2rem] border-zinc-700 bg-zinc-900/95 shadow-[0_-8px_40px_rgba(0,0,0,0.5)] border-b-0 px-4 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] pt-3"
     >
       <button type="button" onClick={onToggleExpanded} className="mx-auto mb-3 block h-1.5 w-14 rounded-full bg-white/20" />
 
