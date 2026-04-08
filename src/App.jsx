@@ -97,9 +97,10 @@ function App() {
             </div>
           </Router>
         </AuthProvider>
-      </FloatingActionProvider>
-    </ThemeProvider>
-  );
+      </ToastProvider>
+    </FloatingActionProvider>
+  </ThemeProvider>
+);
 }
 
 function RootRedirect() {
