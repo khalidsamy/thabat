@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from ' AnimatePresence'; 
+import { motion, AnimatePresence } from 'framer-motion'; 
 import { Check, ChevronRight, Target, BookOpen, Flame, Compass, Sparkles, Trophy, ListRestart, ArrowDown01, ArrowUp10 } from 'lucide-react';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
