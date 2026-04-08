@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ChevronRight, Target, BookOpen, Flame, Compass, Sparkles, Trophy } from 'lucide-react';
+import { Check, ChevronRight, Target, BookOpen, Flame, Compass, Sparkles, Trophy, ListRestart, ArrowDown01, ArrowUp10 } from 'lucide-react';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
 import Button from './Button';
@@ -12,12 +12,13 @@ const SetupWizard = ({ user, onComplete }) => {
   
   const [formData, setFormData] = useState({
     hifzStatus: { juzCount: null, surahs: [] },
+    hifzDirection: 'START_FROM_BEGINNING',
     currentGoal: null,
     dailyCapacity: { pages: 1, lines: 0 },
     revisionIntensity: 'HIZB'
   });
 
-  const totalSteps = 4;
+  const totalSteps = 5;
 
   const handleNext = () => {
     if (step < totalSteps && isStepValid()) setStep(s => s + 1);
@@ -38,6 +39,10 @@ const SetupWizard = ({ user, onComplete }) => {
     }));
   };
 
+  const setHifzDirection = (dir) => {
+    setFormData(d => ({ ...d, hifzDirection: dir }));
+  };
+
   const setCurrentGoal = (id) => {
     setFormData(d => ({ ...d, currentGoal: id }));
   };
@@ -50,11 +55,11 @@ const SetupWizard = ({ user, onComplete }) => {
         setupCompleted: true
       });
       if (res.data.success) {
-        showSuccess('Your hifz journey is ready! Bismillah.');
+        showSuccess('رحلتك في حفظ القرآن جاهزة! بسم الله.');
         if (typeof onComplete === 'function') onComplete(res.data.user);
       }
     } catch (err) {
-      showError(err.message || 'Failed to complete setup.');
+      showError(err.message || 'فشل في إكمال الإعداد.');
     } finally {
       setIsSubmitting(false);
     }
@@ -62,13 +67,14 @@ const SetupWizard = ({ user, onComplete }) => {
 
   const isStepValid = () => {
     if (step === 1) return formData.hifzStatus?.juzCount !== null;
-    if (step === 2) return formData.currentGoal !== null;
-    if (step === 3) return formData.dailyCapacity?.pages > 0 && formData.revisionIntensity;
-    return true; // Step 4 is a summary
+    if (step === 2) return formData.hifzDirection !== null;
+    if (step === 3) return formData.currentGoal !== null;
+    if (step === 4) return formData.dailyCapacity?.pages > 0 && formData.revisionIntensity;
+    return true; 
   };
 
   const renderProgress = () => (
-    <div className="flex gap-2 mb-10">
+    <div className="flex gap-2 mb-10" dir="rtl">
       {[...Array(totalSteps)].map((_, i) => (
         <div 
           key={i} 
@@ -80,19 +86,13 @@ const SetupWizard = ({ user, onComplete }) => {
     </div>
   );
 
-  const containerVariants = {
-    hidden: { opacity: 0, x: 20 },
-    visible: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -20 }
-  };
-
   return (
-    <div className="min-h-[80vh] flex items-center justify-center p-4">
+    <div className="min-h-[80vh] flex items-center justify-center p-4" dir="rtl">
       <motion.div 
         layout
         className="glass-card w-full max-w-xl rounded-[2.5rem] p-6 sm:p-12 relative overflow-hidden"
       >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[100px] rounded-full -mr-32 -mt-32" />
+        <div className="absolute top-0 left-0 w-64 h-64 bg-emerald-500/5 blur-[100px] rounded-full -ml-32 -mt-32" />
         
         {renderProgress()}
 
@@ -100,38 +100,37 @@ const SetupWizard = ({ user, onComplete }) => {
           {step === 1 && (
             <motion.div 
               key="step1" 
-              initial={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, x: 20 }}
               className="space-y-8"
             >
               <div className="space-y-3">
                 <div className="w-16 h-16 bg-emerald-500/10 rounded-3xl flex items-center justify-center border border-emerald-500/20">
                   <Compass className="h-8 w-8 text-emerald-500" />
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">Where are you on your journey?</h2>
-                <p className="text-sm text-slate-400">Tell us how much of the Holy Quran you have currently memorized.</p>
+                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">ما هو مقدار حفظك الحالي؟</h2>
+                <p className="text-sm text-slate-400 font-medium">أخبرنا بمدى إنجازك في حفظ القرآن الكريم حتى نتمكن من بناء خطتك.</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
-                  { label: 'Beginner', desc: '0-2 Juz memorized', val: 0 },
-                  { label: 'Intermediate', desc: '5+ Juz memorized', val: 5 },
-                  { label: 'Advanced', desc: '15+ Juz memorized', val: 15 },
-                  { label: 'Hafiz', desc: 'Full Quran (30 Juz)', val: 30 }
+                  { label: 'مبتدئ', desc: '0-2 جزء', val: 0 },
+                  { label: 'متوسط', desc: '5+ أجزاء', val: 5 },
+                  { label: 'متقدم', desc: '15+ جزءاً', val: 15 },
+                  { label: 'خاتم (حافظ)', desc: 'القرآن كاملاً (30 جزء)', val: 30 }
                 ].map((opt) => (
                   <button
                     key={opt.val}
-                    onClick={() => typeof setJuzCount === 'function' && setJuzCount(opt.val)}
-                    className={`text-left p-6 rounded-3xl border-2 transition-all active:scale-[0.98] ${
+                    onClick={() => setJuzCount(opt.val)}
+                    className={`text-right p-6 rounded-3xl border-2 transition-all active:scale-[0.98] ${
                       formData?.hifzStatus?.juzCount === opt.val 
                         ? 'border-emerald-500 bg-emerald-500/10 shadow-xl shadow-emerald-500/10' 
                         : 'border-white/5 bg-white/5 hover:bg-white/10'
                     }`}
                   >
                     <p className="font-black text-white">{opt.label}</p>
-                    <p className="text-xs text-slate-500 mt-1">{opt.desc}</p>
+                    <p className="text-xs text-slate-500 mt-1 font-bold">{opt.desc}</p>
                   </button>
                 ))}
               </div>
@@ -141,40 +140,39 @@ const SetupWizard = ({ user, onComplete }) => {
           {step === 2 && (
             <motion.div 
               key="step2" 
-              initial={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, x: 20 }}
               className="space-y-8"
             >
               <div className="space-y-3">
                 <div className="w-16 h-16 bg-emerald-500/10 rounded-3xl flex items-center justify-center border border-emerald-500/20">
-                  <Target className="h-8 w-8 text-emerald-500" />
+                  <ListRestart className="h-8 w-8 text-emerald-500" />
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">What is your current focus?</h2>
-                <p className="text-sm text-slate-400">Choose your primary goal for this season.</p>
+                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">ما هو مسار حفظك المفضل؟</h2>
+                <p className="text-sm text-slate-400 font-medium">حدد الاتجاه الذي تتبعه في حفظك الجديد.</p>
               </div>
 
               <div className="space-y-4">
                 {[
-                  { id: 'MEMORIZING_NEW', label: 'Memorizing New', desc: 'Continue moving forward with new Surahs.', Icon: Flame },
-                  { id: 'REVIEWING_OLD', label: 'Perfecting Revision', desc: 'Focus specifically on stabilizing past hifz.', Icon: BookOpen }
+                  { id: 'START_FROM_BEGINNING', label: 'من البداية (الفاتحة/البقرة)', desc: 'الحفظ بالترتيب التقليدي للمصحف.', Icon: ArrowDown01 },
+                  { id: 'START_FROM_END', label: 'من النهاية (جزء عم)', desc: 'الحفظ من قصار السور صعوداً.', Icon: ArrowUp10 }
                 ].map(({ id, label, desc, Icon }) => (
                   <button
                     key={id}
-                    onClick={() => typeof setCurrentGoal === 'function' && setCurrentGoal(id)}
-                    className={`w-full flex items-center gap-6 p-6 rounded-3xl border-2 transition-all text-left ${
-                      formData?.currentGoal === id 
+                    onClick={() => setHifzDirection(id)}
+                    className={`w-full flex items-center gap-6 p-6 rounded-3xl border-2 transition-all text-right ${
+                      formData?.hifzDirection === id 
                         ? 'border-emerald-500 bg-emerald-500/10' 
                         : 'border-white/5 bg-white/5 hover:bg-white/10'
                     }`}
                   >
                     <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center">
-                      <Icon className={`h-6 w-6 ${formData?.currentGoal === id ? 'text-emerald-500' : 'text-slate-500'}`} />
+                      <Icon className={`h-6 w-6 ${formData?.hifzDirection === id ? 'text-emerald-500' : 'text-slate-500'}`} />
                     </div>
                     <div>
                       <p className="font-black text-white">{label}</p>
-                      <p className="text-sm text-slate-500">{desc}</p>
+                      <p className="text-sm text-slate-500 font-medium">{desc}</p>
                     </div>
                   </button>
                 ))}
@@ -185,35 +183,42 @@ const SetupWizard = ({ user, onComplete }) => {
           {step === 3 && (
             <motion.div 
               key="step3" 
-              initial={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, x: 20 }}
               className="space-y-8"
             >
               <div className="space-y-3">
                 <div className="w-16 h-16 bg-emerald-500/10 rounded-3xl flex items-center justify-center border border-emerald-500/20">
-                  <Flame className="h-8 w-8 text-emerald-500" />
+                  <Target className="h-8 w-8 text-emerald-500" />
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">Define your pace</h2>
-                <p className="text-sm text-slate-400">How much time can you commit daily to reaching your goal?</p>
+                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">ما هو هدفك الأساسي؟</h2>
+                <p className="text-sm text-slate-400 font-medium">اختر التركيز الرئيسي لجدولك في هذه المرحلة.</p>
               </div>
 
-              <div className="space-y-6">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-4">Revision Intensity (الورد)</p>
-                  <select 
-                    value={formData?.revisionIntensity || 'HIZB'}
-                    onChange={(e) => setFormData(d => ({ ...d, revisionIntensity: e.target.value }))}
-                    className="w-full bg-white/5 border-2 border-white/5 rounded-2xl p-5 text-white font-bold outline-none focus:border-emerald-500 transition-all cursor-pointer"
+              <div className="space-y-4">
+                {[
+                  { id: 'MEMORIZING_NEW', label: 'حفظ جديد', desc: 'التركيز على إضافة سور وآيات جديدة لذاكرتك.', Icon: Flame },
+                  { id: 'REVIEWING_OLD', label: 'تثبيت المراجعة', desc: 'التركيز المكثف على تقوية المحفوظ السابق.', Icon: BookOpen }
+                ].map(({ id, label, desc, Icon }) => (
+                  <button
+                    key={id}
+                    onClick={() => setCurrentGoal(id)}
+                    className={`w-full flex items-center gap-6 p-6 rounded-3xl border-2 transition-all text-right ${
+                      formData?.currentGoal === id 
+                        ? 'border-emerald-500 bg-emerald-500/10' 
+                        : 'border-white/5 bg-white/5 hover:bg-white/10'
+                    }`}
                   >
-                    <option value="HIZB" className="bg-slate-900">1 Hizb / Day (Balanced)</option>
-                    <option value="1_JUZ" className="bg-slate-900">1 Juz / Day (Strong)</option>
-                    <option value="2_JUZ" className="bg-slate-900">2 Juz / Day (Intensive)</option>
-                    <option value="RUB_EL_HIZB" className="bg-slate-900">1 Rub' / Day (Light)</option>
-                    <option value="NONE" className="bg-slate-900">No Revision Plan (Not Recommended)</option>
-                  </select>
-                </div>
+                    <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center">
+                      <Icon className={`h-6 w-6 ${formData?.currentGoal === id ? 'text-emerald-500' : 'text-slate-500'}`} />
+                    </div>
+                    <div>
+                      <p className="font-black text-white">{label}</p>
+                      <p className="text-sm text-slate-500 font-medium">{desc}</p>
+                    </div>
+                  </button>
+                ))}
               </div>
             </motion.div>
           )}
@@ -221,36 +226,70 @@ const SetupWizard = ({ user, onComplete }) => {
           {step === 4 && (
             <motion.div 
               key="step4" 
-              initial={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="space-y-8"
+            >
+              <div className="space-y-3">
+                <div className="w-16 h-16 bg-emerald-500/10 rounded-3xl flex items-center justify-center border border-emerald-500/20">
+                  <Flame className="h-8 w-8 text-emerald-500" />
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">حدد وتيرة إنجازك</h2>
+                <p className="text-sm text-slate-400 font-medium">ما هو مقدار الورد الذي يمكنك الالتزام به يومياً في (المراجعة)؟</p>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 px-1">شدة المراجعة (الورد اليومي)</p>
+                  <select 
+                    value={formData?.revisionIntensity || 'HIZB'}
+                    onChange={(e) => setFormData(d => ({ ...d, revisionIntensity: e.target.value }))}
+                    className="w-full bg-white/5 border-2 border-white/5 rounded-2xl p-5 text-white font-bold outline-none focus:border-emerald-500 transition-all cursor-pointer appearance-none"
+                  >
+                    <option value="HIZB" className="bg-slate-900">1 حزب / يوم (متوازن)</option>
+                    <option value="1_JUZ" className="bg-slate-900">1 جزء / يوم (قوي)</option>
+                    <option value="2_JUZ" className="bg-slate-900">2 جزء / يوم (مكثف)</option>
+                    <option value="RUB_EL_HIZB" className="bg-slate-900">1 ربع / يوم (خفيف)</option>
+                    <option value="NONE" className="bg-slate-900">لا يوجد خطة مراجعة (غير مستحسن)</option>
+                  </select>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {step === 5 && (
+            <motion.div 
+              key="step5" 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
               className="space-y-8 text-center"
             >
               <div className="space-y-3">
                 <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
                   <Trophy className="h-10 w-10 text-emerald-500" />
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-black text-white">Commitment is key.</h2>
-                <p className="text-sm text-slate-400 leading-relaxed">
-                  "The most beloved actions to Allah are those performed consistently, even if they are few."
+                <h2 className="text-2xl sm:text-3xl font-black text-white">الاستمرارية سر النجاح</h2>
+                <p className="text-sm text-slate-400 leading-relaxed font-medium">
+                  "أحب الأعمال إلى الله أدومها وإن قل."
                 </p>
               </div>
 
-              <div className="surface-inset p-8 rounded-[2rem] text-left border border-white/5 bg-white/[0.02]">
-                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500/80 mb-6">Your Initial Plan</p>
+              <div className="surface-inset p-8 rounded-[2rem] text-right border border-white/5 bg-white/[0.02]">
+                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500/80 mb-6">ملخص خطتك الأولية</p>
                 <div className="space-y-4">
                   <div className="flex items-center gap-4">
                     <Check className="h-5 w-5 text-emerald-500" />
-                    <span className="text-white font-medium">Starting with {formData?.hifzStatus?.juzCount || 0} Juz memorized.</span>
+                    <span className="text-white font-bold">المحفوظ الحالي: {formData?.hifzStatus?.juzCount || 0} جزء.</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <Check className="h-5 w-5 text-emerald-500" />
-                    <span className="text-white font-medium">{formData?.currentGoal === 'MEMORIZING_NEW' ? 'New Memorization focus.' : 'Stabilization focus.'}</span>
+                    <span className="text-white font-bold">المسار: {formData?.hifzDirection === 'START_FROM_BEGINNING' ? 'من البداية' : 'من جزء عم'}.</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <Check className="h-5 w-5 text-emerald-500" />
-                    <span className="text-white font-medium">Revision intensity: {formData?.revisionIntensity || 'HIZB'}.</span>
+                    <span className="text-white font-bold">التركيز: {formData?.currentGoal === 'MEMORIZING_NEW' ? 'حفظ جديد' : 'تثبيت المراجعة'}.</span>
                   </div>
                 </div>
               </div>
@@ -259,14 +298,6 @@ const SetupWizard = ({ user, onComplete }) => {
         </AnimatePresence>
 
         <div className="mt-12 flex gap-4">
-          {step > 1 && (
-            <button
-              onClick={handleBack}
-              className="flex-1 py-5 rounded-2xl bg-white/5 text-slate-400 font-black uppercase tracking-[0.2em] hover:bg-white/10 transition-all"
-            >
-              Back
-            </button>
-          )}
           <button
             onClick={handleNext}
             disabled={isSubmitting || !isStepValid()}
@@ -276,11 +307,20 @@ const SetupWizard = ({ user, onComplete }) => {
               <span className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
               <>
-                {step === totalSteps ? 'Finalize' : 'Confirm'}
-                <ChevronRight className="h-5 w-5" />
+                {step === totalSteps ? 'إبداء الرحلة' : 'تأكيد'}
+                <ChevronRight className={`h-5 w-5 ${step === totalSteps ? 'hidden' : ''} -scale-x-100`} />
               </>
             )}
           </button>
+          
+          {step > 1 && (
+            <button
+              onClick={handleBack}
+              className="flex-1 py-5 rounded-2xl bg-white/5 text-slate-400 font-black uppercase tracking-[0.2em] hover:bg-white/10 transition-all"
+            >
+              رجوع
+            </button>
+          )}
         </div>
       </motion.div>
     </div>
