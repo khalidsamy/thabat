@@ -1,18 +1,24 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from ' AnimatePresence'; 
 import { Check, ChevronRight, Target, BookOpen, Flame, Compass, Sparkles, Trophy, ListRestart, ArrowDown01, ArrowUp10 } from 'lucide-react';
 import api from '../services/api';
 import { useToast } from '../context/ToastContext';
 import Button from './Button';
 
+/**
+ * Multi-step onboarding wizard for new Quran students.
+ * Captures hifz status, preferred direction (Mashriq vs Maghrib logic), and intensity.
+ * Persists profile completion to trigger the main dashboard experience.
+ */
 const SetupWizard = ({ user, onComplete }) => {
+  // --- STATE ---
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showSuccess, showError } = useToast();
   
   const [formData, setFormData] = useState({
     hifzStatus: { juzCount: null, surahs: [] },
-    hifzDirection: 'START_FROM_BEGINNING',
+    hifzDirection: 'START_FROM_BEGINNING', // Standard forward path
     currentGoal: null,
     dailyCapacity: { pages: 1, lines: 0 },
     revisionIntensity: 'HIZB'
@@ -20,6 +26,7 @@ const SetupWizard = ({ user, onComplete }) => {
 
   const totalSteps = 5;
 
+  // --- NAVIGATION ---
   const handleNext = () => {
     if (step < totalSteps && isStepValid()) setStep(s => s + 1);
     else if (step === totalSteps && isStepValid()) handleSubmit();
@@ -29,6 +36,7 @@ const SetupWizard = ({ user, onComplete }) => {
     if (step > 1) setStep(s => s - 1);
   };
 
+  // --- LOGIC ---
   const setJuzCount = (val) => {
     setFormData(d => ({ 
       ...d, 
@@ -66,13 +74,16 @@ const SetupWizard = ({ user, onComplete }) => {
   };
 
   const isStepValid = () => {
-    if (step === 1) return formData.hifzStatus?.juzCount !== null;
-    if (step === 2) return formData.hifzDirection !== null;
-    if (step === 3) return formData.currentGoal !== null;
-    if (step === 4) return formData.dailyCapacity?.pages > 0 && formData.revisionIntensity;
-    return true; 
+    switch(step) {
+      case 1: return formData.hifzStatus?.juzCount !== null;
+      case 2: return formData.hifzDirection !== null;
+      case 3: return formData.currentGoal !== null;
+      case 4: return formData.dailyCapacity?.pages > 0 && formData.revisionIntensity;
+      default: return true;
+    }
   };
 
+  // --- RENDER HELPERS ---
   const renderProgress = () => (
     <div className="flex gap-2 mb-10" dir="rtl">
       {[...Array(totalSteps)].map((_, i) => (
@@ -97,6 +108,7 @@ const SetupWizard = ({ user, onComplete }) => {
         {renderProgress()}
 
         <AnimatePresence mode="wait">
+          {/* Step 1: Hifz Assessment */}
           {step === 1 && (
             <motion.div 
               key="step1" 
@@ -137,6 +149,7 @@ const SetupWizard = ({ user, onComplete }) => {
             </motion.div>
           )}
 
+          {/* Step 2: Hifz Path Selection */}
           {step === 2 && (
             <motion.div 
               key="step2" 
@@ -180,6 +193,7 @@ const SetupWizard = ({ user, onComplete }) => {
             </motion.div>
           )}
 
+          {/* Step 3: Performance Focus */}
           {step === 3 && (
             <motion.div 
               key="step3" 
@@ -223,6 +237,7 @@ const SetupWizard = ({ user, onComplete }) => {
             </motion.div>
           )}
 
+          {/* Step 4: Revision Intensity */}
           {step === 4 && (
             <motion.div 
               key="step4" 
@@ -258,6 +273,7 @@ const SetupWizard = ({ user, onComplete }) => {
             </motion.div>
           )}
 
+          {/* Step 5: Final Confirmation */}
           {step === 5 && (
             <motion.div 
               key="step5" 
@@ -297,6 +313,7 @@ const SetupWizard = ({ user, onComplete }) => {
           )}
         </AnimatePresence>
 
+        {/* Footer Navigation */}
         <div className="mt-12 flex gap-4">
           <button
             onClick={handleNext}

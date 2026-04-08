@@ -1,19 +1,28 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 
 /**
- * Real-time Quranic recitation feedback hook.
+ * Real-time Quranic recitation engine.
  * Handles normalization and word-level diffing between speech and target text.
+ * Optimized for Arabic STT nuances (simplified text vs. Quranic diacritics).
  */
 export const useVoiceCorrection = (targetVerses = [], _onComplete) => {
+  // --- STATE ---
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
-  const [matches, setMatches] = useState([]); // Array of { text: string, status: 'correct' | 'wrong' | 'pending' }
+  const [matches, setMatches] = useState([]); 
   const [masteryScore, setMasteryScore] = useState(0);
   const [error, setError] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
   
   const recognitionRef = useRef(null);
 
+  // --- UTILS ---
+
+  /**
+   * Compares two strings using Levenshtein distance.
+   * Essential for STT which might return slightly different spellings for the same tajweed.
+   */
   const getLevenshteinDistance = (a, b) => {
     const matrix = [];
     for (let i = 0; i <= b.length; i++) matrix[i] = [i];
@@ -41,23 +50,25 @@ export const useVoiceCorrection = (targetVerses = [], _onComplete) => {
       return 1 - distance / Math.max(a.length, b.length);
   };
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  // Normalize Arabic text strictly for comparison (STT usually returns simplified text)
+  /**
+   * Normalizes Arabic text for comparison.
+   * Strips diacritics (Harakaat) and Quranic symbols as WebSpeech API 
+   * returns basic Uthmani or simplified text without these markers.
+   */
   const normalize = useCallback((str) => {
     if (!str) return "";
     return str
-      // 1. Remove all Quranic symbols, diacritics, and small characters
+      // Remove Harakaat, diacritics, and Quranic punctuation marks
       .replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E8\u06EA-\u06ED]/g, "")
-      // 2. Standardize Alef variations (أ, إ, آ -> ا)
+      // Normalize Letter variations to simplify matching
       .replace(/[أإآ]/g, "ا")
-      // 3. Standardize Alef Maqsura and Ya (ى -> ي)
       .replace(/ى/g, "ي")
-      // 4. Standardize Teh Marbuta (ة -> ه)
       .replace(/ة/g, "ه")
       .replace(/\s+/g, " ")
       .trim();
   }, []);
+
+  // --- ENGINE ---
 
   useEffect(() => {
     if (targetVerses.length > 0) {
@@ -71,14 +82,18 @@ export const useVoiceCorrection = (targetVerses = [], _onComplete) => {
     return () => stopListening();
   }, [targetVerses, normalize]);
 
+  /**
+   * Core diffing logic. 
+   * Checks the transcript against the target 'matches'.
+   * Allows for 1-word skip detection to handle common recitation hiccups.
+   */
   const updateMatches = useCallback((finalSpeech, onError) => {
     const speechWords = normalize(finalSpeech).split(/\s+/).filter(w => w.length > 0);
-    
     let errorDetected = false;
     
     setMatches(prev => {
       const updated = [...prev];
-      const threshold = 0.72; // Refined threshold for Arabic STT
+      const threshold = 0.72; // Optimized for Arabic speech ambiguity
       let localIndex = currentIndex;
       
       speechWords.forEach(sWord => {
@@ -91,7 +106,7 @@ export const useVoiceCorrection = (targetVerses = [], _onComplete) => {
             updated[localIndex].status = 'correct';
             localIndex++;
         } else {
-            // Check next word for single skip
+            // Check next word for single skip error detection
             const nextIdx = localIndex + 1;
             if (nextIdx < updated.length) {
                 const nextSim = getSimilarity(updated[nextIdx].normalized, sWord);
@@ -99,19 +114,19 @@ export const useVoiceCorrection = (targetVerses = [], _onComplete) => {
                     updated[localIndex].status = 'wrong';
                     updated[nextIdx].status = 'correct';
                     errorDetected = true;
-                    if ('vibrate' in navigator) navigator.vibrate(300); // Haptic!
+                    if ('vibrate' in navigator) navigator.vibrate(300); 
                     if (onError) onError(updated[localIndex].text);
                     localIndex = nextIdx + 1;
                 } else {
                     updated[localIndex].status = 'wrong';
                     errorDetected = true;
-                    if ('vibrate' in navigator) navigator.vibrate(300); // Haptic!
+                    if ('vibrate' in navigator) navigator.vibrate(300);
                     if (onError) onError(updated[localIndex].text);
                 }
             } else {
                 updated[localIndex].status = 'wrong';
                 errorDetected = true;
-                if ('vibrate' in navigator) navigator.vibrate(300); // Haptic!
+                if ('vibrate' in navigator) navigator.vibrate(300);
                 if (onError) onError(updated[localIndex].text);
             }
         }
@@ -125,6 +140,8 @@ export const useVoiceCorrection = (targetVerses = [], _onComplete) => {
 
     return errorDetected;
   }, [normalize, currentIndex]);
+
+  // --- CONTROLS ---
 
   const startListening = useCallback((onWordError) => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -154,7 +171,7 @@ export const useVoiceCorrection = (targetVerses = [], _onComplete) => {
           const hasError = updateMatches(speech, onWordError);
           if (hasError) {
               recognition.stop();
-              return; // Exit stream immediately
+              return; // Terminate recognition on error to prevent cascading fails
           }
         } else {
           interimText += event.results[i][0].transcript;

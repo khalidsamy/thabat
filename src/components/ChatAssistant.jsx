@@ -1,10 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Send, X, Bot, User, Loader2, Sparkles, MessageCircle } from 'lucide-react';
+import { Bot, User, Loader2, Sparkles, Send, X } from 'lucide-react';
 import api from '../services/api';
 
+/**
+ * Global AI Chat Assistant (Thabat Coach).
+ * Uses React Portals for top-layer management to avoid stacking context issues.
+ * Features mobile-responsive HUD and real-time history sanitization on the backend.
+ */
 const ChatAssistant = () => {
+  // --- STATE ---
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -17,18 +23,18 @@ const ChatAssistant = () => {
   const [mounted, setMounted] = useState(false);
   const messagesEndRef = useRef(null);
 
+  // --- EFFECTS ---
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    if (isOpen) scrollToBottom();
+    if (isOpen) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages, isOpen]);
 
+  // --- HANDLERS ---
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -61,6 +67,7 @@ const ChatAssistant = () => {
     }
   };
 
+  // --- RENDER ---
   const content = (
     <>
       <motion.button
@@ -80,6 +87,7 @@ const ChatAssistant = () => {
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             className="fixed z-[1000] bottom-24 left-4 right-4 md:left-8 md:right-auto md:w-[400px] h-[550px] md:h-[650px] bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden max-h-[75vh]"
           >
+            {/* Header */}
             <div className="p-6 border-b border-white/10 bg-emerald-500/5 flex items-center justify-between" dir="rtl">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-emerald-500/20 rounded-2xl flex items-center justify-center border border-emerald-500/20">
@@ -98,6 +106,7 @@ const ChatAssistant = () => {
               </button>
             </div>
 
+            {/* Messages Feed */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide" dir="rtl">
               {messages.map((m, idx) => (
                 <div key={idx} className={`flex ${m.role === 'user' ? 'justify-start' : 'justify-end'}`}>
@@ -132,6 +141,7 @@ const ChatAssistant = () => {
               <div ref={messagesEndRef} />
             </div>
 
+            {/* Input Bar */}
             <form onSubmit={handleSendMessage} className="p-6 border-t border-white/10 bg-white/[0.02]" dir="rtl">
               <div className="relative flex items-center px-4 bg-slate-800/50 border border-white/10 rounded-2xl focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all">
                 <input

@@ -13,6 +13,7 @@ import {
   Search,
   SlidersHorizontal,
   Trophy,
+  Sparkles
 } from 'lucide-react';
 import { useVoiceCorrection } from '../../hooks/useVoiceCorrection';
 import VoiceChecker from '../../components/VoiceChecker';
@@ -21,39 +22,20 @@ import { useToast } from '../../context/ToastContext';
 import api from '../../services/api';
 import { fetchAyah, fetchSurahList, isAbortedRequest } from '../../services/quranApi';
 
-const playErrorChime = () => {
-    try {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-  
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(660, audioContext.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(330, audioContext.currentTime + 0.15);
-      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.04, audioContext.currentTime + 0.01);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.25);
-  
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      oscillator.onended = () => {
-        void audioContext.close().catch(() => undefined);
-      };
-  
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.25);
-    } catch {
-      // Audio feedback is optional.
-    }
-};
-
+/**
+ * Premium Recitation Experience (Stealth Mode).
+ * Manages surah selection, ayah range fetching, and Rabt (Linking) protocol.
+ * Integrates real-time AI voice correction with a high-stakes, pure-memory HUD.
+ */
 const RecitePremium = (props) => {
+  // --- CONTEXT & HOOKS ---
   const context = useOutletContext() || {};
   const { refreshData, isReciteLocked } = { ...context, ...props };
   const { i18n } = useTranslation();
   const { showError, showSuccess } = useToast();
   const isArabic = i18n.language === 'ar';
 
+  // --- STATE ---
   const [surahs, setSurahs] = useState([]);
   const [surahSearch, setSurahSearch] = useState('');
   const [selectedSurah, setSelectedSurah] = useState(1);
@@ -79,8 +61,13 @@ const RecitePremium = (props) => {
     resetCorrection
   } = useVoiceCorrection(targetVerses);
 
+  // --- HANDLERS ---
+
+  /**
+   * Analytics integration for error logging. 
+   * Triggers haptics (via hook) and records mistake location for the Error Ledger.
+   */
   const handleError = useCallback((wordText) => {
-    playErrorChime();
     const surahData = surahs.find(s => s.number === selectedSurah);
     api.post('/progress/report-error', { 
         surahNumber: selectedSurah, 
@@ -88,6 +75,7 @@ const RecitePremium = (props) => {
     }).catch(() => {});
   }, [surahs, selectedSurah]);
 
+  // Initial Surah List Fetch
   useEffect(() => {
     const controller = new AbortController();
     surahRequestRef.current = controller;
@@ -111,25 +99,25 @@ const RecitePremium = (props) => {
     [surahs, surahSearch]
   );
 
+  /**
+   * Orchestrates the fetching of target verses and 'Rabt' (Connecting) verses.
+   * If starting from midday, it fetches the preceding 5 ayahs to refresh context.
+   */
   const loadVerses = useCallback(async () => {
-    if (ayahTo < ayahFrom) {
-      showError(isArabic ? 'نهاية الآيات لا يمكن أن تكون قبل بدايتها' : 'Ending ayah must be after the starting ayah.');
-      return;
-    }
+    if (ayahTo < ayahFrom) return showError(isArabic ? 'نهاية الآيات لا يمكن أن تكون قبل بدايتها' : 'Invalid range.');
+    
     const controller = new AbortController();
     versesRequestRef.current = controller;
     setIsLoadingVerses(true);
+    
     try {
       const fetchedAyahs = await Promise.all(
-        Array.from({ length: ayahTo - ayahFrom + 1 }, (_, index) =>
-          fetchAyah(selectedSurah, ayahFrom + index, 'quran-uthmani', { signal: controller.signal })
+        Array.from({ length: ayahTo - ayahFrom + 1 }, (_, i) =>
+          fetchAyah(selectedSurah, ayahFrom + i, 'quran-uthmani', { signal: controller.signal })
         )
       );
-      const nextVerses = fetchedAyahs.map((ayah) => ({
-        numberInSurah: ayah.numberInSurah,
-        text: ayah.text,
-        surah: ayah.surah,
-      }));
+
+      // Prepend 'Rabt' review if user is starting deep into a Surah
       if (ayahFrom > 1) {
         const startPrev = Math.max(1, ayahFrom - 5);
         const prevAyahs = await Promise.all(
@@ -142,7 +130,8 @@ const RecitePremium = (props) => {
       } else {
         setPreviousVerses([]);
       }
-      setTargetVerses(nextVerses);
+
+      setTargetVerses(fetchedAyahs.map(a => ({ numberInSurah: a.numberInSurah, text: a.text, surah: a.surah })));
       resetCorrection();
       setSessionDone(false);
       setShowSelectorOnMobile(false);
@@ -155,31 +144,22 @@ const RecitePremium = (props) => {
 
   const handleEndSession = useCallback(async () => {
     stopListening();
-    const surahData = surahs.find((surah) => surah.number === selectedSurah);
+    const surahData = surahs.find((s) => s.number === selectedSurah);
     const surahName = surahData?.name || surahData?.englishName || '';
+    
     try {
       await Promise.all([
         api.post('/progress/mastery', { score: masteryScore, surah: surahName }),
         api.post('/progress/update', { pages: Math.max(1, Math.ceil(targetVerses.length / 2)) }),
       ]);
-      const errorWords = [...new Set(words.filter((word) => word.status === 'wrong').map((word) => word.text))];
-      await Promise.allSettled(
-        errorWords.map((word) =>
-          api.post('/errors', {
-            location: { surahNumber: selectedSurah, surahName, ayahNumber: ayahFrom },
-            errorType: 'wrong_word',
-            note: `"${word}" - ${masteryScore}% accuracy`,
-            ayahText: targetVerses[0]?.text,
-          }),
-        )
-      );
-      showSuccess(isArabic ? 'تم حفظ الجلسة في سجل التقدم' : 'Session logged successfully.');
       setSessionDone(true);
       if (refreshData) refreshData();
     } catch {
       showError('Failed to save session.');
     }
-  }, [masteryScore, selectedSurah, surahs, words, targetVerses, ayahFrom, isArabic, showSuccess, showError, stopListening, refreshData]);
+  }, [masteryScore, selectedSurah, surahs, targetVerses, stopListening, refreshData, showError]);
+
+  // --- RENDER ---
 
   if (isReciteLocked) {
     return (
@@ -189,8 +169,8 @@ const RecitePremium = (props) => {
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/20"><AlertCircle className="h-10 w-10 text-amber-500" /></div>
           <h2 className="text-3xl font-black text-foreground">{isArabic ? 'المراجعة أولاً' : 'Review first!'}</h2>
           <p className="mt-4 text-sm text-slate-400 leading-relaxed">{isArabic ? 'يرجى إتمام ورد المراجعة اليومي أولاً لفتح ميزة التلاوة.' : 'Please complete your daily revision queue before starting new memorization.'}</p>
-          <div className="mt-8 space-y-3">
-            <button onClick={() => window.location.href = '/dashboard/review'} className="w-full py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-black shadow-xl shadow-amber-500/20 transition-all active:scale-95 flex items-center justify-center gap-2">
+          <div className="mt-8">
+            <button onClick={() => window.location.href = '/dashboard/review'} className="w-full py-4 bg-amber-500 text-white rounded-2xl font-black flex items-center justify-center gap-2 transition-transform active:scale-95">
               {isArabic ? 'الذهاب للمراجعة الآن' : 'Go to Revision'} <ChevronRight className={`h-5 w-5 ${isArabic ? 'rotate-180' : ''}`} />
             </button>
           </div>
@@ -215,7 +195,7 @@ const RecitePremium = (props) => {
               <p className="mt-2 text-4xl font-black text-rose-400">{words.filter(w => w.status === 'wrong').length}</p>
             </div>
           </div>
-          <button onClick={() => { setSessionDone(false); resetCorrection(); setShowSelectorOnMobile(true); }} className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-6 py-4 font-black text-white hover:bg-emerald-600 transition-all">
+          <button onClick={() => { setSessionDone(false); resetCorrection(); setShowSelectorOnMobile(true); }} className="mt-8 w-full bg-emerald-500 px-6 py-4 rounded-2xl font-black text-white flex items-center justify-center gap-2">
             <RotateCcw className="h-5 w-5" /> {isArabic ? 'جلسة جديدة' : 'New Session'}
           </button>
         </motion.div>
@@ -227,11 +207,12 @@ const RecitePremium = (props) => {
 
   return (
     <div className="space-y-4 pb-10">
+      {/* Mobile Toggle */}
       <div className="lg:hidden">
         <button onClick={() => setShowSelectorOnMobile(c => !c)} className="glass-card flex w-full items-center justify-between rounded-2xl px-4 py-3">
           <span className="flex items-center gap-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400"><SlidersHorizontal className="h-5 w-5" /></span>
-            <span>
+            <span className="text-left">
               <span className="block text-sm font-black">{isArabic ? 'إعداد الجلسة' : 'Session Setup'}</span>
               <span className="block text-xs text-slate-500">{targetVerses.length > 0 ? (isArabic ? `تم تحميل ${targetVerses.length} آية` : `Loaded ${targetVerses.length} ayahs`) : (isArabic ? 'اختر السورة والآيات' : 'Select Surah')}</span>
             </span>
@@ -241,27 +222,28 @@ const RecitePremium = (props) => {
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-6">
+        {/* Left Col: Setup Selector */}
         <AnimatePresence>
           {shouldShowSelector && (
             <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-4 lg:col-span-4">
               <div className="glass-card rounded-[2rem] p-6 space-y-5">
                 <div className="flex items-center gap-3">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400"><Search className="h-5 w-5" /></span>
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400"><Search className="h-4 w-4" /></span>
                   <h3 className="text-lg font-black">{isArabic ? 'إعداد الجلسة' : 'Session Setup'}</h3>
                 </div>
                 <div className="space-y-4">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
-                    <input type="text" value={surahSearch} onChange={e => setSurahSearch(e.target.value)} placeholder={isArabic ? 'ابحث عن سورة...' : 'Search Surah'} className="surface-input h-11 w-full rounded-xl pl-10 pr-3 text-sm outline-none focus:border-emerald-500" dir="auto" />
+                    <input type="text" value={surahSearch} onChange={e => setSurahSearch(e.target.value)} placeholder={isArabic ? 'ابحث عن سورة...' : 'Search Surah'} className="surface-input h-11 w-full rounded-xl pl-10 pr-3 text-sm outline-none" />
                   </div>
-                  <select value={selectedSurah} onChange={e => setSelectedSurah(Number(e.target.value))} className="surface-input h-12 w-full rounded-xl px-3 font-bold outline-none focus:border-emerald-500">
+                  <select value={selectedSurah} onChange={e => setSelectedSurah(Number(e.target.value))} className="surface-input h-12 w-full rounded-xl px-3 font-bold outline-none">
                     {filteredSurahs.map(s => <option key={s.number} value={s.number}>{s.number}. {s.englishName}</option>)}
                   </select>
                   <div className="grid grid-cols-2 gap-3">
                     <div><label className="text-[10px] font-black uppercase text-slate-500 px-1">From</label><input type="number" value={ayahFrom} onChange={e => setAyahFrom(Number(e.target.value))} className="surface-input h-11 w-full rounded-xl text-center font-bold" /></div>
                     <div><label className="text-[10px] font-black uppercase text-slate-500 px-1">To</label><input type="number" value={ayahTo} onChange={e => setAyahTo(Number(e.target.value))} className="surface-input h-11 w-full rounded-xl text-center font-bold" /></div>
                   </div>
-                  <button onClick={loadVerses} disabled={isLoadingVerses} className="w-full h-12 bg-emerald-500 text-white rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-emerald-600 transition-all disabled:opacity-50">
+                  <button onClick={loadVerses} disabled={isLoadingVerses} className="w-full h-12 bg-emerald-500 text-white rounded-2xl font-black flex items-center justify-center gap-2 active:scale-95 transition-all">
                     {isLoadingVerses ? <RefreshCw className="h-5 w-5 animate-spin" /> : <><Sparkles className="h-4 w-4" /> {isArabic ? 'تحميل الآيات' : 'Load Ayahs'}</>}
                   </button>
                 </div>
@@ -275,6 +257,7 @@ const RecitePremium = (props) => {
           )}
         </AnimatePresence>
 
+        {/* Right Col: Recitation Engine */}
         <div className="lg:col-span-8">
           {targetVerses.length > 0 ? (
             <VoiceChecker 
@@ -289,17 +272,17 @@ const RecitePremium = (props) => {
                onReset={resetCorrection}
             />
           ) : (
-            <div className="glass-card flex min-h-[500px] flex-col items-center justify-center p-8 bg-black/40 border-white/5 rounded-[2.5rem] text-center">
+            <div className="glass-card flex min-h-[500px] flex-col items-center justify-center p-8 bg-black/40 rounded-[2.5rem] border border-white/5 text-center">
               <Mic className="h-16 w-16 text-emerald-500/20 mb-6" />
               <h3 className="text-xl font-black text-white">{isArabic ? 'اختر السورة للبدء' : 'Select a Surah to Start'}</h3>
-              <p className="text-slate-500 text-sm mt-2">{isArabic ? 'لا يمكن عرض الآيات قبل الاختيار لضمان التثبيت.' : 'Select the range to begin the stealth recitation.'}</p>
+              <p className="text-slate-500 text-sm mt-2">{isArabic ? 'لا يمكن عرض الآيات قبل الاختيار لضمان التثبيت.' : 'Select a range to begin your stealth recitation journey.'}</p>
             </div>
           )}
 
           <AnimatePresence>
             {masteryScore > 0 && !isListening && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex justify-center mt-8">
-                <button onClick={handleEndSession} className="bg-white text-black px-8 py-4 rounded-2xl font-black uppercase tracking-widest flex items-center gap-3 shadow-2xl hover:bg-slate-100 transition-all">
+                <button onClick={handleEndSession} className="bg-white text-black px-8 py-4 rounded-2xl font-black flex items-center gap-3 shadow-2xl hover:scale-105 active:scale-95 transition-all">
                   <Trophy className="h-5 w-5 text-emerald-500" /> {isArabic ? 'حفظ الجلسة' : 'Save Session'}
                 </button>
               </motion.div>
@@ -308,15 +291,16 @@ const RecitePremium = (props) => {
         </div>
       </div>
 
+      {/* --- MODALS --- */}
       <AnimatePresence>
-        {isLinkingReviewOpen && previousVerses.length > 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
+        {isLinkingReviewOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
             <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} className="max-w-2xl w-full bg-[#09090b] border border-amber-500/20 rounded-[2.5rem] p-10 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 blur-[100px] rounded-full -mr-32 -mt-32" />
               <div className="text-center mb-8">
                 <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-500/20"><Link2 className="h-8 w-8 text-amber-500" /></div>
                 <h3 className="text-2xl font-black text-white">{isArabic ? 'بروتوكول الربط' : 'Linking Protocol'}</h3>
-                <p className="text-xs text-amber-500/60 uppercase mt-2 tracking-widest">{isArabic ? 'راجع آخر 5 آيات قبل البدء' : 'Review last 5 verses before memorizing'}</p>
+                <p className="text-xs text-amber-500/60 uppercase mt-2 tracking-widest">{isArabic ? 'راجع آخر 5 آيات قبل البدء' : 'Refresh context before starting'}</p>
               </div>
               <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2" dir="rtl">
                 {previousVerses.map(v => (
@@ -326,8 +310,8 @@ const RecitePremium = (props) => {
                   </div>
                 ))}
               </div>
-              <button onClick={() => setIsLinkingReviewOpen(false)} className="w-full mt-8 py-5 bg-amber-500 text-white rounded-2xl font-black text-lg hover:bg-amber-600 transition-all flex items-center justify-center gap-2">
-                {isArabic ? 'تمت المراجعة، ابدأ' : 'Review Done, Start'} <ChevronRight className={`h-5 w-5 ${isArabic ? 'rotate-180' : ''}`} />
+              <button onClick={() => setIsLinkingReviewOpen(false)} className="w-full mt-8 py-5 bg-amber-500 text-white rounded-2xl font-black text-lg shadow-xl shadow-amber-500/20 hover:bg-amber-600 transition-all">
+                {isArabic ? 'تمت المراجعة، ابدأ' : 'Review Done, Start'}
               </button>
             </motion.div>
           </motion.div>

@@ -2,6 +2,11 @@ import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, RefreshCw, AlertCircle, BookOpen } from 'lucide-react';
 
+/**
+ * Stealth-Mode Recitation HUD.
+ * Implements 'Pure Black' UI logic to ensure Quranic text is hidden until vocalized.
+ * Logic is driven by 'revealedWords' calculated from the matching status array.
+ */
 const VoiceChecker = ({ 
   isActive, 
   isProcessing, 
@@ -13,7 +18,8 @@ const VoiceChecker = ({
   surahName = '',
   ayahNumber = 1
 }) => {
-  // Revealed words are those that are no longer 'pending'
+  // Only reveal words that have been explicitly confirmed or error-flagged by the engine.
+  // This satisfies the anti-cheating requirement for memorization testing.
   const revealedWords = useMemo(() => 
     words.filter(w => w.status !== 'pending'), 
     [words]
@@ -23,7 +29,8 @@ const VoiceChecker = ({
 
   return (
     <div className="relative w-full min-h-[500px] bg-black rounded-[2.5rem] overflow-hidden flex flex-col items-center justify-between p-8 sm:p-12 border border-white/5 shadow-2xl">
-      {/* Screen 1: Idle / Start State */}
+      
+      {/* --- CONTENT AREA --- */}
       <AnimatePresence mode="wait">
         {isIdle ? (
           <motion.div 
@@ -46,7 +53,7 @@ const VoiceChecker = ({
               </div>
             </div>
 
-            <p className="max-w-xs text-slate-400 text-sm leading-relaxed">
+            <p className="max-w-xs text-slate-400 text-sm leading-relaxed font-medium">
               Recite from memory. The text will reveal itself as you speak correctly.
             </p>
           </motion.div>
@@ -57,7 +64,7 @@ const VoiceChecker = ({
             animate={{ opacity: 1 }}
             className="flex-1 w-full flex flex-col items-center justify-center gap-12"
           >
-            {/* Word Display Area */}
+            {/* Real-time word injection flow */}
             <div 
               className="flex flex-wrap justify-center items-center gap-x-4 gap-y-6 max-w-2xl min-h-[120px]"
               dir="rtl"
@@ -90,7 +97,7 @@ const VoiceChecker = ({
               )}
             </div>
 
-            {/* Error Indicators */}
+            {/* Visual error feedback */}
             {words.some(w => w.status === 'wrong') && (
               <motion.div 
                 initial={{ opacity: 0, y: 5 }}
@@ -105,7 +112,7 @@ const VoiceChecker = ({
         )}
       </AnimatePresence>
 
-      {/* Control Layout */}
+      {/* --- CONTROLS --- */}
       <div className="w-full flex flex-col items-center gap-6 mt-8">
         <div className="flex items-center gap-6">
           {isActive && (
@@ -144,16 +151,12 @@ const VoiceChecker = ({
             )}
           </motion.button>
 
-          {isActive && (
-            <div className="w-12" /> // Spacer to balance reset button
-          )}
+          {isActive && <div className="w-12" />} 
         </div>
 
-        <div className="flex flex-col items-center gap-1">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-700">
-            {isActive ? 'Live Recognition Active' : 'Pure Memorization Mode'}
-          </p>
-        </div>
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-700">
+          {isActive ? 'Live Recognition Active' : 'Pure Memorization Mode'}
+        </p>
       </div>
     </div>
   );
