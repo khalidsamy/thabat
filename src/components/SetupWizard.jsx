@@ -11,8 +11,8 @@ const SetupWizard = ({ user, onComplete }) => {
   const { showSuccess, showError } = useToast();
   
   const [formData, setFormData] = useState({
-    hifzStatus: { juzCount: 0, surahs: [] },
-    currentGoal: 'MEMORIZING_NEW',
+    hifzStatus: { juzCount: null, surahs: [] },
+    currentGoal: null,
     dailyCapacity: { pages: 1, lines: 0 },
     revisionIntensity: 'HIZB'
   });
@@ -46,6 +46,13 @@ const SetupWizard = ({ user, onComplete }) => {
     }
   };
 
+  const isStepValid = () => {
+    if (step === 1) return formData.hifzStatus.juzCount !== null;
+    if (step === 2) return formData.currentGoal !== null;
+    if (step === 3) return formData.dailyCapacity.pages > 0 && formData.revisionIntensity;
+    return true; // Step 4 is a summary
+  };
+
   const renderProgress = () => (
     <div className="flex gap-2 mb-10">
       {[...Array(totalSteps)].map((_, i) => (
@@ -77,7 +84,14 @@ const SetupWizard = ({ user, onComplete }) => {
 
         <AnimatePresence mode="wait">
           {step === 1 && (
-            <motion.div key="step1" {...containerVariants} className="space-y-8">
+            <motion.div 
+              key="step1" 
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={containerVariants} 
+              className="space-y-8"
+            >
               <div className="space-y-3">
                 <div className="w-16 h-16 bg-emerald-500/10 rounded-3xl flex items-center justify-center border border-emerald-500/20">
                   <Compass className="h-8 w-8 text-emerald-500" />
@@ -111,7 +125,14 @@ const SetupWizard = ({ user, onComplete }) => {
           )}
 
           {step === 2 && (
-            <motion.div key="step2" {...containerVariants} className="space-y-8">
+            <motion.div 
+              key="step2" 
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={containerVariants} 
+              className="space-y-8"
+            >
               <div className="space-y-3">
                 <div className="w-16 h-16 bg-emerald-500/10 rounded-3xl flex items-center justify-center border border-emerald-500/20">
                   <Target className="h-8 w-8 text-emerald-500" />
@@ -148,7 +169,14 @@ const SetupWizard = ({ user, onComplete }) => {
           )}
 
           {step === 3 && (
-            <motion.div key="step3" {...containerVariants} className="space-y-8">
+            <motion.div 
+              key="step3" 
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={containerVariants} 
+              className="space-y-8"
+            >
               <div className="space-y-3">
                 <div className="w-16 h-16 bg-emerald-500/10 rounded-3xl flex items-center justify-center border border-emerald-500/20">
                   <Sparkles className="h-8 w-8 text-emerald-500" />
@@ -197,7 +225,14 @@ const SetupWizard = ({ user, onComplete }) => {
           )}
 
           {step === 4 && (
-            <motion.div key="step4" {...containerVariants} className="space-y-8 text-center">
+            <motion.div 
+              key="step4" 
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={containerVariants} 
+              className="space-y-8 text-center"
+            >
               <div className="space-y-3">
                 <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
                   <Trophy className="h-10 w-10 text-emerald-500" />
@@ -240,8 +275,8 @@ const SetupWizard = ({ user, onComplete }) => {
           )}
           <button
             onClick={handleNext}
-            disabled={isSubmitting}
-            className={`flex-[2] py-5 rounded-2xl bg-emerald-500 text-white font-black uppercase tracking-[0.2em] shadow-xl shadow-emerald-500/20 active:scale-95 transition-all flex items-center justify-center gap-3 ${isSubmitting ? 'opacity-70 pointer-events-none' : 'hover:bg-emerald-600'}`}
+            disabled={isSubmitting || !isStepValid()}
+            className={`flex-[2] py-5 rounded-2xl bg-emerald-500 text-white font-black uppercase tracking-[0.2em] shadow-xl shadow-emerald-500/20 active:scale-95 transition-all flex items-center justify-center gap-3 ${isSubmitting || !isStepValid() ? 'opacity-40 grayscale-[0.5] pointer-events-none' : 'hover:bg-emerald-600'}`}
           >
             {isSubmitting ? (
               <span className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

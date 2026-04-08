@@ -85,30 +85,43 @@ const Dashboard = () => {
     }
 
     // Revision Gatekeeper Logic
-    if (progressResult.status === 'fulfilled' && progressResult.value.data.success) {
+    if (progressResult.status === 'fulfilled' && progressResult.value?.data?.success) {
       const prog = progressResult.value.data.progress;
+      
+      // Safety check for RevisionEngine functions
       const locked = typeof isReciteLocked === 'function' ? isReciteLocked(prog) : false;
       setReciteLocked(locked);
       
-      const queue = await getDailyQueue(prog);
-      setRevisionQueue(queue);
+      if (typeof getDailyQueue === 'function') {
+        const queue = await getDailyQueue(prog);
+        setRevisionQueue(queue);
+      }
 
-      // Sheikh Alaa's Proactive Reminders
-      const isAr = authUser?.language === 'ar' || i18n.language === 'ar';
-      notificationService.checkAndRemind(prog, isAr);
+      // Sheikh Alaa's Proactive Reminders logic
+      const isAr = authUser?.language === 'ar' || i18n?.language === 'ar';
+      if (notificationService && typeof notificationService.checkAndRemind === 'function') {
+        notificationService.checkAndRemind(prog, isAr);
+      }
     }
  
-    setDailyVerse(QURAN_VERSES[Math.floor(Math.random() * QURAN_VERSES.length)]);
+    if (QURAN_VERSES && Array.isArray(QURAN_VERSES) && QURAN_VERSES.length > 0) {
+      setDailyVerse(QURAN_VERSES[Math.floor(Math.random() * QURAN_VERSES.length)]);
+    }
  
-    notificationService.requestPermission();
+    if (notificationService && typeof notificationService.requestPermission === 'function') {
+      notificationService.requestPermission();
+    }
   } catch (err) {
-    // This catch only fires for synchronous errors (e.g. QURAN_VERSES undefined)
-    console.error('loadInitialData unexpected error:', err);
+    console.error('loadInitialData unexpected error detail:', {
+      message: err?.message,
+      stack: err?.stack,
+      error: err
+    });
     if (authUser) setUser(authUser);
   } finally {
     setIsLoading(false);
   }
-}, [authUser]);
+}, [authUser, i18n]);
 
   useEffect(() => { loadInitialData(); }, [loadInitialData]);
 
@@ -218,7 +231,7 @@ const Dashboard = () => {
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <Loader2 className="h-10 w-10 text-emerald-500 animate-spin" />
         <p className="text-foreground font-black text-lg animate-pulse">
-          {t('dashboard.syncing') || 'جاري المزامنة...'}
+          {(typeof t === 'function' ? t('dashboard.syncing') : null) || 'جاري المزامنة...'}
         </p>
       </div>
     );

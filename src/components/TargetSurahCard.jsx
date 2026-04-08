@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, PlayCircle } from 'lucide-react';
+import { Sparkles, PlayCircle, Lock } from 'lucide-react';
 
 const TargetSurahCard = ({ surahName, progress, isLocked, itemVariants }) => {
   const { t } = useTranslation();
