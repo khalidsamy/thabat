@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, ShieldCheck, Zap, ArrowRight } from 'lucide-react';
 
-const TodayMissionCard = ({ mission, itemVariants }) => {
+const TodayMissionCard = ({ mission, itemVariants, history = [] }) => {
   const navigate = useNavigate();
   if (!mission) return null;
 
@@ -16,6 +16,15 @@ const TodayMissionCard = ({ mission, itemVariants }) => {
   };
 
   const tasks = [mission.part1, mission.part2].filter(Boolean);
+
+  // Generate weekly activity dots
+  const last7Days = Array(7).fill(false).map((_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    const dStr = d.toISOString().split('T')[0];
+    const dayEntry = history.find(h => h.date.split('T')[0] === dStr);
+    return dayEntry ? dayEntry.pages > 0 : false;
+  });
 
   return (
     <motion.div variants={itemVariants} className="lg:col-span-12">
@@ -31,14 +40,31 @@ const TodayMissionCard = ({ mission, itemVariants }) => {
             <h2 className="text-3xl font-black text-white tracking-tight">Your Spiritual Goals</h2>
           </div>
           
-          <div className="flex items-center gap-4 bg-white/5 p-2 rounded-2xl border border-white/5">
-            <div className="px-4 py-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
-              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Focus</p>
-              <p className="text-sm font-black text-emerald-400 capitalize">{mission.part2?.type.toLowerCase()}</p>
+          <div className="flex items-center gap-6">
+            {/* Weekly Streak Dots */}
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none">Weekly Streak</p>
+              <div className="flex gap-1.5">
+                {last7Days.map((active, i) => (
+                  <div 
+                    key={i} 
+                    className={`w-2.5 h-2.5 rounded-full ${
+                      active ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-white/10'
+                    } ${i === 6 ? 'scale-125 border border-white/20' : ''}`}
+                  />
+                ))}
+              </div>
             </div>
-            <div className="px-4 py-2">
-              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Level</p>
-              <p className="text-sm font-black text-white">{mission.part1?.tag || 'Balanced'}</p>
+
+            <div className="flex items-center gap-4 bg-white/5 p-2 rounded-2xl border border-white/5">
+              <div className="px-4 py-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Focus</p>
+                <p className="text-sm font-black text-emerald-400 capitalize">{mission.part2?.type.toLowerCase()}</p>
+              </div>
+              <div className="px-4 py-2 hidden sm:block">
+                <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Level</p>
+                <p className="text-sm font-black text-white">{mission.part1?.tag || 'Balanced'}</p>
+              </div>
             </div>
           </div>
         </div>

@@ -81,6 +81,17 @@ class NotificationService {
       
       this.send(title, body);
     }
+
+    // Inactivity Nudge (12:00 PM - 4 hours after Morning Goal)
+    if (hours === 12 && !progress.revisionCompletedToday && progress.doneToday === 0) {
+      const title = isArabic ? 'تذكير بالثبات' : 'Nudge: Stay Consistent!';
+      const body = isArabic 
+        ? 'لقد مرت 4 ساعات على ورد الصباح ولم تبدأ بعد. القليل الدائم خير من الكثير المنقطع!'
+        : 'It\'s been 4 hours since your morning goal. 15 minutes now will save your Hifz!';
+      
+      this.send(title, body);
+      localStorage.setItem('thabat_last_remind_hour', hours.toString());
+    }
   }
 }
 
