@@ -113,13 +113,13 @@ const ReciterPicker = ({ isArabic, isOpen, onSelect, selectedReciter, setIsOpen 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsOpen(false)}
-            className="fixed inset-0 z-30 block bg-transparent"
+            className="fixed inset-0 z-[90] block bg-transparent"
           />
           <motion.div
             initial={{ opacity: 0, y: 10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.98 }}
-            className="glass-card-strong absolute inset-x-0 top-[calc(100%+0.75rem)] z-40 overflow-hidden rounded-[1.75rem] p-2"
+            className="glass-card-strong absolute inset-x-0 top-[calc(100%+0.75rem)] z-[100] overflow-hidden rounded-[1.75rem] p-2"
           >
             {RECITERS.map((reciter) => {
               const active = reciter.id === selectedReciter.id;
@@ -750,7 +750,7 @@ const ListeningStation = (props) => {
       </section>
 
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-[340px,minmax(0,1fr)]">
-        <div className="space-y-6">
+        <div className="space-y-6 relative z-20">
           <div className="glass-card rounded-[2rem] p-5 sm:p-6">
             <div className="mb-5 flex items-center gap-3">
               <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500">
