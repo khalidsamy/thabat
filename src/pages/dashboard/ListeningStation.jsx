@@ -173,8 +173,8 @@ const DesktopPlayer = ({
   selectedReciter,
   selectedSurahMeta,
 }) => (
-  <div className={`pointer-events-none fixed bottom-5 z-[54] hidden md:block ${isRtl ? 'left-6 right-24 lg:right-72' : 'left-24 right-6 lg:left-72'}`}>
-    <div className="glass-card-strong pointer-events-auto flex items-center gap-5 rounded-[1.9rem] px-5 py-4">
+  <div className={`pointer-events-none fixed bottom-5 z-[9999] hidden md:block ${isRtl ? 'left-6 right-24 lg:right-72' : 'left-24 right-6 lg:left-72'}`}>
+    <div className="glass-card-strong border-emerald-500/10 pointer-events-auto flex items-center gap-5 rounded-[1.9rem] px-5 py-4">
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span className="eyebrow">{isArabic ? 'محطة الاستماع' : 'Listening Station'}</span>
@@ -262,11 +262,11 @@ const MobilePlayerSheet = ({
   selectedReciter,
   selectedSurahMeta,
 }) => (
-  <div className="fixed inset-x-0 bottom-0 z-[56] md:hidden">
+  <div className="fixed inset-x-0 bottom-0 z-[9999] md:hidden">
     <motion.div
       animate={{ y: isExpanded ? 0 : 96 }}
       transition={{ type: 'spring', stiffness: 280, damping: 28 }}
-      className="glass-card-strong rounded-t-[2rem] border-b-0 px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3"
+      className="glass-card-strong rounded-t-[2rem] border-zinc-700 bg-zinc-900/95 shadow-[0_-8px_40px_rgba(0,0,0,0.5)] border-b-0 px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3"
     >
       <button type="button" onClick={onToggleExpanded} className="mx-auto mb-3 block h-1.5 w-14 rounded-full bg-white/20" />
 
@@ -1037,9 +1037,14 @@ const ListeningStation = (props) => {
         {!isAutoScrollEnabled && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
+            animate={{ 
+                opacity: 1, 
+                scale: 1, 
+                y: 0,
+                bottom: selectedSurahMeta ? "7.5rem" : "2rem" // Slide up when player is active
+            }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            className="sync-fab-container"
+            className="fixed right-6 z-[9998] flex flex-col items-center gap-2"
           >
             <button
               onClick={() => setIsAutoScrollEnabled(true)}
