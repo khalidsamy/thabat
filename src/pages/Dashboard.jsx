@@ -48,9 +48,20 @@ const Dashboard = () => {
   const loadInitialData = useCallback(async () => {
   setIsLoading(true);
   try {
-    const [progressResult, userResult] = await Promise.allSettled([
-      api.get('/progress'),
-      api.get('/user/profile'),
+    // Using individual catch blocks for higher compatibility and specific error tracking
+    const [progressResult, userResult] = await Promise.all([
+      api.get('/progress')
+        .then(res => ({ status: 'fulfilled', value: res }))
+        .catch(err => {
+          console.error('API Error (Progress):', err);
+          return { status: 'rejected', reason: err };
+        }),
+      api.get('/user/profile')
+        .then(res => ({ status: 'fulfilled', value: res }))
+        .catch(err => {
+          console.error('API Error (User):', err);
+          return { status: 'rejected', reason: err };
+        })
     ]);
  
     // Progress — fall back to an empty defaults object so the UI never crashes

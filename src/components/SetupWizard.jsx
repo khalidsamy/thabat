@@ -100,10 +100,10 @@ const SetupWizard = ({ user, onComplete }) => {
           {step === 1 && (
             <motion.div 
               key="step1" 
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={containerVariants} 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
               className="space-y-8"
             >
               <div className="space-y-3">
@@ -123,9 +123,9 @@ const SetupWizard = ({ user, onComplete }) => {
                 ].map((opt) => (
                   <button
                     key={opt.val}
-                    onClick={() => setJuzCount(opt.val)}
+                    onClick={() => typeof setJuzCount === 'function' && setJuzCount(opt.val)}
                     className={`text-left p-6 rounded-3xl border-2 transition-all active:scale-[0.98] ${
-                      formData.hifzStatus?.juzCount === opt.val 
+                      formData?.hifzStatus?.juzCount === opt.val 
                         ? 'border-emerald-500 bg-emerald-500/10 shadow-xl shadow-emerald-500/10' 
                         : 'border-white/5 bg-white/5 hover:bg-white/10'
                     }`}
@@ -141,10 +141,10 @@ const SetupWizard = ({ user, onComplete }) => {
           {step === 2 && (
             <motion.div 
               key="step2" 
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={containerVariants} 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
               className="space-y-8"
             >
               <div className="space-y-3">
@@ -162,15 +162,15 @@ const SetupWizard = ({ user, onComplete }) => {
                 ].map(({ id, label, desc, Icon }) => (
                   <button
                     key={id}
-                    onClick={() => setCurrentGoal(id)}
+                    onClick={() => typeof setCurrentGoal === 'function' && setCurrentGoal(id)}
                     className={`w-full flex items-center gap-6 p-6 rounded-3xl border-2 transition-all text-left ${
-                      formData.currentGoal === id 
+                      formData?.currentGoal === id 
                         ? 'border-emerald-500 bg-emerald-500/10' 
                         : 'border-white/5 bg-white/5 hover:bg-white/10'
                     }`}
                   >
                     <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center">
-                      <Icon className={`h-6 w-6 ${formData.currentGoal === id ? 'text-emerald-500' : 'text-slate-500'}`} />
+                      <Icon className={`h-6 w-6 ${formData?.currentGoal === id ? 'text-emerald-500' : 'text-slate-500'}`} />
                     </div>
                     <div>
                       <p className="font-black text-white">{label}</p>
@@ -185,53 +185,33 @@ const SetupWizard = ({ user, onComplete }) => {
           {step === 3 && (
             <motion.div 
               key="step3" 
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={containerVariants} 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
               className="space-y-8"
             >
               <div className="space-y-3">
                 <div className="w-16 h-16 bg-emerald-500/10 rounded-3xl flex items-center justify-center border border-emerald-500/20">
-                  <Sparkles className="h-8 w-8 text-emerald-500" />
+                  <Flame className="h-8 w-8 text-emerald-500" />
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">Define your capacity.</h2>
-                <p className="text-sm text-slate-400">Be honest with yourself to ensure consistency.</p>
+                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">Define your pace</h2>
+                <p className="text-sm text-slate-400">How much time can you commit daily to reaching your goal?</p>
               </div>
 
               <div className="space-y-6">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-4">Daily New Memorization</p>
-                  <div className="flex gap-3">
-                    {[1, 2, 3, 5].map(n => (
-                      <button
-                        key={n}
-                        onClick={() => setFormData(d => ({ ...d, dailyCapacity: { ...d.dailyCapacity, pages: n } }))}
-                        className={`flex-1 p-5 rounded-2xl border-2 transition-all ${
-                          formData.dailyCapacity.pages === n 
-                            ? 'border-emerald-500 bg-emerald-500/10 text-emerald-500' 
-                            : 'border-white/5 bg-white/5 text-slate-400'
-                        }`}
-                      >
-                        <span className="font-black text-xl">{n}</span>
-                        <span className="block text-[9px] uppercase tracking-tighter mt-1">Pages</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
                   <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-4">Revision Intensity (الورد)</p>
                   <select 
-                    value={formData.revisionIntensity}
+                    value={formData?.revisionIntensity || 'HIZB'}
                     onChange={(e) => setFormData(d => ({ ...d, revisionIntensity: e.target.value }))}
-                    className="w-full bg-white/5 border-2 border-white/5 rounded-2xl p-5 text-white font-bold outline-none focus:border-emerald-500 transition-all"
+                    className="w-full bg-white/5 border-2 border-white/5 rounded-2xl p-5 text-white font-bold outline-none focus:border-emerald-500 transition-all cursor-pointer"
                   >
-                    <option value="HIZB">1 Hizb / Day (Balanced)</option>
-                    <option value="1_JUZ">1 Juz / Day (Strong)</option>
-                    <option value="2_JUZ">2 Juz / Day (Intensive)</option>
-                    <option value="RUB_EL_HIZB">1 Rub' / Day (Light)</option>
-                    <option value="NONE">No Revision Plan (Not Recommended)</option>
+                    <option value="HIZB" className="bg-slate-900">1 Hizb / Day (Balanced)</option>
+                    <option value="1_JUZ" className="bg-slate-900">1 Juz / Day (Strong)</option>
+                    <option value="2_JUZ" className="bg-slate-900">2 Juz / Day (Intensive)</option>
+                    <option value="RUB_EL_HIZB" className="bg-slate-900">1 Rub' / Day (Light)</option>
+                    <option value="NONE" className="bg-slate-900">No Revision Plan (Not Recommended)</option>
                   </select>
                 </div>
               </div>
@@ -241,10 +221,10 @@ const SetupWizard = ({ user, onComplete }) => {
           {step === 4 && (
             <motion.div 
               key="step4" 
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={containerVariants} 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
               className="space-y-8 text-center"
             >
               <div className="space-y-3">
@@ -257,20 +237,20 @@ const SetupWizard = ({ user, onComplete }) => {
                 </p>
               </div>
 
-              <div className="surface-inset p-8 rounded-[2rem] text-left">
+              <div className="surface-inset p-8 rounded-[2rem] text-left border border-white/5 bg-white/[0.02]">
                 <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500/80 mb-6">Your Initial Plan</p>
                 <div className="space-y-4">
                   <div className="flex items-center gap-4">
                     <Check className="h-5 w-5 text-emerald-500" />
-                    <span className="text-white font-medium">Starting with {formData.hifzStatus.juzCount} Juz memorized.</span>
+                    <span className="text-white font-medium">Starting with {formData?.hifzStatus?.juzCount || 0} Juz memorized.</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <Check className="h-5 w-5 text-emerald-500" />
-                    <span className="text-white font-medium">{formData.currentGoal === 'MEMORIZING_NEW' ? 'New Memorization focus.' : 'Stabilization focus.'}</span>
+                    <span className="text-white font-medium">{formData?.currentGoal === 'MEMORIZING_NEW' ? 'New Memorization focus.' : 'Stabilization focus.'}</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <Check className="h-5 w-5 text-emerald-500" />
-                    <span className="text-white font-medium">{formData.dailyCapacity.pages} Pages per day + {formData.revisionIntensity} revision.</span>
+                    <span className="text-white font-medium">Revision intensity: {formData?.revisionIntensity || 'HIZB'}.</span>
                   </div>
                 </div>
               </div>

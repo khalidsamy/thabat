@@ -156,7 +156,16 @@ const ChatAssistant = () => {
     </>
   );
 
-  return portalNode ? createPortal(content, portalNode) : null;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  const targetNode = document.getElementById('chat-portal-root') || document.body;
+  return createPortal(content, targetNode);
 };
 
 export default ChatAssistant;

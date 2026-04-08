@@ -187,14 +187,7 @@ export const getJuzMasteryData = (user, progress) => {
   });
 };
 
-const RevisionEngine = {
-  getDailyQueue,
-  getLinkingVerses,
-  trackError,
-  getHeatmapData,
-  getJuzMasteryData,
-  isReciteLocked
-};
-
-export default RevisionEngine;
+/**
+ * RevisionEngine.js: Standardizing on named exports for production stability.
+ */
 
