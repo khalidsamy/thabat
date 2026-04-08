@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
 import api from '../../services/api';
 import { fetchSurahList } from '../../services/quranApi';
+import LinkingModal from '../../components/LinkingModal';
 
 const RECITERS = [
   {
@@ -368,8 +369,13 @@ const ListeningStation = (props) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [repeatMode, setRepeatMode] = useState('off');
   const [isMobilePlayerExpanded, setIsMobilePlayerExpanded] = useState(false);
+  const [showLinkingChallenge, setShowLinkingChallenge] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showScrollBottom, setShowScrollBottom] = useState(true);
+
+  const nextSurah = useMemo(() => {
+    return surahs.find(s => s.number === selectedSurahNumber + 1);
+  }, [surahs, selectedSurahNumber]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -625,6 +631,11 @@ const ListeningStation = (props) => {
       }
 
       setIsPlaying(false);
+      
+      // Trigger Linking Challenge if there is a next surah
+      if (nextSurah) {
+        setShowLinkingChallenge(true);
+      }
     };
 
     const handleError = () => {
@@ -737,6 +748,12 @@ const ListeningStation = (props) => {
   return (
     <div className="space-y-6 pb-52 md:pb-44">
       <audio ref={audioRef} preload="metadata" />
+
+      <LinkingModal 
+        isOpen={showLinkingChallenge} 
+        onClose={() => setShowLinkingChallenge(false)}
+        nextSurah={nextSurah}
+      />
 
       <section className="glass-card overflow-hidden rounded-[2rem] p-5 sm:p-6 lg:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
