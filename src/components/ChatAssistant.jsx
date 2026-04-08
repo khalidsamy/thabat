@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, Send, X, Bot, User, Loader2, Sparkles, MessageCircle } from 'lucide-react';
 import api from '../services/api';
@@ -13,7 +14,12 @@ const ChatAssistant = () => {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [portalNode, setPortalNode] = useState(null);
   const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    setPortalNode(document.getElementById('chat-portal-root'));
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -33,7 +39,6 @@ const ChatAssistant = () => {
     setIsLoading(true);
 
     try {
-      // We pass the history excluding the last message to the backend
       const res = await api.post('/ai/chat', {
         message: input,
         history: messages.map(m => ({ 
@@ -56,28 +61,25 @@ const ChatAssistant = () => {
     }
   };
 
-  return (
+  const content = (
     <>
-      {/* Floating Toggle Button */}
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed z-[101] bottom-[calc(env(safe-area-inset-bottom)+9.5rem)] right-4 h-12 w-12 sm:bottom-28 sm:right-8 sm:h-14 sm:w-14 bg-emerald-500 text-zinc-950 rounded-full shadow-[0_20px_50px_rgba(16,185,129,0.3)] flex items-center justify-center border-2 border-white/20"
+        className="fixed z-[999] bottom-[calc(env(safe-area-inset-bottom)+9.5rem)] right-4 h-12 w-12 sm:bottom-28 sm:right-8 sm:h-14 sm:w-14 bg-emerald-500 text-zinc-950 rounded-full shadow-[0_20px_50px_rgba(16,185,129,0.3)] flex items-center justify-center border-2 border-white/20"
       >
         {isOpen ? <X className="h-6 w-6" /> : <Sparkles className="h-6 w-6" />}
       </motion.button>
 
-      {/* Chat Panel */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed z-[102] bottom-[calc(env(safe-area-inset-bottom)+14rem)] right-4 left-4 sm:left-auto sm:right-8 sm:w-[400px] h-[500px] sm:h-[600px] bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden"
+            className="fixed z-[1000] bottom-[calc(env(safe-area-inset-bottom)+14rem)] right-4 left-4 sm:left-auto sm:right-8 sm:w-[400px] h-[500px] sm:h-[600px] bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden"
           >
-            {/* Header */}
             <div className="p-6 border-b border-white/10 bg-emerald-500/5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-emerald-500/20 rounded-2xl flex items-center justify-center border border-emerald-500/20">
@@ -96,7 +98,6 @@ const ChatAssistant = () => {
               </button>
             </div>
 
-            {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide">
               {messages.map((m, idx) => (
                 <div key={idx} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -131,7 +132,6 @@ const ChatAssistant = () => {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Area */}
             <form onSubmit={handleSendMessage} className="p-6 border-t border-white/10 bg-white/[0.02]">
               <div className="relative flex items-center px-4 bg-slate-800/50 border border-white/10 rounded-2xl focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all">
                 <input
@@ -155,6 +155,8 @@ const ChatAssistant = () => {
       </AnimatePresence>
     </>
   );
+
+  return portalNode ? createPortal(content, portalNode) : null;
 };
 
 export default ChatAssistant;

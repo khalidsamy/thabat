@@ -24,6 +24,7 @@ import ReviewSession from './pages/ReviewSession';
 import MutashabihatLog from './pages/MutashabihatLog';
 import MutashabihatReview from './pages/MutashabihatReview';
 import Settings from './pages/Settings';
+import ChatAssistant from './components/ChatAssistant';
 
 // Auth Guards
 import ProtectedRoute from './components/ProtectedRoute';
@@ -39,6 +40,7 @@ function App() {
           <Router>
             <div className="min-h-screen bg-background">
               <Toast />
+              <ChatAssistant />
               <Routes>
               {/* Global Root Transition Logic */}
                 <Route path="/" element={<RootRedirect />} />

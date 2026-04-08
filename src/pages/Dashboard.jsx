@@ -269,7 +269,6 @@ const Dashboard = () => {
 
       <HeartMessage isOpen={isHeartOpen} onClose={() => setIsHeartOpen(false)} />
       <MindMapModal isOpen={isMindMapOpen} onClose={() => setIsMindMapOpen(false)} pageNumber={progress?.currentPage} />
-      <ChatAssistant />
     </div>
   );
 };
