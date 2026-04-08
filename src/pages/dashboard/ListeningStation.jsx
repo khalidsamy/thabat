@@ -517,6 +517,7 @@ const ListeningStation = (props) => {
       try {
         const payload = await fetchSurahAudio(selectedSurahNumber, selectedReciter.identifier, controller.signal);
         setSurahPayload(payload);
+        setIsPlaying(true); // DEFINITIVE FIX: Trigger playback immediately on success
       } catch (error) {
         if (!controller.signal.aborted) {
           setLoadError(error.message || 'Unable to stream this Surah right now.');
@@ -548,16 +549,21 @@ const ListeningStation = (props) => {
     }
 
     if (!isPlaying || !currentAyah?.audio) {
-      if (audio.dataset.sourceKey === sourceKey) {
+      if (audio.dataset.sourceKey === sourceKey && !audio.paused) {
         audio.pause();
       }
       return;
     }
 
+    // Playback with safety guard
     const playPromise = audio.play();
     if (playPromise?.catch) {
       playPromise.catch((e) => {
-        if (e.name !== 'AbortError') setIsPlaying(false);
+        // AbortError is normal during rapid navigation - ignore it
+        if (e.name !== 'AbortError' && e.name !== 'NotAllowedError') {
+          console.error("Playback error:", e);
+          setIsPlaying(false);
+        }
       });
     }
   }, [currentAyah?.audio, currentAyahIndex, isPlaying, selectedReciter.identifier, selectedSurahNumber]);
@@ -657,19 +663,25 @@ const ListeningStation = (props) => {
   }, [isMarkedListened, isPlaying, isTargetSurah, refreshData, selectedListenKey, selectedReciter.identifier, selectedReciter.name, selectedSurahMeta]);
 
   const handleSelectSurah = useCallback((surahNumber) => {
-    if (surahNumber === selectedSurahNumber) {
-        // If already playing, just resume if paused
+    if (surahNumber === selectedSurahNumber && surahPayload) {
+        // If already loaded, just toggle play
         setIsPlaying(true);
         return;
     }
 
-    // Reset for fresh start
+    // AGGRESSIVE RESET: Prepare engine for new stream
+    if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = ""; // Clear existing src to prevent cross-contamination
+    }
+
     setSelectedSurahNumber(surahNumber);
     setSurahPayload(null);
     setCurrentAyahIndex(0);
-    setIsPlaying(true); // Auto-play on selection
+    setIsLoadingSurah(true); // Immediate loading state
+    setIsPlaying(false); // Will be set to true by the fetch effect upon success
     setLoadError('');
-  }, [selectedSurahNumber]);
+  }, [selectedSurahNumber, surahPayload]);
 
   const togglePlay = useCallback(() => {
     if (!selectedSurahMeta || isLoadingSurah) return;
