@@ -69,7 +69,7 @@ const SetupWizard = ({ user, onComplete }) => {
     <div className="min-h-[80vh] flex items-center justify-center p-4">
       <motion.div 
         layout
-        className="glass-card w-full max-w-xl rounded-[2.5rem] p-8 sm:p-12 relative overflow-hidden"
+        className="glass-card w-full max-w-xl rounded-[2.5rem] p-6 sm:p-12 relative overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[100px] rounded-full -mr-32 -mt-32" />
         
@@ -82,8 +82,8 @@ const SetupWizard = ({ user, onComplete }) => {
                 <div className="w-16 h-16 bg-emerald-500/10 rounded-3xl flex items-center justify-center border border-emerald-500/20">
                   <Compass className="h-8 w-8 text-emerald-500" />
                 </div>
-                <h2 className="text-3xl font-black text-white leading-tight">Where are you on your journey?</h2>
-                <p className="text-slate-400">Tell us how much of the Holy Quran you have currently memorized.</p>
+                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">Where are you on your journey?</h2>
+                <p className="text-sm text-slate-400">Tell us how much of the Holy Quran you have currently memorized.</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -116,8 +116,8 @@ const SetupWizard = ({ user, onComplete }) => {
                 <div className="w-16 h-16 bg-emerald-500/10 rounded-3xl flex items-center justify-center border border-emerald-500/20">
                   <Target className="h-8 w-8 text-emerald-500" />
                 </div>
-                <h2 className="text-3xl font-black text-white leading-tight">What is your current focus?</h2>
-                <p className="text-slate-400">Choose your primary goal for this season.</p>
+                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">What is your current focus?</h2>
+                <p className="text-sm text-slate-400">Choose your primary goal for this season.</p>
               </div>
 
               <div className="space-y-4">
@@ -153,8 +153,8 @@ const SetupWizard = ({ user, onComplete }) => {
                 <div className="w-16 h-16 bg-emerald-500/10 rounded-3xl flex items-center justify-center border border-emerald-500/20">
                   <Sparkles className="h-8 w-8 text-emerald-500" />
                 </div>
-                <h2 className="text-3xl font-black text-white leading-tight">Define your capacity.</h2>
-                <p className="text-slate-400">Be honest with yourself to ensure consistency.</p>
+                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">Define your capacity.</h2>
+                <p className="text-sm text-slate-400">Be honest with yourself to ensure consistency.</p>
               </div>
 
               <div className="space-y-6">
@@ -202,8 +202,8 @@ const SetupWizard = ({ user, onComplete }) => {
                 <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
                   <Trophy className="h-10 w-10 text-emerald-500" />
                 </div>
-                <h2 className="text-3xl font-black text-white">Commitment is key.</h2>
-                <p className="text-slate-400 leading-relaxed">
+                <h2 className="text-2xl sm:text-3xl font-black text-white">Commitment is key.</h2>
+                <p className="text-sm text-slate-400 leading-relaxed">
                   "The most beloved actions to Allah are those performed consistently, even if they are few."
                 </p>
               </div>

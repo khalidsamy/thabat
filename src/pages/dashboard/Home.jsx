@@ -155,7 +155,7 @@ const Home = (props) => {
                   history={progress?.history || []}
                   onVisualize={onVisualize}
                 />
-                <MasteryHeatmap progress={progress} itemVariants={itemVariants} />
+                <MasteryHeatmap user={user} progress={progress} itemVariants={itemVariants} />
               </>
             )}
           </motion.div>
@@ -198,7 +198,7 @@ const Home = (props) => {
 
           {/* Row 3 - Full Width Progress Visualization */}
           <DashboardLayout.Item cols={12}>
-             <MasteryHeatmap progress={progress} itemVariants={itemVariants} />
+             <MasteryHeatmap user={user} progress={progress} itemVariants={itemVariants} />
           </DashboardLayout.Item>
         </DashboardLayout>
       </div>

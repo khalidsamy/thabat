@@ -4,7 +4,10 @@ import { Sparkles, Heart, Star, Trophy } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const DailyMotivationCard = ({ dailyVerse, itemVariants }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const fallbackArabic = i18n.language === 'ar' ? '«وَقُل رَّبِّ زِدْنِي عِلْمًا»' : '«And say, My Lord, increase me in knowledge»';
+  const fallbackEnglish = i18n.language === 'ar' ? '«And say, My Lord, increase me in knowledge»' : 'And say, My Lord, increase me in knowledge';
 
   return (
     <motion.div 
@@ -20,10 +23,10 @@ const DailyMotivationCard = ({ dailyVerse, itemVariants }) => {
         <div className="relative flex items-center justify-between">
           <div className="flex flex-col">
             <span className="text-[10px] font-black uppercase tracking-[0.4em] mb-1 text-[color:var(--theme-text-muted)]">
-              {t('dashboard.daily_motivation') || 'DAILY MOTIVATION'}
+              {t('dashboard.daily_motivation')}
             </span>
             <h2 className="text-xl font-bold text-foreground tracking-tight">
-              {t('dashboard.daily_verse') || 'Daily Verse'}
+              {t('dashboard.daily_verse')}
             </h2>
           </div>
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center backdrop-blur-md border border-[color:var(--theme-border)] bg-[color:var(--theme-surface-muted)] shadow-xl group-hover:rotate-6 transition-transform">
@@ -34,14 +37,14 @@ const DailyMotivationCard = ({ dailyVerse, itemVariants }) => {
         {/* Content: Verse */}
         <div className="relative py-4 sm:py-6">
           <p className="text-xl sm:text-3xl lg:text-4xl font-extrabold text-foreground leading-[1.4] drop-shadow-sm mb-4 text-center sm:text-right" dir="rtl">
-            {dailyVerse?.arabic || (i18n.language === 'ar' ? '«وَقُل رَّبِّ زِدْنِي عِلْمًا»' : '«And say, My Lord, increase me in knowledge»')}
+            {dailyVerse?.arabic || fallbackArabic}
           </p>
           <div className="flex flex-col items-center sm:items-end gap-2">
             <p className="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-500/80" dir="rtl">
-              — {dailyVerse?.reference}
+              — {dailyVerse?.reference || 'Taha: 114'}
             </p>
             <p className="text-sm sm:text-base font-medium italic leading-relaxed max-w-xl text-center sm:text-right text-[color:var(--theme-text-soft)]">
-              {dailyVerse?.english}
+              {dailyVerse?.english || fallbackEnglish}
             </p>
           </div>
         </div>

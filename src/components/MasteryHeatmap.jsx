@@ -21,7 +21,7 @@ const MasteryHeatmap = ({ user, progress, itemVariants }) => {
 
   return (
     <motion.div variants={itemVariants} className="lg:col-span-12">
-      <div className="glass-card rounded-[2rem] p-6 lg:p-8 overflow-hidden relative">
+      <div className="glass-card rounded-[2rem] p-5 sm:p-6 lg:p-8 overflow-hidden relative">
         <div className="absolute top-0 right-0 p-8 opacity-5">
            <ShieldCheck className="w-32 h-32 text-emerald-500" />
         </div>
@@ -34,7 +34,7 @@ const MasteryHeatmap = ({ user, progress, itemVariants }) => {
               </span>
               <div className="h-px w-8 bg-emerald-500/30"></div>
             </div>
-            <h2 className="text-2xl font-black text-white tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
               خارطة الثبات (Juz Stability)
             </h2>
           </div>
