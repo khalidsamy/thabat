@@ -13,8 +13,9 @@ import { AlertCircle, History, ShieldAlert } from 'lucide-react';
 const Progress = (props) => {
   const { t, i18n } = useTranslation();
   const context = useOutletContext() || {};
-  const { progress, refreshKey, itemVariants } = {
+  const { progress, user, refreshKey, itemVariants } = {
     progress: {}, 
+    user: {},
     ...context, 
     ...props 
   };
@@ -30,6 +31,9 @@ const Progress = (props) => {
 
   return (
     <div className="space-y-8 pb-32">
+      {/* Mastery Heatmap - Priority 1 Visualization */}
+      <MasteryHeatmap user={user} progress={progress} itemVariants={itemVariants} />
+
       {/* Rank and Overall Mastery */}
       <motion.section variants={itemVariants} className="mb-10">
         <div className="flex items-center justify-between mb-6">
