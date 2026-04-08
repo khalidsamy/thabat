@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { FloatingActionProvider } from './context/FloatingActionContext';
+import FloatingActionStack from './components/layout/FloatingActionStack';
 
 import Toast from './components/Toast';
 import { useContext } from 'react';
@@ -35,10 +37,12 @@ import ResponsiveLayout from './components/layout/ResponsiveLayout';
 function App() {
   return (
     <ThemeProvider>
-      <ToastProvider>
+      <FloatingActionProvider>
+        <ToastProvider>
         <AuthProvider>
           <Router>
             <div className="min-h-screen bg-background">
+              <FloatingActionStack />
               <Toast />
               <ChatAssistant />
               <Routes>
@@ -93,7 +97,7 @@ function App() {
             </div>
           </Router>
         </AuthProvider>
-      </ToastProvider>
+      </FloatingActionProvider>
     </ThemeProvider>
   );
 }

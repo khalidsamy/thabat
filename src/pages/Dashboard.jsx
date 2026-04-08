@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext, useCallback, useMemo } from 'react';
+import { useFloatingActionStack } from '../context/FloatingActionContext';
 import { useTranslation } from 'react-i18next';
 import { useLocation, Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -250,6 +251,24 @@ const Dashboard = () => {
     handleVoiceComplete, loadInitialData, shareProgress, reciteLocked, revisionQueue
   ]);
 
+  const { registerElement, unregisterElement } = useFloatingActionStack();
+
+  const heartButton = (
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={() => setIsHeartOpen(true)}
+      className={`pointer-events-auto flex items-center justify-center rounded-3xl border-2 border-white/20 bg-gradient-to-br from-amber-400 to-amber-600 shadow-[0_20px_50px_rgba(245,158,11,0.3)] h-12 w-12 sm:h-14 sm:w-14 ${hasBottomPlayerRoute ? 'hidden sm:flex' : 'flex'}`}
+    >
+      <Heart className="h-5 w-5 fill-white text-white sm:h-6 sm:w-6" />
+    </motion.button>
+  );
+
+  useEffect(() => {
+    registerElement('bottomRight', 'dashboard-heart', heartButton);
+    return () => unregisterElement('bottomRight', 'dashboard-heart');
+  }, [registerElement, unregisterElement, heartButton]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
@@ -281,16 +300,6 @@ const Dashboard = () => {
           {isDashboardRoot ? <Home {...sharedProps} /> : <Outlet context={sharedProps} />}
         </motion.div>
       </AnimatePresence>
-
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setIsHeartOpen(true)}
-        className={`fixed items-center justify-center rounded-3xl border-2 border-white/20 bg-gradient-to-br from-amber-400 to-amber-600 shadow-[0_20px_50px_rgba(245,158,11,0.3)] ${hasBottomPlayerRoute ? 'hidden sm:flex' : 'flex'} bottom-[calc(env(safe-area-inset-bottom)+5.25rem)] right-4 h-12 w-12 sm:bottom-8 sm:right-8 sm:h-14 sm:w-14`}
-        style={{ zIndex: 'var(--z-nav)' }}
-      >
-        <Heart className="h-5 w-5 fill-white text-white sm:h-6 sm:w-6" />
-      </motion.button>
 
       <HeartMessage isOpen={isHeartOpen} onClose={() => setIsHeartOpen(false)} />
       <MindMapModal isOpen={isMindMapOpen} onClose={() => setIsMindMapOpen(false)} pageNumber={progress?.currentPage} />

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useFloatingActionStack } from '../context/FloatingActionContext';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bot, User, Loader2, Sparkles, Send, X } from 'lucide-react';
@@ -67,6 +68,13 @@ const ChatAssistant = () => {
     }
   };
 
+  const { registerElement, unregisterElement } = useFloatingActionStack();
+
+  useEffect(() => {
+    registerElement('bottomLeft', 'chat-assistant', content);
+    return () => unregisterElement('bottomLeft', 'chat-assistant');
+  }, [registerElement, unregisterElement, content]);
+
   // --- RENDER ---
   const content = (
     <>
@@ -74,7 +82,7 @@ const ChatAssistant = () => {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed z-[999] bottom-6 left-6 md:bottom-8 md:left-8 h-14 w-14 bg-emerald-500 text-zinc-950 rounded-full shadow-[0_20px_50px_rgba(16,185,129,0.3)] flex items-center justify-center border-2 border-white/20 active:scale-90 transition-transform"
+        className="pointer-events-auto h-14 w-14 bg-emerald-500 text-zinc-950 rounded-full shadow-[0_20px_50px_rgba(16,185,129,0.3)] flex items-center justify-center border-2 border-white/20 active:scale-90 transition-transform"
       >
         {isOpen ? <X className="h-6 w-6" /> : <Sparkles className="h-6 w-6" />}
       </motion.button>
@@ -85,7 +93,7 @@ const ChatAssistant = () => {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed z-[1000] bottom-24 left-4 right-4 md:left-8 md:right-auto md:w-[400px] h-[550px] md:h-[650px] bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden max-h-[75vh]"
+            className="fixed bottom-24 left-4 right-4 md:left-8 md:right-auto md:w-[400px] h-[550px] md:h-[650px] bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden max-h-[75vh] pointer-events-auto"
           >
             {/* Header */}
             <div className="p-6 border-b border-white/10 bg-emerald-500/5 flex items-center justify-between" dir="rtl">
@@ -168,8 +176,7 @@ const ChatAssistant = () => {
 
   if (!mounted) return null;
 
-  const targetNode = document.getElementById('chat-portal-root') || document.body;
-  return createPortal(content, targetNode);
+  return null; // Rendered via FloatingActionStack
 };
 
 export default ChatAssistant;
