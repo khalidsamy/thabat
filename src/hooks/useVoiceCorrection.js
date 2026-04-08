@@ -78,13 +78,12 @@ export const useVoiceCorrection = (targetVerses = [], _onComplete) => {
     
     setMatches(prev => {
       const updated = [...prev];
-      const threshold = 0.75; // Balanced Similarity Threshold (was 0.8)
+      const threshold = 0.72; // Refined threshold for Arabic STT
       let localIndex = currentIndex;
       
       speechWords.forEach(sWord => {
         if (localIndex >= updated.length || errorDetected) return;
 
-        // Visual match for debugging
         const targetWordNormalized = updated[localIndex].normalized;
         const currentSim = getSimilarity(targetWordNormalized, sWord);
         
@@ -92,39 +91,35 @@ export const useVoiceCorrection = (targetVerses = [], _onComplete) => {
             updated[localIndex].status = 'correct';
             localIndex++;
         } else {
-            // 2. Try to match the NEXT word (handle single-word skip)
+            // Check next word for single skip
             const nextIdx = localIndex + 1;
             if (nextIdx < updated.length) {
                 const nextSim = getSimilarity(updated[nextIdx].normalized, sWord);
                 if (nextSim >= threshold) {
-                    // Mark current as 'wrong' (skipped/mistake) and next as 'correct'
                     updated[localIndex].status = 'wrong';
                     updated[nextIdx].status = 'correct';
-                    errorDetected = true; // Error found
-                    if (onError) onError(updated[localIndex].text); // Alert trigger
+                    errorDetected = true;
+                    if ('vibrate' in navigator) navigator.vibrate(300); // Haptic!
+                    if (onError) onError(updated[localIndex].text);
                     localIndex = nextIdx + 1;
                 } else {
-                    // 3. This is a clear mistake on the current word
                     updated[localIndex].status = 'wrong';
-                    errorDetected = true; // Error found
-                    if (onError) onError(updated[localIndex].text); // Alert trigger
-                    // Stop index here - forcing repetition
+                    errorDetected = true;
+                    if ('vibrate' in navigator) navigator.vibrate(300); // Haptic!
+                    if (onError) onError(updated[localIndex].text);
                 }
             } else {
                 updated[localIndex].status = 'wrong';
-                errorDetected = true; // Error found
+                errorDetected = true;
+                if ('vibrate' in navigator) navigator.vibrate(300); // Haptic!
                 if (onError) onError(updated[localIndex].text);
             }
         }
       });
       
       setCurrentIndex(localIndex);
-
-      const totalWords = updated.length;
-      const correctCount = updated.filter(m => m.status === 'correct').length;
-      const score = totalWords > 0 ? Math.round((correctCount / totalWords) * 100) : 0;
+      const score = Math.round((updated.filter(m => m.status === 'correct').length / updated.length) * 100);
       setMasteryScore(score);
-
       return updated;
     });
 
