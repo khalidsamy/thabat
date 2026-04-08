@@ -14,9 +14,21 @@
   --color-destructive: #ef4444;
   --color-border: var(--theme-border);
   --breakpoint-xs: 24.375rem;
+
+  /* Z-Index Scale: The Source of Truth */
+  --z-base: 0;
+  --z-nav: 50;
+  --z-toast: 100;
+  --z-modal: 200;
+  --z-overlay: 300;
+  --z-assistant: 999;
 }
 
 @layer base {
+  #root {
+    isolation: isolate;
+  }
+  
   * {
     border-color: var(--color-border);
     scrollbar-color: rgba(52, 211, 153, 0.3) transparent;
