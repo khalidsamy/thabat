@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BarChart3, Sparkles } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
@@ -9,16 +9,35 @@ import MemorizedGaugeCard from '../../components/MemorizedGaugeCard';
 import NextInQueueCard from '../../components/NextInQueueCard';
 import MasteryHeatmap from '../../components/MasteryHeatmap';
 import HifzStreaks from '../../components/HifzStreaks';
+import SetupWizard from '../../components/SetupWizard';
+import TodayMissionCard from '../../components/TodayMissionCard';
+import { generateTodayMission } from '../../utils/DailyTaskGenerator';
 
 const MOBILE_VIEWS = [
-  { id: 'focus', label: 'Focus Deck', icon: Sparkles },
-  { id: 'metrics', label: 'Metrics', icon: BarChart3 },
+  { id: 'focus', label: 'Today\'s Mission', icon: Sparkles },
+  { id: 'metrics', label: 'Growth Stats', icon: BarChart3 },
 ];
 
 const Home = (props) => {
   const context = useOutletContext() || {};
-  const { progress, user, dailyVerse, itemVariants, onVisualize, isReciteLocked, revisionQueue } = { progress: {}, user: {}, ...context, ...props };
+  const { 
+    progress, 
+    user, 
+    dailyVerse, 
+    itemVariants, 
+    onVisualize, 
+    isReciteLocked, 
+    revisionQueue,
+    refreshData 
+  } = { progress: {}, user: {}, ...context, ...props };
+  
   const [mobileView, setMobileView] = useState('focus');
+
+  const mission = useMemo(() => generateTodayMission(user, progress), [user, progress]);
+
+  if (user && !user.setupCompleted) {
+    return <SetupWizard user={user} onComplete={refreshData} />;
+  }
 
   const isCompletedToday = progress?.revisionCompletedToday;
 
@@ -54,15 +73,10 @@ const Home = (props) => {
           >
             {mobileView === 'focus' ? (
               <>
-                <NextInQueueCard 
-                  queue={revisionQueue} 
-                  isLocked={isReciteLocked} 
-                  isCompleted={isCompletedToday}
-                  itemVariants={itemVariants} 
-                />
+                <TodayMissionCard mission={mission} itemVariants={itemVariants} />
                 <DailyMotivationCard dailyVerse={dailyVerse} itemVariants={itemVariants} />
                 <TargetSurahCard
-                  surahName={progress?.currentSurahName || user?.currentTargetSurah || (isArabic ? 'سورة البقرة' : 'Al-Baqara')}
+                  surahName={progress?.currentSurahName || user?.currentTargetSurah || 'Al-Baqara'}
                   progress={progress?.masteryPercent || 0}
                   isLocked={isReciteLocked}
                   itemVariants={itemVariants}
@@ -89,47 +103,42 @@ const Home = (props) => {
 
       <div className="hidden lg:block">
         <DashboardLayout>
-        {/* Row 0 - Revision Gateway */}
-        <NextInQueueCard 
-            queue={revisionQueue} 
-            isLocked={isReciteLocked} 
-            isCompleted={isCompletedToday}
-            itemVariants={itemVariants} 
-        />
+          {/* Main Mission Control */}
+          <TodayMissionCard mission={mission} itemVariants={itemVariants} />
 
-        {/* Row 1 — 8/4: wide motivation card + compact target tracker */}
-        <DashboardLayout.Item cols={8}>
-          <DailyMotivationCard dailyVerse={dailyVerse} itemVariants={itemVariants} />
-        </DashboardLayout.Item>
-        <DashboardLayout.Item cols={4}>
-          <TargetSurahCard
-            surahName={progress?.currentSurahName || user?.currentTargetSurah}
-            progress={progress?.masteryPercent || 0}
-            isLocked={isReciteLocked}
-            itemVariants={itemVariants}
-          />
-        </DashboardLayout.Item>
+          {/* Row 1 — 8/4: wide motivation card + compact target tracker */}
+          <DashboardLayout.Item cols={8}>
+            <DailyMotivationCard dailyVerse={dailyVerse} itemVariants={itemVariants} />
+          </DashboardLayout.Item>
+          <DashboardLayout.Item cols={4}>
+            <TargetSurahCard
+              surahName={progress?.currentSurahName || user?.currentTargetSurah}
+              progress={progress?.masteryPercent || 0}
+              isLocked={isReciteLocked}
+              itemVariants={itemVariants}
+            />
+          </DashboardLayout.Item>
 
-        {/* Row 2 — 6/6 */}
-        <DashboardLayout.Item cols={6}>
-          <MemorizedGaugeCard percentage={progress?.masteryPercent || 0} itemVariants={itemVariants} />
-        </DashboardLayout.Item>
-        <DashboardLayout.Item cols={6}>
-          <HifzStreaks
-            streak={progress?.streak}
-            isCompletedToday={progress?.doneToday >= progress?.dailyTarget}
-            wasActiveYesterday={progress?.streak > 0}
-            currentSurah={progress?.currentSurahName || user?.currentTargetSurah}
-            completion={progress?.masteryPercent || 0}
-            history={progress?.history || []}
-            onVisualize={onVisualize}
-          />
-        </DashboardLayout.Item>
+          {/* Row 2 — 6/6 */}
+          <DashboardLayout.Item cols={6}>
+            <MemorizedGaugeCard percentage={progress?.masteryPercent || 0} itemVariants={itemVariants} />
+          </DashboardLayout.Item>
+          <DashboardLayout.Item cols={6}>
+            <HifzStreaks
+              streak={progress?.streak}
+              isCompletedToday={progress?.doneToday >= progress?.dailyTarget}
+              wasActiveYesterday={progress?.streak > 0}
+              currentSurah={progress?.currentSurahName || user?.currentTargetSurah}
+              completion={progress?.masteryPercent || 0}
+              history={progress?.history || []}
+              onVisualize={onVisualize}
+            />
+          </DashboardLayout.Item>
 
-        {/* Row 3 - Full Width Progress Visualization */}
-        <DashboardLayout.Item cols={12}>
-           <MasteryHeatmap progress={progress} itemVariants={itemVariants} />
-        </DashboardLayout.Item>
+          {/* Row 3 - Full Width Progress Visualization */}
+          <DashboardLayout.Item cols={12}>
+             <MasteryHeatmap progress={progress} itemVariants={itemVariants} />
+          </DashboardLayout.Item>
         </DashboardLayout>
       </div>
     </div>

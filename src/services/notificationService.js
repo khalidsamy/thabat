@@ -41,10 +41,21 @@ class NotificationService {
 
     // Morning Goal (8:00 AM)
     if (hours === this.morningTime && !progress.revisionCompletedToday) {
-      const title = isArabic ? 'صباح الخير! ابدأ وردك اليومي' : 'Good Morning! Start your daily Wird';
+      const title = isArabic ? 'Assalamu Alaikum! ابدأ وردك اليومي' : 'Assalamu Alaikum! Today\'s goal is 1 Juz.';
       const body = isArabic 
-        ? `أنت على خطة ${progress.revisionGoal}. لا تنسى إتمام ورد المراجعة اليوم.`
-        : `You are on the ${progress.revisionGoal} plan. Don't forget to complete your revision today.`;
+        ? `أنت على خطة ${progress.revisionGoal}. ابدأ الآن لتبقى على المسار الصحيح!`
+        : `Start now to stay on track with your ${progress.revisionGoal} goal!`;
+      
+      this.send(title, body);
+      localStorage.setItem('thabat_last_remind_hour', hours.toString());
+    }
+
+    // Mid-day Nudge (2:00 PM / 14:00)
+    if (hours === 14 && !progress.revisionCompletedToday) {
+      const title = isArabic ? 'تذكير منتصف اليوم' : 'Mid-day Nudge';
+      const body = isArabic 
+        ? 'لم تسجل وردك بعد. 15 دقيقة الآن ستبقي حفظك ثابتاً!'
+        : 'You haven\'t logged your revision yet. 15 minutes now will save your Hifz!';
       
       this.send(title, body);
       localStorage.setItem('thabat_last_remind_hour', hours.toString());
@@ -59,6 +70,16 @@ class NotificationService {
       
       this.send(title, body);
       localStorage.setItem('thabat_last_remind_hour', hours.toString());
+    }
+
+    // Streak Milestone (7, 30, 100 days)
+    if (progress.streak > 0 && [7, 30, 100].includes(progress.streak)) {
+      const title = isArabic ? 'تحفيز الثبات!' : 'Thabat Streak!';
+      const body = isArabic
+        ? `ما شاء الله! لقد أتممت ${progress.streak} أيام من الاستمرارية.`
+        : `MashaAllah! You've reached a ${progress.streak} days streak. Consistency is your strength!`;
+      
+      this.send(title, body);
     }
   }
 }
